@@ -1,0 +1,7 @@
+#
+# Introspection on the system
+#
+select *
+where {
+  graph eng:describe { bind(st:atw(st:turtle) as ?q) }
+}

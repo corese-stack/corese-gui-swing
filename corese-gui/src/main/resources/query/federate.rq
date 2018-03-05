@@ -1,0 +1,11 @@
+#
+# Federated query on several SPARQL endpoints
+#
+@service <http://fr.dbpedia.org/sparql>
+@service <http://dbpedia.org/sparql>
+
+select distinct ?l where {                        
+    ?x rdfs:label 'Paris'@fr, ?l
+    filter langMatches(lang(?l), 'en')
+}
+order by ?l
