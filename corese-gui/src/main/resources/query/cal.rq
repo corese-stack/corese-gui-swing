@@ -1,0 +1,15 @@
+#
+# Compute the day of a date
+# http://fr.wikipedia.org/wiki/Détermination_du_jour
+#
+# Olivier Corby - Wimmics, Inria, I3S - 2015
+#
+prefix spqr: <http://ns.inria.fr/sparql-extension/spqr/>
+select 
+
+(xt:jour(now()) as ?j)
+(xt:day("2001-01-01"^^xsd:date) as ?d)
+(spqr:romain(1959) as ?s)
+(spqr:digit("CIX") as ?c)
+
+where  {}

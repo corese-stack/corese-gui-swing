@@ -1,0 +1,10 @@
+template {
+  st:number() " " ?p " : " ?v
+}
+where {
+  graph eng:describe {
+    [] kg:index 0 ; 
+       kg:item [ rdf:predicate ?p ; rdf:value ?v ]     
+  }
+}
+order by desc(?v) ?p
