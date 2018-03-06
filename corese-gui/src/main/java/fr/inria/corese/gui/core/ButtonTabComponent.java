@@ -1,4 +1,4 @@
-package fr.inria.acacia.corese.gui.core;
+package fr.inria.corese.gui.core;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;

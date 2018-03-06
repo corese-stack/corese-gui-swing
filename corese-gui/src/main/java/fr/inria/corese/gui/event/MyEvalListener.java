@@ -1,6 +1,6 @@
-package fr.inria.acacia.corese.gui.event;
+package fr.inria.corese.gui.event;
 
-import fr.inria.acacia.corese.gui.core.MainFrame;
+import fr.inria.corese.gui.core.MainFrame;
 import fr.inria.edelweiss.kgram.event.EvalListener;
 
 

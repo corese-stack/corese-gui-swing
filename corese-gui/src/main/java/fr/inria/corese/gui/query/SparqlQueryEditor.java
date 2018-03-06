@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.acacia.corese.gui.query;
+package fr.inria.corese.gui.query;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,8 +38,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
-import fr.inria.acacia.corese.gui.core.CompoundUndoManager;
-import fr.inria.acacia.corese.gui.core.MainFrame;
+import fr.inria.corese.gui.core.CompoundUndoManager;
+import fr.inria.corese.gui.core.MainFrame;
 
 /**
  *

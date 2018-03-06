@@ -1,4 +1,4 @@
-package fr.inria.acacia.corese.gui.query;
+package fr.inria.corese.gui.query;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import fr.inria.acacia.corese.api.IDatatype;
 import fr.inria.acacia.corese.cg.datatype.DatatypeMap;
 
 import fr.inria.acacia.corese.exceptions.EngineException;
-import fr.inria.acacia.corese.gui.core.Command;
+import fr.inria.corese.gui.core.Command;
 import fr.inria.acacia.corese.triple.parser.ASTQuery;
 import fr.inria.edelweiss.engine.core.Engine;
 import fr.inria.edelweiss.engine.model.api.Bind;
