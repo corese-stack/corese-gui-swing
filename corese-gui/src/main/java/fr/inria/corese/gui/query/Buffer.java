@@ -1,4 +1,4 @@
-package fr.inria.acacia.corese.gui.query;
+package fr.inria.corese.gui.query;
 
 import java.util.Hashtable;
 

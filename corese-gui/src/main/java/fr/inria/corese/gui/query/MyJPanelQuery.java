@@ -1,4 +1,4 @@
-package fr.inria.acacia.corese.gui.query;
+package fr.inria.corese.gui.query;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,7 +34,7 @@ import javax.swing.undo.CannotUndoException;
 
 import fr.inria.acacia.corese.api.IDatatype;
 import fr.inria.acacia.corese.exceptions.EngineException;
-import fr.inria.acacia.corese.gui.core.MainFrame;
+import fr.inria.corese.gui.core.MainFrame;
 import fr.inria.acacia.corese.triple.parser.ASTQuery;
 import fr.inria.acacia.corese.triple.parser.NSManager;
 import fr.inria.edelweiss.kgenv.parser.Pragma;

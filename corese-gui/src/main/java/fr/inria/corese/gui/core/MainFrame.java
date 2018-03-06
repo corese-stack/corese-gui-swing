@@ -1,6 +1,6 @@
-package fr.inria.acacia.corese.gui.core;
+package fr.inria.corese.gui.core;
 
-import fr.inria.acacia.corese.gui.query.MyJPanelQuery;
+import fr.inria.corese.gui.query.MyJPanelQuery;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -40,9 +40,9 @@ import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 
 import fr.inria.acacia.corese.exceptions.EngineException;
-import fr.inria.acacia.corese.gui.event.MyEvalListener;
-import fr.inria.acacia.corese.gui.query.Buffer;
-import fr.inria.acacia.corese.gui.query.GraphEngine;
+import fr.inria.corese.gui.event.MyEvalListener;
+import fr.inria.corese.gui.query.Buffer;
+import fr.inria.corese.gui.query.GraphEngine;
 import fr.inria.corese.kgtool.workflow.Data;
 import fr.inria.corese.kgtool.workflow.WorkflowParser;
 import fr.inria.corese.kgtool.workflow.SemanticWorkflow;

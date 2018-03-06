@@ -1,4 +1,4 @@
-package fr.inria.acacia.corese.gui.query;
+package fr.inria.corese.gui.query;
 
 import java.util.Date;
 
@@ -6,8 +6,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import fr.inria.acacia.corese.exceptions.EngineException;
-import fr.inria.acacia.corese.gui.core.MainFrame;
-import fr.inria.acacia.corese.gui.event.MyEvalListener;
+import fr.inria.corese.gui.core.MainFrame;
+import fr.inria.corese.gui.event.MyEvalListener;
 import fr.inria.acacia.corese.triple.parser.NSManager;
 import fr.inria.edelweiss.kgram.core.Mappings;
 import fr.inria.edelweiss.kgram.core.Query;

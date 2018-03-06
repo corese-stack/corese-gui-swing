@@ -3,9 +3,9 @@
  * and open the template in the editor.
  */
 
-package fr.inria.acacia.corese.gui.core;
+package fr.inria.corese.gui.core;
 
-import fr.inria.acacia.corese.gui.query.GraphEngine;
+import fr.inria.corese.gui.query.GraphEngine;
 
 
 /**
