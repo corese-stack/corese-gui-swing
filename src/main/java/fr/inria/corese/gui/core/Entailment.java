@@ -4,7 +4,7 @@ import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.rule.RuleError;
 import fr.inria.corese.gui.query.GraphEngine;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -13,9 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-//import fr.inria.corese.sparql.gui.event.MyLoadListener;
-//import fr.inria.corese.sparql.gui.event.MyQueryListener;
-import fr.inria.corese.kgram.event.Event;
+//import fr.inria.corese.core.sparql.gui.event.MyLoadListener;
+//import fr.inria.corese.core.sparql.gui.event.MyQueryListener;
+import fr.inria.corese.core.kgram.event.Event;
 
 public class JFrameDebug extends JFrame{
 

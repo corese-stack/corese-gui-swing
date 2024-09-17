@@ -4,9 +4,9 @@ import java.util.Hashtable;
 
 import javax.swing.JOptionPane;
 
-import fr.inria.corese.kgram.event.Event;
-import fr.inria.corese.kgram.event.EventImpl;
-import fr.inria.corese.kgram.event.User;
+import fr.inria.corese.core.kgram.event.Event;
+import fr.inria.corese.core.kgram.event.EventImpl;
+import fr.inria.corese.core.kgram.event.User;
 
 /**
  * Synchronized buffer to interact with GUI & Listener

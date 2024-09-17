@@ -3,9 +3,9 @@ package fr.inria.corese.gui.query;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphDistance;
 import fr.inria.corese.gui.core.MainFrame;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
 import org.json.JSONObject;
 
 /**

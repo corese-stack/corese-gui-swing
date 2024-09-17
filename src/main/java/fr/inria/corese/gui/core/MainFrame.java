@@ -92,14 +92,14 @@ import fr.inria.corese.gui.event.MyEvalListener;
 import fr.inria.corese.gui.query.Buffer;
 import fr.inria.corese.gui.query.GraphEngine;
 import fr.inria.corese.gui.query.MyJPanelQuery;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.event.Event;
-import fr.inria.corese.shex.shacl.Shex;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.exceptions.SafetyException;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.event.Event;
+import fr.inria.corese.core.shex.shacl.Shex;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 
 /**
  * Fenêtre principale, avec le conteneur d'onglets et le menu
@@ -774,7 +774,7 @@ public class MainFrame extends JFrame implements ActionListener {
         // coreseBox = new JRadioButton("Corese - SPARQL 1.1");
         // coreseBox.setSelected(true);
         // coreseBox.addActionListener(this);system
-        kgramBox = new JRadioButton("Corese/Kgram SPARQL 1.1");
+        kgramBox = new JRadioButton("Corese.Core.Kgram SPARQL 1.1");
         kgramBox.setSelected(true);
         kgramBox.addActionListener(this);
         comment = new JMenuItem("Comment");

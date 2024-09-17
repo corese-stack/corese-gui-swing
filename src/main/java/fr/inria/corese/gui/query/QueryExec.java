@@ -3,16 +3,16 @@ package fr.inria.corese.gui.query;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Dataset;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.event.EventListener;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Dataset;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.EventListener;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.kgram.core.SparqlException;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 
 /**
  * Evaluator of SPARQL query by KGRAM Implement KGRAM on top of Corese with

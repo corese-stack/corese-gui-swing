@@ -4,12 +4,12 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.ProviderService;
 import fr.inria.corese.core.query.ResultMessage;
 import fr.inria.corese.gui.core.MainFrame;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.triple.cst.LogKey;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Context;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.triple.cst.LogKey;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Context;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import java.util.List;
 import org.json.JSONObject;
 

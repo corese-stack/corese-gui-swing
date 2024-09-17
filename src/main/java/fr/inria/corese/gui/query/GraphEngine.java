@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.inria.corese.compiler.eval.QuerySolverVisitor;
+import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphStore;
@@ -33,12 +33,12 @@ import fr.inria.corese.core.util.Parameter;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.util.Tool;
 import fr.inria.corese.gui.core.Command;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Access;
-import fr.inria.corese.sparql.triple.parser.Constant;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
 
 /**
  * Lite implementation of IEngine using kgraph and kgram

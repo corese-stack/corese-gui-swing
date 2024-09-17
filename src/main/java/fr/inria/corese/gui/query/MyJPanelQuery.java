@@ -48,7 +48,7 @@ import org.graphstream.ui.layout.springbox.implementations.LinLog;
 import org.graphstream.ui.swingViewer.View;
 import org.graphstream.ui.swingViewer.Viewer;
 
-import fr.inria.corese.compiler.parser.Pragma;
+import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
@@ -60,19 +60,19 @@ import fr.inria.corese.core.util.CompareMappings;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.util.SPINProcess;
 import fr.inria.corese.gui.core.MainFrame;
-import fr.inria.corese.kgram.api.core.ExpType;
-import fr.inria.corese.kgram.core.Mapping;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.core.SparqlException;
-import fr.inria.corese.sparql.api.IDatatype;
-import fr.inria.corese.sparql.datatype.RDF;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.function.term.Binding;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.kgram.api.core.ExpType;
+import fr.inria.corese.core.kgram.core.Mapping;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.sparql.api.IDatatype;
+import fr.inria.corese.core.sparql.datatype.RDF;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.function.term.Binding;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 
 /**
  * Onglet Query avec tout ce qu'il contient.
@@ -527,7 +527,7 @@ public final class MyJPanelQuery extends JPanel {
         sparqlQueryEditor.setQueryText(newRequest);
     }
 
-    private String getLabel(NSManager nsm, fr.inria.corese.kgram.api.core.Node n) {
+    private String getLabel(NSManager nsm, fr.inria.corese.core.kgram.api.core.Node n) {
         IDatatype dt = n.getValue();
         if (dt.isURI()) {
             return nsm.toPrefix(n.getLabel());
@@ -631,7 +631,7 @@ public final class MyJPanelQuery extends JPanel {
     void fillTable(Mappings map, int sort) {
         Query q = map.getQuery();
         ASTQuery ast = q.getAST();
-        List<fr.inria.corese.kgram.api.core.Node> vars = q.getSelect();
+        List<fr.inria.corese.core.kgram.api.core.Node> vars = q.getSelect();
         if (q.isUpdate() && map.size() > 0) {
             vars = map.get(0).getQueryNodeList();
         }
@@ -645,7 +645,7 @@ public final class MyJPanelQuery extends JPanel {
         }
         model.addColumn("num", col);
 
-        for (fr.inria.corese.kgram.api.core.Node var : vars) {
+        for (fr.inria.corese.core.kgram.api.core.Node var : vars) {
             if (accept(ast, var.getLabel())) {
                 String columnName = var.getLabel();
                 // System.out.println(sv);
@@ -656,7 +656,7 @@ public final class MyJPanelQuery extends JPanel {
                         break;
                     }
                     Mapping m = map.get(j);
-                    fr.inria.corese.kgram.api.core.Node value = m.getNode(columnName);
+                    fr.inria.corese.core.kgram.api.core.Node value = m.getNode(columnName);
 
                     if (value != null) {
                         IDatatype dt = value.getValue();
@@ -829,7 +829,7 @@ public final class MyJPanelQuery extends JPanel {
      * template return turtle graph description display as graph
      */
     void display(Mappings map, NSManager nsm) {
-        fr.inria.corese.kgram.api.core.Node res = map.getTemplateResult();
+        fr.inria.corese.core.kgram.api.core.Node res = map.getTemplateResult();
         if (res != null) {
             fr.inria.corese.core.Graph g = fr.inria.corese.core.Graph.create();
             Load ld = Load.create(g);
@@ -897,10 +897,10 @@ public final class MyJPanelQuery extends JPanel {
 
         MultiGraph graph = new MultiGraph(g.getName(), false, true);
 
-        for (fr.inria.corese.kgram.api.core.Edge ent : g.getEdges()) {
-            fr.inria.corese.kgram.api.core.Edge edge = ent.getEdge();
-            fr.inria.corese.kgram.api.core.Node n1 = edge.getNode(0);
-            fr.inria.corese.kgram.api.core.Node n2 = edge.getNode(1);
+        for (fr.inria.corese.core.kgram.api.core.Edge ent : g.getEdges()) {
+            fr.inria.corese.core.kgram.api.core.Edge edge = ent.getEdge();
+            fr.inria.corese.core.kgram.api.core.Node n1 = edge.getNode(0);
+            fr.inria.corese.core.kgram.api.core.Node n2 = edge.getNode(1);
 
             sujetUri = n1.getLabel();
             objetUri = n2.getLabel();
@@ -939,7 +939,7 @@ public final class MyJPanelQuery extends JPanel {
         return graph;
     }
 
-    void style(fr.inria.corese.kgram.api.core.Node n, Node gn) {
+    void style(fr.inria.corese.core.kgram.api.core.Node n, Node gn) {
         if (n.isBlank()) {
             gn.setAttribute("ui.class", "Blank");
         } else if (n.getDatatypeValue().isLiteral()) {
@@ -947,7 +947,7 @@ public final class MyJPanelQuery extends JPanel {
         }
     }
 
-    private boolean isStyle(fr.inria.corese.kgram.api.core.Edge edge) {
+    private boolean isStyle(fr.inria.corese.core.kgram.api.core.Edge edge) {
         return edge.getEdgeLabel().equals(KGSTYLE);
     }
 
@@ -961,8 +961,8 @@ public final class MyJPanelQuery extends JPanel {
             // Pour chaque variable du résultat on ajoute une feuille contenant le nom de la
             // variable et sa valeur
 
-            for (fr.inria.corese.kgram.api.core.Node var : map.getSelect()) {
-                fr.inria.corese.kgram.api.core.Node node = res.getNode(var);
+            for (fr.inria.corese.core.kgram.api.core.Node var : map.getSelect()) {
+                fr.inria.corese.core.kgram.api.core.Node node = res.getNode(var);
                 if (node != null) {
                     x.add(new DefaultMutableTreeNode(var.getLabel()));
                     x.add(new DefaultMutableTreeNode(node.getValue().toString()));

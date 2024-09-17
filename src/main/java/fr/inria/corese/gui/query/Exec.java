@@ -1,25 +1,25 @@
 package fr.inria.corese.gui.query;
 
-import fr.inria.corese.compiler.federate.FederateVisitor;
+import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.gui.core.MainFrame;
 import fr.inria.corese.gui.event.MyEvalListener;
-import fr.inria.corese.sparql.triple.parser.NSManager;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.kgram.core.Query;
-import fr.inria.corese.kgram.event.Event;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.core.Query;
+import fr.inria.corese.core.kgram.event.Event;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.util.SPINProcess;
 import fr.inria.corese.core.util.Tool;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
 import org.apache.logging.log4j.Level;
 
 /**

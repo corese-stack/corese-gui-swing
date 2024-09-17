@@ -10,7 +10,7 @@ import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.gui.core.MainFrame;
 import fr.inria.corese.gui.editor.pane.EditorPane;
 import fr.inria.corese.gui.editor.pane.ResultPane;
-import fr.inria.corese.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 public class LoadButton extends Button {
 

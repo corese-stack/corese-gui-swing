@@ -4,40 +4,40 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>fr.inria.corese</groupId>
-		<artifactId>corese-parent</artifactId>
-		<version>${revision}</version>
-		<relativePath>..</relativePath>
-	</parent>
-	<artifactId>corese-gui</artifactId>
 	<name>corese-gui</name>
-	<!--        <properties>
-            <maven.test.skip>true</maven.test.skip>
-        </properties>-->
+	<groupId>fr.inria.corese</groupId>
+	<artifactId>corese-gui</artifactId>
+	<version>4.5.1</version>
+
+	<properties>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+
+		<log4j2.version>2.18.0</log4j2.version>
+		<slf4j.version>1.8.0-beta2</slf4j.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>shex</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
+			<groupId>fr.inria.corese</groupId>
 			<artifactId>corese-rdf4j</artifactId>
+			<version>4.5.1</version>
 		</dependency>
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
+			<groupId>fr.inria.corese</groupId>
 			<artifactId>corese-jena</artifactId>
-			<version>${revision}</version>
+			<version>4.5.1</version>
 		</dependency>
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
+			<groupId>fr.inria.corese</groupId>
 			<artifactId>corese-core</artifactId>
-			<version>${revision}</version>
+			<version>4.5.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.graphstream</groupId>
 			<artifactId>gs-core</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jena</groupId>
@@ -57,22 +57,27 @@
 		<dependency>
 			<groupId>org.graphstream</groupId>
 			<artifactId>gs-ui</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
+			<version>${log4j2.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
+			<version>${log4j2.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j18-impl</artifactId>
+			<version>${log4j2.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!--		<dependency>
@@ -103,6 +108,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.1</version>
 				<configuration>
 					<createDependencyReducedPom>false</createDependencyReducedPom>
 					<filters>

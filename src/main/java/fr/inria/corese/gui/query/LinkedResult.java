@@ -7,16 +7,16 @@ import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.util.Property;
 import static fr.inria.corese.core.util.Property.Value.GUI_BROWSE;
 import fr.inria.corese.gui.core.MainFrame;
-import fr.inria.corese.kgram.core.Mappings;
-import fr.inria.corese.sparql.datatype.DatatypeMap;
-import fr.inria.corese.sparql.exceptions.EngineException;
-import fr.inria.corese.sparql.triple.parser.ASTQuery;
-import fr.inria.corese.sparql.triple.parser.Constant;
-import fr.inria.corese.sparql.triple.parser.Expression;
-import fr.inria.corese.sparql.triple.parser.Metadata;
-import fr.inria.corese.sparql.triple.parser.Query;
-import fr.inria.corese.sparql.triple.parser.URLParam;
-import fr.inria.corese.sparql.triple.parser.URLServer;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
+import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.sparql.triple.parser.Expression;
+import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.Query;
+import fr.inria.corese.core.sparql.triple.parser.URLParam;
+import fr.inria.corese.core.sparql.triple.parser.URLServer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -377,7 +377,7 @@ public class LinkedResult implements URLParam {
     ASTQuery rewrite(ASTQuery ast, String uri) {
         ast.setLimit(10);
         Query q = Query.create(ast);
-        fr.inria.corese.sparql.triple.parser.Service s = 
+        fr.inria.corese.core.sparql.triple.parser.Service s =
                 ast.service(Constant.create(DatatypeMap.newResource(uri)), q);
         ASTQuery as = ASTQuery.create();
         as.setNSM(ast.getNSM());

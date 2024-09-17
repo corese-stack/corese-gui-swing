@@ -1,7 +1,7 @@
 package fr.inria.corese.gui.event;
 
 import fr.inria.corese.gui.core.MainFrame;
-import fr.inria.corese.kgram.event.EvalListener;
+import fr.inria.corese.core.kgram.event.EvalListener;
 
 
 /**
