@@ -32,7 +32,6 @@ public class Exec extends Thread {
 
     static final String qvalidate = "template { st:apply-templates-with(st:spintypecheck) } where {}";
     static final String qshacl = "template { xt:turtle(?g) } where { bind (sh:shacl() as ?g) }";
-    static final String qshex  = "template { xt:turtle(?g) } where { bind (sh:shex() as ?g) }";
 
     //static final String qvalidate = "template {st:apply-templates-with('/home/corby/AData/template/spintypecheck/template/')} where {}";
     static final String qgraph = NSManager.STL + "query";
@@ -44,7 +43,6 @@ public class Exec extends Thread {
     boolean debug = false;
     private boolean validate = false;
     private boolean shacl = false;
-    private boolean shex = false;
     QueryExec current;
     private GraphEngine graphEngine;
     private Mappings mappings;
@@ -119,7 +117,7 @@ public class Exec extends Thread {
         try {
             String q = query;
             if (isShacl()) {
-                q = (isShex()) ? qshex : qshacl;
+                q = qshacl;
             }
             // draft test: Mappings available using xt:mappings()
             Mappings map = exec.SPARQLQuery(q, getMappings());
@@ -243,20 +241,6 @@ public class Exec extends Thread {
      */
     public void setShacl(boolean shacl) {
         this.shacl = shacl;
-    }
-
-    /**
-     * @return the shex
-     */
-    public boolean isShex() {
-        return shex;
-    }
-
-    /**
-     * @param shex the shex to set
-     */
-    public void setShex(boolean shex) {
-        this.shex = shex;
     }
 
     public Mappings getMappings() {

@@ -102,7 +102,6 @@ public final class MyJPanelQuery extends JPanel {
             buttonLog,
             buttonCopy, buttonBrowse,
             buttonSort, buttonCompare,
-            buttonShex,
             buttonKill, buttonStop, buttonValidate, buttonToSPIN, buttonToSPARQL,
             buttonTKgram, buttonProve;
     private JButton buttonSearch;
@@ -187,7 +186,6 @@ public final class MyJPanelQuery extends JPanel {
 
         buttonRun = new JButton();
         buttonShacl = new JButton();
-        buttonShex = new JButton();
         buttonPush = new JButton();
         buttonHeader = new JButton();
         buttonLog = new JButton();
@@ -333,7 +331,6 @@ public final class MyJPanelQuery extends JPanel {
         buttonCompare.setText("Compare");
         buttonRun.setText("Query");
         buttonShacl.setText("Shacl");
-        buttonShex.setText("Shex");
         buttonStop.setText("Stop");
         buttonKill.setText("Kill");
         buttonValidate.setText("Validate");
@@ -404,7 +401,6 @@ public final class MyJPanelQuery extends JPanel {
         hSeq2.addComponent(buttonRun);
         hSeq2.addComponent(buttonSort);
         hSeq2.addComponent(buttonShacl);
-        hSeq2.addComponent(buttonShex);
         hSeq2.addComponent(buttonHeader);
         hSeq2.addComponent(buttonLog);
         hSeq2.addComponent(buttonPush);
@@ -445,7 +441,6 @@ public final class MyJPanelQuery extends JPanel {
         vParallel2.addComponent(buttonRun);
         vParallel2.addComponent(buttonSort);
         vParallel2.addComponent(buttonShacl);
-        vParallel2.addComponent(buttonShex);
         vParallel2.addComponent(buttonHeader);
         vParallel2.addComponent(buttonLog);
         vParallel2.addComponent(buttonPush);
@@ -506,7 +501,6 @@ public final class MyJPanelQuery extends JPanel {
 
         buttonRun.addActionListener(l_RunListener);
         buttonShacl.addActionListener(l_RunListener);
-        buttonShex.addActionListener(l_RunListener);
         buttonPush.addActionListener(l_RunListener);
         buttonHeader.addActionListener(l_RunListener);
         buttonLog.addActionListener(l_RunListener);
@@ -1031,7 +1025,7 @@ public final class MyJPanelQuery extends JPanel {
                     } else if (ev.getSource() == buttonCompare) {
                         compare();
                     } else if (ev.getSource() == buttonRun || ev.getSource() == buttonValidate
-                            || ev.getSource() == buttonShacl || ev.getSource() == buttonShex) {
+                            || ev.getSource() == buttonShacl ) {
                         // buttonRun
 
                         // Print load message
@@ -1048,8 +1042,7 @@ public final class MyJPanelQuery extends JPanel {
                         Exec exec = newExec(coreseFrame, query, isTrace);
                         setCurrent(exec);
                         exec.setValidate(ev.getSource() == buttonValidate);
-                        exec.setShacl(ev.getSource() == buttonShacl || ev.getSource() == buttonShex);
-                        exec.setShex(ev.getSource() == buttonShex); // coreseFrame.isShexSemantics());
+                        exec.setShacl(ev.getSource() == buttonShacl);
                         // draft test: Mappings available using xt:mappings()
                         // Mappings from previous query may have been copied here
                         // using Copy button

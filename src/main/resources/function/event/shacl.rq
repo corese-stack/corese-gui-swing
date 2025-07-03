@@ -7,7 +7,6 @@
 @beforeShacl
 function us:beforeshacl(focus) {
     xt:print("@beforeShacl");
-    #sh:shexSemantics(true);
     #sh:setdsp(true);
     # additional messages for sh:node elements
     #sh:setup(sh:nodeDetail, true);

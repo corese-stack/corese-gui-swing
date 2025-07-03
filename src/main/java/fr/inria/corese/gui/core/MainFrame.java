@@ -77,7 +77,6 @@ import fr.inria.corese.core.print.rdfc10.CanonicalRdf10.CanonicalizationExceptio
 import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.shex.shacl.Shex;
 import fr.inria.corese.core.sparql.api.ResultFormatDef;
 import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
@@ -128,14 +127,14 @@ public class MainFrame extends JFrame implements ActionListener {
     // Pour le menu
     private JMenuItem loadRDF;
     private JMenuItem loadProperty;
-    private JMenuItem loadSHACL, loadShex;
+    private JMenuItem loadSHACL;
     private JMenuItem loadSHACLShape;
     private JMenuItem loadQuery;
     private JMenuItem loadResult;
     private JMenuItem execWorkflow, loadWorkflow, loadRunWorkflow;
     private JMenuItem loadRule;
     private JMenuItem loadStyle;
-    private JMenuItem cpTransform, shex;
+    private JMenuItem cpTransform;
     private JMenu fileMenuSaveResult;
     private JMenuItem saveQuery;
     private JMenuItem saveResultXml;
@@ -190,7 +189,6 @@ public class MainFrame extends JFrame implements ActionListener {
     private JCheckBox checkBoxLoad;
     private JCheckBox cbrdfs, cbowlrl, cbclean, cbrdfsrl, cbowlrltest, cbowlrllite, cbowlrlext, cbtrace, cbnamed,
             cbindex;
-    private JCheckBox cbshexClosed, cbshexExtend, cbshexCard, cbshexshex;
     private JMenuItem validate;
     // style correspondant au graphe
     private String defaultStylesheet, saveStylesheet;
@@ -247,9 +245,6 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final String URI_CORESE = "http://project.inria.fr/corese";
     private static final String URI_GRAPHSTREAM = "http://graphstream-project.org/";
     int nbTabs = 0;
-
-    boolean shexClosed = true, shexCard = true, shexExtend = true;
-    private boolean shexSemantics = false;
 
     Command cmd;
 
@@ -625,10 +620,6 @@ public class MainFrame extends JFrame implements ActionListener {
         loadResult = new JMenuItem("Result");
         loadResult.addActionListener(this);
 
-        loadShex = new JMenuItem("Shex");
-        loadShex.addActionListener(this);
-        loadShex.setToolTipText("Load Shex");
-
         loadWorkflow = new JMenuItem("Workflow");
         loadWorkflow.addActionListener(this);
 
@@ -683,9 +674,6 @@ public class MainFrame extends JFrame implements ActionListener {
 
         cpTransform = new JMenuItem("Compile Transformation");
         cpTransform.addActionListener(this);
-
-        shex = new JMenuItem("Translate Shex to Shacl");
-        shex.addActionListener(this);
 
         saveQuery = new JMenuItem("Save Query");
         saveQuery.addActionListener(this);
@@ -798,11 +786,6 @@ public class MainFrame extends JFrame implements ActionListener {
 
         cbnamed = new JCheckBox("Load Named");
 
-        cbshexCard = new JCheckBox("Cardinality");
-        cbshexClosed = new JCheckBox("Closed");
-        cbshexExtend = new JCheckBox("Shacl Extension");
-        cbshexshex = new JCheckBox("Shex Semantics");
-
         checkBoxLoad = new JCheckBox("Load");
         checkBoxQuery = new JCheckBox("Query");
         checkBoxRule = new JCheckBox("Rule");
@@ -833,7 +816,6 @@ public class MainFrame extends JFrame implements ActionListener {
         JMenu templateMenu = new JMenu("Template");
         JMenu displayMenu = new JMenu("Display");
         JMenu shaclMenu = new JMenu("Shacl");
-        JMenu shexMenu = new JMenu("Shex");
         JMenu eventMenu = new JMenu("Event");
         JMenu explainMenu = new JMenu("Explain");
         JMenu aboutMenu = new JMenu("?");
@@ -852,7 +834,6 @@ public class MainFrame extends JFrame implements ActionListener {
         fileMenuLoad.add(loadSHACLShape);
         fileMenuLoad.add(loadQuery);
         fileMenuLoad.add(loadResult);
-        fileMenuLoad.add(loadShex);
         fileMenuLoad.add(loadWorkflow);
         fileMenuLoad.add(loadRunWorkflow);
         fileMenuLoad.add(loadStyle);
@@ -861,7 +842,6 @@ public class MainFrame extends JFrame implements ActionListener {
 
         fileMenu.add(execWorkflow);
         fileMenu.add(cpTransform);
-        fileMenu.add(shex);
 
         fileMenu.add(fileMenuSaveGraph);
         fileMenuSaveGraph.add(exportRDF);
@@ -942,9 +922,6 @@ public class MainFrame extends JFrame implements ActionListener {
         shaclMenu.add(defItem("Constraint Function", "shacl/extension.rq"));
         shaclMenu.add(defItem("Path Function", "shacl/funpath.rq"));
         shaclMenu.add(defItem("Path Linked Data", "shacl/service.rq"));
-
-        shexMenu.add(cbshexCard);
-        shexMenu.add(cbshexExtend);
 
         eventMenu.add(defItemFunction("SPARQL Query", "event/query.rq"));
         eventMenu.add(defItemFunction("SPARQL Update", "event/update.rq"));
@@ -1058,30 +1035,6 @@ public class MainFrame extends JFrame implements ActionListener {
             Load.setDefaultGraphValue(!cbnamed.isSelected());
         });
 
-        cbshexClosed.setEnabled(true);
-        cbshexClosed.setSelected(true);
-        cbshexClosed.addItemListener((ItemEvent e) -> {
-            shexClosed = cbshexClosed.isSelected();
-        });
-
-        cbshexCard.setEnabled(true);
-        cbshexCard.setSelected(true);
-        cbshexCard.addItemListener((ItemEvent e) -> {
-            shexCard = cbshexCard.isSelected();
-        });
-
-        cbshexExtend.setEnabled(true);
-        cbshexExtend.setSelected(true);
-        cbshexExtend.addItemListener((ItemEvent e) -> {
-            shexExtend = cbshexExtend.isSelected();
-        });
-
-        cbshexshex.setEnabled(true);
-        cbshexshex.setSelected(false);
-        cbshexshex.addItemListener((ItemEvent e) -> {
-            setShexSemantics(cbshexshex.isSelected());
-        });
-
         cbowlrl.setEnabled(true);
         cbowlrl.setSelected(false);
         cbowlrl.addItemListener((ItemEvent e) -> {
@@ -1189,7 +1142,6 @@ public class MainFrame extends JFrame implements ActionListener {
         menuBar.add(templateMenu);
         menuBar.add(displayMenu);
         menuBar.add(shaclMenu);
-        menuBar.add(shexMenu);
         menuBar.add(eventMenu);
         menuBar.add(explainMenu);
         menuBar.add(aboutMenu);
@@ -1343,8 +1295,6 @@ public class MainFrame extends JFrame implements ActionListener {
             loadProperty();
         } else if (e.getSource() == loadSHACLShape) {
             basicLoad(SHACL_SHACL);
-        } else if (e.getSource() == loadShex) {
-            shex(true);
         } else if (e.getSource() == execWorkflow) {
             execWorkflow();
         } else if (e.getSource() == loadWorkflow) {
@@ -1353,8 +1303,6 @@ public class MainFrame extends JFrame implements ActionListener {
             loadWorkflow(true);
         } else if (e.getSource() == cpTransform) {
             compile();
-        } else if (e.getSource() == shex) {
-            shex(false);
         }
         // sauvegarde la requête dans un fichier texte (.txt)
         else if (e.getSource() == saveQuery) {
@@ -1995,29 +1943,6 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
-    void shex(boolean load) {
-        String path = selectPath("Shex", "shex");
-        if (path != null) {
-            Shex shex = new Shex().setExtendShacl(shexExtend)
-                    .setClosed(shexClosed)
-                    .setExpCardinality(shexCard);
-            String name = path.replace(".shex", "shex.ttl");
-            try {
-                shex.parse(path);
-                System.out.println(shex.getStringBuilder());
-                System.out.println("Result in: " + name);
-                write(shex.getStringBuilder().toString(), name);
-                appendMsg(String.format("Translate %s into %s\n", path, name));
-                if (load) {
-                    loadRDF(name);
-                }
-            } catch (Exception ex) {
-                java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
-                        ex);
-            }
-        }
-    }
-
     void compile(String path) {
         TemplatePrinter p = TemplatePrinter.create(path);
         try {
@@ -2423,20 +2348,6 @@ public class MainFrame extends JFrame implements ActionListener {
         if (getSingleton() != null) {
             getSingleton().appendMsg("\n");
         }
-    }
-
-    /**
-     * @return the shexSemantics
-     */
-    public boolean isShexSemantics() {
-        return shexSemantics;
-    }
-
-    /**
-     * @param shexSemantics the shexSemantics to set
-     */
-    public void setShexSemantics(boolean shexSemantics) {
-        this.shexSemantics = shexSemantics;
     }
 
     public static MainFrame getSingleton() {
