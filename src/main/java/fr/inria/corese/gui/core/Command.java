@@ -17,7 +17,6 @@ public class Command extends HashMap<String, String> {
     private static Logger logger = LogManager.getLogger(Command.class);
     
     public static final String VERBOSE          = "-verbose";
-    public static final String DEBUG            = "-debug";
     public static final String MAX_LOAD         = "-maxload";
     public static final String LINKED_FUNCTION  = "-linkedfunction";
     public static final String SUPER_USER       = "-su";

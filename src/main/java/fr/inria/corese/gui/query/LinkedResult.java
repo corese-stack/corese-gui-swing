@@ -92,7 +92,7 @@ public class LinkedResult implements URLParam {
         }
         
         ASTQuery ast = (ASTQuery) map.getAST();
-        if (ast.hasMetadata(Metadata.BROWSE) || Property.booleanValue(GUI_BROWSE)) {
+        if (ast.hasMetadata(Metadata.BROWSE) || Property.getBooleanValue(GUI_BROWSE)) {
             browse(map);
         }
     }

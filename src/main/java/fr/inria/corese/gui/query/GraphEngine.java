@@ -17,10 +17,12 @@ import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
 import fr.inria.corese.core.Event;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.GraphStore;
+import fr.inria.corese.core.api.Loader;
+import fr.inria.corese.core.compiler.eval.QuerySolverVisitor;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.load.Build;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
@@ -28,17 +30,16 @@ import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.Cleaner;
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-import fr.inria.corese.core.util.Parameter;
-import fr.inria.corese.core.util.Property;
-import fr.inria.corese.core.util.Tool;
-import fr.inria.corese.gui.core.Command;
-import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
+import fr.inria.corese.core.storage.api.dataManager.DataManager;
+import fr.inria.corese.core.util.Parameter;
+import fr.inria.corese.core.util.Property;
+import fr.inria.corese.core.util.Tool;
+import fr.inria.corese.gui.core.Command;
 
 /**
  * Lite implementation of IEngine using kgraph and kgram
@@ -98,9 +99,6 @@ public class GraphEngine {
             switch (key) {
                 case Command.VERBOSE:
                     graph.setVerbose(true);
-                    break;
-                case Command.DEBUG:
-                    graph.setDebugMode(true);
                     break;
                 case Command.METADATA:
                     graph.setMetadata(true);
@@ -249,7 +247,7 @@ public class GraphEngine {
 
     public void loadString(String rdf) throws EngineException, LoadException {
         Load ld = loader();
-        ld.loadString(rdf, ld.TURTLE_FORMAT);
+        ld.loadString(rdf, Loader.format.TURTLE_FORMAT);
     }
 
     public void loadDirProtect(String path) {
@@ -311,7 +309,6 @@ public class GraphEngine {
     }
 
     public void runQueryEngine() {
-        qengine.setDebug(isDebug);
         try {
             qengine.process();
         } catch (EngineException ex) {
@@ -342,7 +339,7 @@ public class GraphEngine {
 
     }
 
-    public void loadRDF(String rdf, int format) throws EngineException, LoadException {
+    public void loadRDF(String rdf, Loader.format format) throws EngineException, LoadException {
 
         InputStream stream = new ByteArrayInputStream(rdf.getBytes(StandardCharsets.UTF_8));
 

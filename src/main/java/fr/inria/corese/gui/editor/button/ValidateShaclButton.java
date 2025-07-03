@@ -7,11 +7,11 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.shacl.Shacl;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.gui.core.MainFrame;
 import fr.inria.corese.gui.editor.pane.EditorPane;
 import fr.inria.corese.gui.editor.pane.ResultPane;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 
 public class ValidateShaclButton extends Button {
 
@@ -42,12 +42,12 @@ public class ValidateShaclButton extends Button {
                     resultPane.setContent("Error : SHACL document is empty.");
                     return;
                 }
-                
+
                 // Try to load SHACL file
                 Graph shapeGraph = Graph.create();
                 Load ld = Load.create(shapeGraph);
                 try {
-                    ld.loadString(editorShaclContent, Load.TURTLE_FORMAT);
+                    ld.loadString(editorShaclContent, Load.format.TURTLE_FORMAT);
                 } catch (LoadException e1) {
                     resultPane.setContent("Error : malformed SHACL document.");
                     e1.printStackTrace();
@@ -55,9 +55,9 @@ public class ValidateShaclButton extends Button {
                 }
 
                 // Eval
-                Shacl shacl = new Shacl(coreseGraph, shapeGraph);                
+                Shacl shacl = new Shacl(coreseGraph, shapeGraph);
                 shacl.setDataManager(mainFrame.getMyCorese().getDataManager());
-                                
+
                 Graph result = null;
                 try {
                     result = shacl.eval();

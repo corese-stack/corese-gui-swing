@@ -577,10 +577,10 @@ public final class MyJPanelQuery extends JPanel {
         if (Property.stringValue(GUI_SELECT_FORMAT) != null) {
             switch (Property.stringValue(GUI_SELECT_FORMAT)) {
                 case Property.JSON:
-                    return clean(ResultFormat.create(map, ResultFormat.JSON_FORMAT)
+                    return clean(ResultFormat.create(map, ResultFormat.format.JSON_FORMAT)
                             .setNbResult(maxResXML()).toString());
                 case Property.XML:
-                    return ResultFormat.create(map, ResultFormat.XML_FORMAT)
+                    return ResultFormat.create(map, ResultFormat.format.XML_FORMAT)
                             .setNbResult(maxResXML()).toString();
             }
         }
@@ -595,19 +595,19 @@ public final class MyJPanelQuery extends JPanel {
             switch (Property.stringValue(GUI_CONSTRUCT_FORMAT)) {
                 case Property.XML:
                 case Property.RDF_XML:
-                    return ResultFormat.create(g, ResultFormat.RDF_XML_FORMAT).toString();
+                    return ResultFormat.create(g, ResultFormat.format.RDF_XML_FORMAT).toString();
                 case Property.TURTLE:
                     return ResultFormat.create(g, map.getQuery().getAST().getNSM(),
-                            ResultFormat.TURTLE_FORMAT).toString();
+                            ResultFormat.format.TURTLE_FORMAT).toString();
                 case Property.TRIG:
-                    return ResultFormat.create(g, ResultFormat.TRIG_FORMAT).toString();
+                    return ResultFormat.create(g, ResultFormat.format.TRIG_FORMAT).toString();
                 case Property.JSON:
-                    return clean(ResultFormat.create(g, ResultFormat.JSONLD_FORMAT).toString());
+                    return clean(ResultFormat.create(g, ResultFormat.format.JSONLD_FORMAT).toString());
             }
         }
         // default
         return ResultFormat.create(g,
-                map.getQuery().getAST().getNSM(), ResultFormat.TRIG_FORMAT).toString();
+                map.getQuery().getAST().getNSM(), ResultFormat.format.TRIG_FORMAT).toString();
         // return turtle(g);
     }
 
@@ -835,7 +835,7 @@ public final class MyJPanelQuery extends JPanel {
             Load ld = Load.create(g);
             String str = res.getLabel();
             try {
-                ld.loadString(str, Load.TURTLE_FORMAT);
+                ld.loadString(str, Load.format.TURTLE_FORMAT);
                 displayGraph(g, nsm);
             } catch (LoadException ex) {
                 logger.log(Level.ERROR, "", ex);

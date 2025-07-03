@@ -1,10 +1,7 @@
 package fr.inria.corese.gui.core;
 
 import static fr.inria.corese.core.util.Property.Value.GUI_DEFAULT_QUERY;
-import static fr.inria.corese.core.util.Property.Value.GUI_EXPLAIN_LIST;
-import static fr.inria.corese.core.util.Property.Value.GUI_QUERY_LIST;
 import static fr.inria.corese.core.util.Property.Value.GUI_RULE_LIST;
-import static fr.inria.corese.core.util.Property.Value.GUI_TEMPLATE_LIST;
 import static fr.inria.corese.core.util.Property.Value.GUI_TITLE;
 import static fr.inria.corese.core.util.Property.Value.GUI_TRIPLE_MAX;
 import static fr.inria.corese.core.util.Property.Value.LOAD_IN_DEFAULT_GRAPH;
@@ -68,6 +65,8 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.xml.sax.SAXException;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.kgram.core.Mappings;
+import fr.inria.corese.core.kgram.event.Event;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.load.LoadException;
 import fr.inria.corese.core.load.QueryLoad;
@@ -78,10 +77,16 @@ import fr.inria.corese.core.print.rdfc10.CanonicalRdf10.CanonicalizationExceptio
 import fr.inria.corese.core.print.rdfc10.HashingUtility.HashAlgorithm;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.RuleEngine;
+import fr.inria.corese.core.shex.shacl.Shex;
+import fr.inria.corese.core.sparql.api.ResultFormatDef;
+import fr.inria.corese.core.sparql.datatype.DatatypeMap;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.core.sparql.exceptions.SafetyException;
+import fr.inria.corese.core.sparql.triple.parser.Access;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.transform.TemplatePrinter;
 import fr.inria.corese.core.transform.Transformer;
 import fr.inria.corese.core.util.Property;
-import fr.inria.corese.core.util.Property.Pair;
 import fr.inria.corese.core.workflow.Data;
 import fr.inria.corese.core.workflow.SemanticWorkflow;
 import fr.inria.corese.core.workflow.WorkflowParser;
@@ -92,14 +97,8 @@ import fr.inria.corese.gui.event.MyEvalListener;
 import fr.inria.corese.gui.query.Buffer;
 import fr.inria.corese.gui.query.GraphEngine;
 import fr.inria.corese.gui.query.MyJPanelQuery;
-import fr.inria.corese.core.kgram.core.Mappings;
-import fr.inria.corese.core.kgram.event.Event;
-import fr.inria.corese.core.shex.shacl.Shex;
-import fr.inria.corese.core.sparql.datatype.DatatypeMap;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.core.sparql.exceptions.SafetyException;
-import fr.inria.corese.core.sparql.triple.parser.Access;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.gui.util.GuiPropertyUtils;
+import fr.inria.corese.gui.util.GuiPropertyUtils.Pair;
 
 /**
  * Fenêtre principale, avec le conteneur d'onglets et le menu
@@ -903,8 +902,9 @@ public class MainFrame extends JFrame implements ActionListener {
         queryMenu.add(ical);
 
         userMenu.add(defItem("Count", "count.rq"));
-        for (Pair pair : Property.getValueList(GUI_QUERY_LIST)) {
-            userMenu.add(defItemQuery(pair.getKey(), pair.getPath()));
+
+        for (Pair pair : GuiPropertyUtils.getGuiList(Property.Value.GUI_QUERY_LIST)) {
+            userMenu.add(defItemQuery(pair.key(), pair.path()));
         }
 
         explainMenu.add(ientailment);
@@ -912,8 +912,8 @@ public class MainFrame extends JFrame implements ActionListener {
         explainMenu.add(ierror);
         explainMenu.add(iowlrl);
 
-        for (Pair pair : Property.getValueList(GUI_EXPLAIN_LIST)) {
-            explainMenu.add(defItemQuery(pair.getKey(), pair.getPath()));
+        for (Pair pair : GuiPropertyUtils.getGuiList(Property.Value.GUI_EXPLAIN_LIST)) {
+            explainMenu.add(defItemQuery(pair.key(), pair.path()));
         }
 
         templateMenu.add(iturtle);
@@ -924,16 +924,16 @@ public class MainFrame extends JFrame implements ActionListener {
         templateMenu.add(ispin);
         templateMenu.add(iowl);
 
-        for (Pair pair : Property.getValueList(GUI_TEMPLATE_LIST)) {
-            templateMenu.add(defItemQuery(pair.getKey(), pair.getPath()));
+        for (Pair pair : GuiPropertyUtils.getGuiList(Property.Value.GUI_TEMPLATE_LIST)) {
+            templateMenu.add(defItemQuery(pair.key(), pair.path()));
         }
 
-        displayMenu.add(defDisplay("Turtle", ResultFormat.TURTLE_FORMAT));
-        displayMenu.add(defDisplay("Trig", ResultFormat.TRIG_FORMAT));
-        displayMenu.add(defDisplay("RDF/XML", ResultFormat.RDF_XML_FORMAT));
-        displayMenu.add(defDisplay("JSON LD", ResultFormat.JSONLD_FORMAT));
-        displayMenu.add(defDisplay("Index", ResultFormat.UNDEF_FORMAT));
-        displayMenu.add(defDisplay("Internal", ResultFormat.UNDEF_FORMAT));
+        displayMenu.add(defDisplay("Turtle", ResultFormat.format.TURTLE_FORMAT));
+        displayMenu.add(defDisplay("Trig", ResultFormat.format.TRIG_FORMAT));
+        displayMenu.add(defDisplay("RDF/XML", ResultFormat.format.RDF_XML_FORMAT));
+        displayMenu.add(defDisplay("JSON LD", ResultFormat.format.JSONLD_FORMAT));
+        displayMenu.add(defDisplay("Index", ResultFormat.format.UNDEF_FORMAT));
+        displayMenu.add(defDisplay("Internal", ResultFormat.format.UNDEF_FORMAT));
 
         shaclMenu.add(itypecheck);
         shaclMenu.add(defItem("Fast Engine", "shacl/fastengine.rq"));
@@ -982,8 +982,8 @@ public class MainFrame extends JFrame implements ActionListener {
         engineMenu.add(cbclean);
         engineMenu.add(cbindex);
 
-        for (Pair pair : Property.getValueList(GUI_RULE_LIST)) {
-            engineMenu.add(defineRuleBox(pair.getKey(), pair.getPath()));
+        for (Pair pair : GuiPropertyUtils.getGuiList(GUI_RULE_LIST)) {
+            engineMenu.add(defineRuleBox(pair.key(), pair.path()));
         }
 
         // engineMenu.add(cbowlrllite);
@@ -1052,7 +1052,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
         // check box is for load file in named graph
         // Property is for load file in default graph, hence the negation
-        cbnamed.setSelected(!Property.booleanValue(LOAD_IN_DEFAULT_GRAPH));
+        cbnamed.setSelected(!Property.getBooleanValue(LOAD_IN_DEFAULT_GRAPH));
         cbnamed.setEnabled(true);
         cbnamed.addItemListener((ItemEvent e) -> {
             Load.setDefaultGraphValue(!cbnamed.isSelected());
@@ -1243,7 +1243,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return it;
     }
 
-    JMenuItem defDisplay(String name, int format) {
+    JMenuItem defDisplay(String name, ResultFormatDef.format format) {
         JMenuItem it = new JMenuItem(name);
         it.addActionListener((ActionEvent event) -> {
             getCurrentQueryPanel().getTextArea().setText(
@@ -1252,8 +1252,8 @@ public class MainFrame extends JFrame implements ActionListener {
         return it;
     }
 
-    String displayMenu(String name, int format) {
-        if (format == ResultFormat.UNDEF_FORMAT) {
+    String displayMenu(String name, ResultFormatDef.format format) {
+        if (format.equals(ResultFormat.format.UNDEF_FORMAT)) {
             return displayGraph(name, format);
         } else {
             ResultFormat ft = ResultFormat.create(getGraph(), format)
@@ -1262,7 +1262,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
-    String displayGraph(String name, int format) {
+    String displayGraph(String name, ResultFormatDef.format format) {
         if (name.equals("Internal")) {
             DatatypeMap.DISPLAY_AS_TRIPLE = false;
         }
@@ -1364,37 +1364,37 @@ public class MainFrame extends JFrame implements ActionListener {
             defaultStylesheet = style;
         } // Sauvegarde le résultat sous forme XML dans un fichier texte
         else if (e.getSource() == saveResultXml) {
-            saveResult(ResultFormat.XML_FORMAT);
+            saveResult(ResultFormat.format.XML_FORMAT);
         } // Sauvegarde le résultat sous forme JSON dans un fichier texte
         else if (e.getSource() == saveResultJson) {
-            saveResult(ResultFormat.JSON_FORMAT);
+            saveResult(ResultFormat.format.JSON_FORMAT);
         } // Sauvegarde le résultat sous forme CSV dans un fichier texte
         else if (e.getSource() == saveResultCsv) {
-            saveResult(ResultFormat.CSV_FORMAT);
+            saveResult(ResultFormat.format.CSV_FORMAT);
         } // Sauvegarde le résultat sous forme TSV dans un fichier texte
         else if (e.getSource() == saveResultTsv) {
-            saveResult(ResultFormat.TSV_FORMAT);
+            saveResult(ResultFormat.format.TSV_FORMAT);
         } // Sauvegarde le résultat sous forme Markdown dans un fichier texte
         else if (e.getSource() == saveResultMarkdown) {
-            saveResult(ResultFormat.MARKDOWN_FORMAT);
+            saveResult(ResultFormat.format.MARKDOWN_FORMAT);
         } // Exporter le graph au format RDF/XML
         else if (e.getSource() == exportRDF) {
-            saveGraph(Transformer.RDFXML);
+            saveGraph(ResultFormat.format.RDF_XML_FORMAT);
         } // Exporter le graph au format Turle
         else if (e.getSource() == exportTurtle) {
-            saveGraph(Transformer.TURTLE);
+            saveGraph(ResultFormat.format.TURTLE_FORMAT);
         } // Exporter le graph au format TriG
         else if (e.getSource() == exportTrig) {
-            saveGraph(Transformer.TRIG);
+            saveGraph(ResultFormat.format.TRIG_FORMAT);
         } // Exporter le graph au format Json
         else if (e.getSource() == exportJson) {
-            saveGraph(Transformer.JSON);
+            saveGraph(ResultFormat.format.JSON_FORMAT);
         } // Exporter le graph au format NTriple
         else if (e.getSource() == exportNt) {
-            saveGraph(ResultFormat.NTRIPLES_FORMAT);
+            saveGraph(ResultFormat.format.NTRIPLES_FORMAT);
         } // Exporter le graph au format NQuad
         else if (e.getSource() == exportNq) {
-            saveGraph(ResultFormat.NQUADS_FORMAT);
+            saveGraph(ResultFormat.format.NQUADS_FORMAT);
         } // Exporter le graph au format OWL
         else if (e.getSource() == exportOwl) {
             saveGraph(Transformer.OWL);
@@ -1552,6 +1552,14 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
+    void saveGraph(ResultFormat.format format) {
+        Graph graph = myCorese.getGraph();
+        ResultFormat ft = ResultFormat.create(graph);
+        ft.setSelectFormat(format);
+        ft.setConstructFormat(format);
+        save(ft.toString());
+    }
+
     void saveGraph(String format) {
         Graph graph = myCorese.getGraph();
         Transformer transformer = Transformer.create(graph, format);
@@ -1585,25 +1593,12 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     /**
-     * Save the graph in the specified format
-     * 
-     * @param format the format in which the graph will be saved
-     *               (See ResultFormat.java for the list of formats)
-     */
-    void saveGraph(int format) {
-        Graph graph = myCorese.getGraph();
-
-        ResultFormat ft = ResultFormat.create(graph, format);
-        save(ft.toString());
-    }
-
-    /**
      * Save the result of a query in the specified format
      * 
      * @param format the format in which the result will be saved
      *               (See ResultFormat.java for the list of formats)
      */
-    void saveResult(int format) {
+    void saveResult(ResultFormat.format format) {
         ResultFormat ft = ResultFormat.create(current.getMappings(), format);
         save(ft.toString());
     }
@@ -1782,14 +1777,15 @@ public class MainFrame extends JFrame implements ActionListener {
 
     void initProperty() {
         if (Property.stringValue(LOAD_QUERY) != null) {
-            initLoadQuery(Property.pathValue(LOAD_QUERY));
+            initLoadQuery(GuiPropertyUtils.pathValue(LOAD_QUERY));
         }
         if (Property.stringValue(GUI_TITLE) != null) {
             setTitle(Property.stringValue(GUI_TITLE));
         }
         if (Property.stringValue(GUI_DEFAULT_QUERY) != null) {
             try {
-                defaultQuery = QueryLoad.create().readWE(Property.pathValue(GUI_DEFAULT_QUERY));
+                defaultQuery = QueryLoad.create()
+                        .readWE(GuiPropertyUtils.pathValue(GUI_DEFAULT_QUERY));
             } catch (LoadException ex) {
                 LOGGER.error(ex);
             }

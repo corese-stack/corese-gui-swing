@@ -40,7 +40,7 @@ public class SyntaxCheckButton extends Button {
                 Graph turtleGraph = Graph.create();
                 Load ld = Load.create(turtleGraph);
                 try {
-                    ld.loadString(editorTurtleContent, Load.TURTLE_FORMAT);
+                    ld.loadString(editorTurtleContent, Load.format.TURTLE_FORMAT);
                     resultPane.setContent("Turtle is syntactically valid");
                 } catch (LoadException e1) {
                     resultPane.setContent(e1.getMessage());
