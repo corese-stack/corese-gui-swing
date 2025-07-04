@@ -67,18 +67,14 @@ repositories {
 dependencies {
 
     // === Corese GUI dependencies ===
-    implementation("fr.inria.corese:corese-core:4.6.4-SNAPSHOT")              // Core module of Corese
-    api("org.graphstream:gs-ui:1.2") 
+    implementation("fr.inria.corese:corese-core:4.6.4-SNAPSHOT")     // Core module of Corese
+    implementation("org.graphstream:gs-ui:1.2")                      // GraphStream UI library
     implementation("org.json:json:20250517")                         // JSON processing library for handling JSON data
 
     // === Logging ===
-    api("org.slf4j:slf4j-api:2.0.9")                                 // Logging API only (SLF4J)
+    implementation("org.slf4j:slf4j-api:2.0.9")                      // Logging API only (SLF4J)
     implementation("org.apache.logging.log4j:log4j-core:2.20.0")     // Log4j2 core for internal logging
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0") // SLF4J binding for Log4j2 (runtime)
-
-    // === Test dependencies ===
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")     // JUnit 5 for testing
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")    // JUnit Platform launcher for running tests
 }
 
 /////////////////////////
@@ -237,25 +233,6 @@ tasks.build {
 
 tasks.shadowJar {
     archiveClassifier.set("standalone")
-}
-
-
-// Configure Jacoco test report task to depend on the test task,
-// so reports are generated after tests run successfully.
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-
-    // Enable XML reporting for Jacoco to allow further processing or CI integration.
-    reports {
-        xml.required.set(true)
-    }
-}
-
-// Set the test task to be followed by Jacoco report generation.
-// This ensures that test coverage reports are always generated after tests.
-tasks.test {
-    useJUnitPlatform() // Use JUnit 5 for running tests
-    finalizedBy(tasks.jacocoTestReport)
 }
 
 // Ensure that all local Maven publication tasks depend on signing tasks.
