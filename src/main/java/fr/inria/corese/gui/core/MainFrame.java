@@ -527,18 +527,18 @@ public class MainFrame extends JFrame implements ActionListener {
                 return (MyJPanelQuery) cp;
             }
         }
-        System.out.println("Previous Query Panel not found");
+        LOGGER.debug("Previous Query Panel not found");
         for (Component cp : conteneurOnglets.getComponents()) {
-            System.out.println("gui: " + cp.getClass().getName());
+            LOGGER.debug("gui: " + cp.getClass().getName());
         }
         return null;
     }
 
     public Mappings getPreviousMappings() {
         MyJPanelQuery panel = getPreviousQueryPanel();
-        System.out.println("gui panel: " + panel);
+        LOGGER.debug("gui panel: " + panel);
         if (panel != null) {
-            System.out.println("gui mappings: " + panel.getMappings());
+            LOGGER.debug("gui mappings: " + panel.getMappings());
             return panel.getMappings();
         }
         return null;
@@ -1486,7 +1486,7 @@ public class MainFrame extends JFrame implements ActionListener {
                         Date d1 = new Date();
                         boolean b = myCorese.runRuleEngine();
                         Date d2 = new Date();
-                        System.out.println("Time: " + (d2.getTime() - d1.getTime()) / 1000.0);
+                        LOGGER.info("Time: " + (d2.getTime() - d1.getTime()) / 1000.0);
                         if (b) {
                             appendMsg("\n rules applied... \n" + myCapturer.getContent() + "\ndone.\n");
                         }
@@ -1695,7 +1695,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     void display() {
         for (int i = 0; i < getOngletListener().getModel().getSize(); i++) {
-            System.out.println("GUI: " + ongletListener.getModel().get(i).toString());
+            LOGGER.info("GUI: " + ongletListener.getModel().get(i).toString());
         }
     }
 
@@ -1985,6 +1985,7 @@ public class MainFrame extends JFrame implements ActionListener {
             Date d2 = new Date();
             appendMsg(myCapturer.getContent());
             System.out.println("Load time: " + (d2.getTime() - d1.getTime()) / 1000.0);
+            LOGGER.info("Load time: " + (d2.getTime() - d1.getTime()) / 1000.0);
         } catch (EngineException | LoadException e) {
             appendMsg(e.toString());
             e.printStackTrace();

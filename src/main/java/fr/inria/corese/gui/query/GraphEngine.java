@@ -95,7 +95,7 @@ public class GraphEngine {
 
     public void setOption(Command cmd) {
         for (String key : cmd.keySet()) {
-            System.out.println("Command: " + key);
+            logger.info("Command: " + key);
             switch (key) {
                 case Command.VERBOSE:
                     graph.setVerbose(true);
@@ -119,7 +119,7 @@ public class GraphEngine {
                     break;
 
                 case Command.LOAD:
-                    System.out.println("load: " + cmd.get(key));
+                    logger.info("load: " + cmd.get(key));
                     loadDirProtect(cmd.get(key));
                     break;
 
@@ -165,9 +165,9 @@ public class GraphEngine {
             max = Property.intValue(GUI_INDEX_MAX);
         }
         Graph g = getGraph();
-        System.out.println(g.display(max));
-        System.out.println(g.getNodeManager().display(max));
-        System.out.println(g.getIndex());
+        logger.info(g.display(max));
+        logger.info(g.getNodeManager().display(max));
+        logger.info(g.getIndex());
         Tool.trace("Memory used: %s", Tool.getMemoryUsageMegabytes());
     }
 
@@ -305,7 +305,7 @@ public class GraphEngine {
         // disconnect RDFS entailment during OWL processing
         getOwlEngine().processWithoutWorkflow();
         Date d2 = new Date();
-        System.out.println("Time: " + (d2.getTime() - d1.getTime()) / (1000.0));
+        logger.info("Time: " + (d2.getTime() - d1.getTime()) / (1000.0));
     }
 
     public void runQueryEngine() {

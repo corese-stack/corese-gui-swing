@@ -554,7 +554,7 @@ public final class MyJPanelQuery extends JPanel {
                     str = "";
                 }
                 if (map.size() > maxResXML()) {
-                    System.out.println(String.format("GUI display %s XML results out of %s", maxResXML(), map.size()));
+                    logger.info(String.format("GUI display %s XML results out of %s", maxResXML(), map.size()));
                 }
                 if (str.isEmpty() && ast.getErrors() != null) {
                     return ast.getErrorString();
@@ -1189,7 +1189,7 @@ public final class MyJPanelQuery extends JPanel {
     }
 
     void show(String mes, Object... obj) {
-        System.out.println(String.format(mes, obj));
+        logger.info(String.format(mes, obj));
     }
 
     void setCurrent(Exec e) {

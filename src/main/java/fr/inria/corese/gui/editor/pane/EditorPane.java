@@ -16,8 +16,13 @@ import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class EditorPane {
 
+    private static final Logger logger = LogManager.getLogger(EditorPane.class);
+    
     private JTextPane editor;
     private JTextArea lineCounter;
     private Font font;
@@ -104,7 +109,7 @@ public class EditorPane {
                 try {
                     undoManager.undo();
                 } catch (CannotUndoException ex) {
-                    System.out.println("Unable to undo: " + ex);
+                    logger.info("Unable to undo: " + ex);
                 }
             }
         });
@@ -114,7 +119,7 @@ public class EditorPane {
                 try {
                     undoManager.redo();
                 } catch (CannotRedoException ex) {
-                    System.out.println("Unable to redo: " + ex);
+                    logger.info("Unable to redo: " + ex);
                 }
             }
         });

@@ -41,6 +41,9 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import fr.inria.corese.gui.core.MainFrame;
 
 /**
@@ -49,6 +52,8 @@ import fr.inria.corese.gui.core.MainFrame;
  */
 public class SparqlQueryEditor extends JPanel implements Runnable, ActionListener, DocumentListener, FocusListener, CaretListener {
 
+    private static final Logger logger = LogManager.getLogger(SparqlQueryEditor.class);
+    
     static final String[] kw = {
             "select", "where", "optional", "service", "minus", "filter",
             "construct", "describe", "union", "bind", "values", "as", "template", "function",
@@ -122,7 +127,7 @@ public class SparqlQueryEditor extends JPanel implements Runnable, ActionListene
                 try {
                     undoManager.undo();
                 } catch (CannotUndoException ex) {
-                    System.out.println("Unable to undo: " + ex);
+                    logger.info("Unable to undo: " + ex);
                 }
             }
         });
@@ -132,7 +137,7 @@ public class SparqlQueryEditor extends JPanel implements Runnable, ActionListene
                 try {
                     undoManager.redo();
                 } catch (CannotRedoException ex) {
-                    System.out.println("Unable to redo: " + ex);
+                    logger.info("Unable to redo: " + ex);
                 }
             }
         });

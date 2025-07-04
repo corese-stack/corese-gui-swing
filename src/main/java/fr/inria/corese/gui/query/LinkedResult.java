@@ -203,7 +203,7 @@ public class LinkedResult implements URLParam {
     // map: IP -> counter
     void displayHistory(JSONObject history) {
         for (String ip : history.keySet()) {
-            System.out.println("GUI: " + ip);
+            logger.debug("GUI: " + ip);
             String command = String.format("whois %s", ip);
             try {
                 Process process = Runtime.getRuntime().exec(command);
@@ -211,7 +211,7 @@ public class LinkedResult implements URLParam {
                         new InputStreamReader(process.getInputStream()));
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
+                    logger.debug(line);
                 }
                 reader.close();
             } catch (IOException e) {
@@ -225,7 +225,7 @@ public class LinkedResult implements URLParam {
      * it contains URL parameters such as mode
      */
     void message(String url, JSONObject json) {
-        //System.out.println("LR:");
+        //logger.debug("LR:");
         
         //display(json);
 
