@@ -1,34 +1,34 @@
 #!/bin/bash
 
-# Script d'installation du formatage automatique
-echo "🔧 Installation du formatage automatique..."
+# Automatic formatting installation script
+echo "🔧 Installing automatic formatting..."
 
-# Vérifier qu'on est dans un repo git
+# Check that we are in a git repository
 if [ ! -d ".git" ]; then
-    echo "❌ Erreur: Ce script doit être exécuté à la racine du projet git"
+    echo "❌ Error: This script must be executed from the git project root"
     exit 1
 fi
 
-# Créer le hook pre-commit
+# Create the pre-commit hook
 cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
 
-# Hook pre-commit pour formatter automatiquement le code Java
-echo "🎨 Formatage automatique du code..."
+# Pre-commit hook to automatically format Java code
+echo "🎨 Automatic code formatting..."
 
-# Exécuter Spotless pour formatter le code
+# Execute Spotless to format the code
 ./gradlew spotlessApply --quiet
 
-# Ajouter les fichiers modifiés par le formatage au commit
+# Add files modified by formatting to the commit
 git add -u
 
-echo "✅ Code formaté automatiquement"
+echo "✅ Code formatted automatically"
 EOF
 
-# Rendre le hook exécutable
+# Make the hook executable
 chmod +x .git/hooks/pre-commit
 
-echo "✅ Hook pre-commit installé !"
+echo "✅ Pre-commit hook installed!"
 echo ""
-echo "💡 Maintenant, le code sera automatiquement formaté à chaque commit."
-echo "   Vous n'avez plus besoin de lancer './gradlew spotlessApply' manuellement."
+echo "💡 Now, the code will be automatically formatted on each commit."
+echo "   You no longer need to run './gradlew spotlessApply' manually."

@@ -231,6 +231,14 @@ tasks.build {
     dependsOn(tasks.shadowJar)
 }
 
+// Apply formatting automatically before building and testing
+tasks.build {
+    dependsOn(tasks.spotlessApply)
+}
+
+tasks.test {
+    dependsOn(tasks.spotlessApply)
+}
 
 tasks.shadowJar {
     archiveClassifier.set("standalone")
@@ -273,7 +281,11 @@ spotless {
     }
 }
 
-// Make sure spotless check runs as part of the check task
+// Make sure spotless apply runs as part of the compilation and check tasks
+tasks.compileJava {
+    dependsOn(tasks.spotlessApply)
+}
+
 tasks.check {
-    dependsOn(tasks.spotlessCheck)
+    dependsOn(tasks.spotlessApply)
 }

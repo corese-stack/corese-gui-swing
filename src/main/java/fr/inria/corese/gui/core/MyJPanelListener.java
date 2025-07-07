@@ -43,12 +43,12 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
     private JTextPane textPaneLogs;
     private DefaultListModel<String> model;
     private boolean frameShow = true;
-    protected static JList<String> listLoadedFiles; // list présent dans le JpanelListener
+    protected static JList<String> listLoadedFiles; // list present in the JpanelListener
     private JFrameDebug myPop;
-    MyPopup popupMenu = new MyPopup(); // On instancie la pop-up
+    MyPopup popupMenu = new MyPopup(); // We instantiate the pop-up
 
     /**
-     * Crée le Panel Listener que l'on ajoutera au conteneur d'onglets dans la fenêtre principale
+     * Creates the Listener Panel that we will add to the tab container in the main window
      *
      * @param coreseFrame
      */
@@ -168,10 +168,10 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
                         info = "Fichier contenant les règles d'inférences";
                     } else if (ext.equals("rdfs")) {
                         info =
-                                "Fichier contenant les éléments de base pour décrire l'ontologie (classe, propriétés) ";
+                                "File containing the basic elements to describe the ontology (class, properties) ";
                     } else if (ext.equals("rdf")) {
                         info =
-                                "Fichier qui permet d'exploiter le fichier .rdfs, il permet de définir chaque entité sous la forme d'un triplets (sujet, prédicat, objet)";
+                                "File that allows exploiting the .rdfs file, it allows defining each entity in the form of a triplet (subject, predicate, object)";
                     }
 
                     size = file.length();
@@ -315,7 +315,7 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
     }
 
     /**
-     * Ré-initialise CORESE et Recharge tous les fichiers précédemment chargés
+     * Re-initializes CORESE and Reloads all previously loaded files
      *
      * @param coreseFrame
      */
@@ -369,7 +369,7 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
     }
 
     /**
-     * Permet de reload le fichier sélectionner dans la liste par l'intermédiaire du pop-up
+     * Allows reloading the selected file from the list through the pop-up
      *
      * @param coreseFrame
      */
@@ -406,7 +406,7 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
     }
 
     @Override
-    /** Permet d'afficher une fenêtre popups pour le fichier lors d'un double-clic */
+    /** Allows displaying a popup window for the file when double-clicking */
     public void mouseClicked(MouseEvent e) {
 
         if (e.getButton() == MouseEvent.BUTTON3 && getModel().getSize() != 0) {

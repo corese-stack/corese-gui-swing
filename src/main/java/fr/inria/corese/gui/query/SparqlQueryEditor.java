@@ -214,7 +214,7 @@ public class SparqlQueryEditor extends JPanel
         StyleConstants.setLineSpacing(attr, 0);
         doc.setParagraphAttributes(0, doc.getLength(), attr, false);
 
-        // compteur de ligne pour la query
+        // line counter for the query
         textAreaLines = new JTextArea(10, 2);
         textAreaLines.setFont(new Font("Sanserif", Font.PLAIN, FontSize));
         textAreaLines.setEditable(false);
@@ -414,8 +414,8 @@ public class SparqlQueryEditor extends JPanel
         }
 
         /**
-         * Les différents ArrayList nous permettant de stocker les indexs des mots à colorier et
-         * également les mots qu'il faut rechercher
+         * The different ArrayLists allow us to store the indexes of words to color and also the
+         * words that need to be searched for
          */
         ArrayList<Integer> tabStartWord = new ArrayList<>();
         ArrayList<Integer> tabStopWord = new ArrayList<>();
@@ -429,7 +429,7 @@ public class SparqlQueryEditor extends JPanel
         ArrayList<Integer> tabStartFunction = new ArrayList<>();
         ArrayList<Integer> tabStopFunction = new ArrayList<>();
 
-        /** On définit les différentes polices à utiliser. */
+        /** We define the different fonts to use. */
         StyleContext sc = new StyleContext();
         // style for keywords
         Style style = sc.addStyle("style", null);
@@ -448,13 +448,14 @@ public class SparqlQueryEditor extends JPanel
         Style function = sc.addStyle("function", null);
         function.addAttribute(StyleConstants.CharacterConstants.Bold, Boolean.TRUE);
 
-        /** Pour la recherche des words */
+        /** For searching words */
         for (String kw : listWords) {
 
             // search occurrences of keyword in text
             // record positions of kw
             for (int i = temp; i < d.getLength(); i++) {
-                // fichier temporaire qui tronque le fichier result a partir du String=toSearch afin
+                // fichier temporaire qui tronque le fichier result a partir du String=toSearch
+                // afin
                 // de trouver les prochains String
                 b_word = content.toString().contains(kw);
                 b_wordUpper = content.toString().contains(kw.toUpperCase());
@@ -470,7 +471,7 @@ public class SparqlQueryEditor extends JPanel
                     } else {
                         start =
                                 content.toString()
-                                        .indexOf(kw.toUpperCase()); // 	Cherche le mot en majuscule
+                                        .indexOf(kw.toUpperCase()); // Cherche le mot en majuscule
                         assert (start > -1);
                         stop = start + kw.toUpperCase().length();
                     }
@@ -480,15 +481,14 @@ public class SparqlQueryEditor extends JPanel
                     if (start == 0 && stop == content.length()) {
                         temp2 = ' ';
                         temp3 = ' ';
-                    } else if (start == 0) { // le cas du début pas besoin d'espace avant le mot
+                    } else if (start == 0) { // beginning case, no need for space before the word
                         temp2 = ' ';
                         temp3 = content.charAt(stop);
-                    } else if (stop
-                            == content.length()) { // le cas de la fin pas besoin d'espace après le
-                        // mot
+                    } else if (stop == content.length()) { // end case, no need for space after the
+                        // word
                         temp2 = content.charAt(start - 1);
                         temp3 = ' ';
-                    } else { // le cas général
+                    } else { // general case
                         temp2 = content.charAt(start - 1);
                         temp3 = content.charAt(stop);
                     }
@@ -496,16 +496,16 @@ public class SparqlQueryEditor extends JPanel
                     if ((temp2 == ' ' || temp2 == '\n' || temp2 == '}')
                             && (temp3 == ' '
                                     || temp3 == '\n'
-                                    || temp3
-                                            == '{')) { // on vérifie alors qu'on est bien entre deux
-                        // blancs ou entre un saut à la ligne
+                                    || temp3 == '{')) { // we check that we are indeed between two
+                        // spaces or between a line break
                         tabStartWord.add(start + temp);
                         tabStopWord.add(stop + temp);
                     }
 
-                    // permet de faire la relation entre le fichier temporaire et le fichier de base
-                    // (JtextArea)
-                    // maintien à jour les chiffres stop et start faussé par le subSequence
+                    // allows maintaining the relationship between the temporary file and the base
+                    // file
+                    // (JTextArea)
+                    // keeps stop and start numbers updated, which are distorted by subSequence
                     temp += stop;
                     content = (content.subSequence(stop, content.length()));
                 } else {
@@ -531,18 +531,18 @@ public class SparqlQueryEditor extends JPanel
             }
             if (content.toString().charAt(lineStartOffset) == '#') {
                 startComm = lineStartOffset;
-                tabStartComm.add(startComm); // on ajoute dans notre arraylist l'index de début
+                tabStartComm.add(startComm); // we add the start index to our arraylist
                 while (content.charAt(startComm) != '\n'
                         && startComm
                                 < (d.getLength()
-                                        - 1)) { // on recherche le saut de ligne afin de déterminer
-                    // l'index du caractère final
+                                        - 1)) { // we search for the line break to determine
+                    // the final character index
                     startComm++;
                 }
                 if (j
                         == getTextAreaLines().getLineCount()
-                                - 2) { // utilisation du if pour colorier différement selon la fin
-                    // du commentaire (saut de ligne ou fin de requête)
+                                - 2) { // using if to color differently according to the end
+                    // of the comment (line break or end of query)
                     tabStopComm.add(startComm + 1);
                 } else {
                     tabStopComm.add(startComm);
@@ -557,13 +557,13 @@ public class SparqlQueryEditor extends JPanel
             e.printStackTrace();
         }
 
-        /** Pour la recherche des " (chaines de caractères) */
+        /** For searching " (character strings) */
         boolean isComm = false;
         int pair = 1;
-        // variable pour déterminer si "ouvrant ou "fermant
+        // variable to determine if opening " or closing "
         for (int i = temp3;
                 i < d.getLength();
-                i++) { // permet de mettre d'un certaine couleur les charactères entre ""
+                i++) { // allows coloring characters between "" with a certain color
             startQuote = 0;
             isComm = false;
             b_quote = content.toString().contains("\"");
@@ -571,7 +571,8 @@ public class SparqlQueryEditor extends JPanel
                 startQuote = content.toString().indexOf("\"");
                 for (int j = 0;
                         j < tabStartComm.size();
-                        j++) { // si le guillemet se situe dans un commentaire => met a jour le temp
+                        j++) { // si le guillemet se situe dans un commentaire => met a
+                    // jour le temp
                     // a la fin du comm et on ne rempli pas le tableau
                     if (startQuote <= (tabStopComm.get(j) - temp3)
                             && startQuote >= (tabStartComm.get(j) - temp3)) {
@@ -581,12 +582,12 @@ public class SparqlQueryEditor extends JPanel
                 }
                 if (!isComm) {
                     if (pair >= 0
-                            && pair % 2
-                                    == 1) { // si guillement ouvrant on range l'index du caractère
-                        // courant dans l'arraylist d'index de début
+                            && pair % 2 == 1) { // if opening quote, we store the current character
+                        // index
+                        // in the start index arraylist
                         tabStartQuote.add(startQuote + temp3);
-                    } else { // sinon on range l'index du caractère  dans l'arraylist d'index de fin
-                        temp3 += 2; // on incrémente de 2 pour colorier les guillemets également
+                    } else { // otherwise we store the character index in the end index arraylist
+                        temp3 += 2; // we increment by 2 to also color the quotes
                         tabStopQuote.add(startQuote + temp3);
                     }
                     pair++;
@@ -610,7 +611,8 @@ public class SparqlQueryEditor extends JPanel
         for (String fun : listFunctions) {
 
             for (int i = temp; i < d.getLength(); i++) {
-                // fichier temporaire qui tronque le fichier result a partir du String=toSearch afin
+                // fichier temporaire qui tronque le fichier result a partir du String=toSearch
+                // afin
                 // de trouver les prochains String
                 b_function = content.toString().contains(fun);
                 b_functionUpper = content.toString().contains(fun.toUpperCase());
@@ -638,28 +640,26 @@ public class SparqlQueryEditor extends JPanel
                     if (start == 0 && stop == content.length()) {
                         temp2 = ' ';
                         temp3 = ' ';
-                    } else if (start == 0) { // le cas du début pas besoin d'espace avant le mot
+                    } else if (start == 0) { // beginning case, no need for space before the word
                         temp2 = ' ';
                         temp3 = content.charAt(stop);
-                    } else if (stop
-                            == content.length()) { // le cas de la fin pas besoin d'espace après le
-                        // mot
+                    } else if (stop == content.length()) { // end case, no need for space after the
+                        // word
                         temp2 = content.charAt(start - 1);
-                    } else { // le cas général
+                    } else { // general case
                         temp2 = content.charAt(start - 1);
                         temp3 = content.charAt(stop);
                     }
                     if ((temp2 == ' ' || temp2 == '\n')
-                            && (temp3
-                                    == '(')) { // on vérifie alors qu'on est bien entre deux blancs
-                        // ou entre un saut à la ligne
+                            && (temp3 == '(')) { // we check that we are indeed between two spaces
+                        // or between a line break
                         tabStartFunction.add(start + temp);
-                        tabStopFunction.add(stop + temp); // pr pas prendre la parenthèse
+                        tabStopFunction.add(stop + temp); // to not include the parenthesis
                     }
 
-                    // permet de faire la relation entre le fichier temporaire et le fichier de base
+                    // allows making the relationship between the temporary file and the base file
                     // (JtextArea)
-                    // maintien à jour les chiffres stop et start faussé par le subSequence
+                    // keeps the stop and start numbers updated that were skewed by the subSequence
                     temp += stop;
                     content = (content.subSequence(stop, content.length()));
                 } else {
@@ -743,7 +743,8 @@ public class SparqlQueryEditor extends JPanel
         ArrayList<Integer> tabStop = new ArrayList<>();
         boolean b = temps.toString().contains(toSearch);
         for (int i = temp; i < temps.length(); i++) {
-            // fichier temporaire qui tronque le fichier result a partir du String=toSearch afin de
+            // fichier temporaire qui tronque le fichier result a partir du String=toSearch
+            // afin de
             // trouver les prochains String
             b = temps.toString().contains(toSearch);
             if (b == true) {
@@ -755,9 +756,9 @@ public class SparqlQueryEditor extends JPanel
                 assert (start > -1);
                 stop = start + toSearch.length();
                 tabStop.add(stop + temp);
-                // permet de faire la relation entre le fichier temporaire et le fichier de base
+                // allows making the relationship between the temporary file and the base file
                 // (JtextArea)
-                // maintien à jour les chiffres stop et start faussé par le subSequence
+                // keeps the stop and start numbers updated that were skewed by the subSequence
                 temp += stop;
                 temps = (temps.subSequence(stop, temps.length()));
             } else {

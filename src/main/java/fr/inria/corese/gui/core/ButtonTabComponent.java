@@ -1,21 +1,36 @@
 package fr.inria.corese.gui.core;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
 
 /**
- * Crée la croix fermante sur les onglets Contient un JButton pour fermer l'onglet et un JLabel pour
- * montrer le texte lorsqu'on passe sur le bouton
+ * Creates the closing cross on tabs. Contains a JButton to close the tab and a JLabel to show the
+ * text when hovering over the button
  */
 public class ButtonTabComponent extends JPanel {
 
     private final JTabbedPane pane;
 
     /**
-     * Ajoute le bouton fermant à l'onglet
+     * Adds the closing button to the tab
      *
      * @param coreseFrame
      */

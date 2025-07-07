@@ -75,7 +75,7 @@ import fr.inria.corese.core.util.SPINProcess;
 import fr.inria.corese.gui.core.MainFrame;
 
 /**
- * Onglet Query avec tout ce qu'il contient.
+ * Query tab with everything it contains.
  *
  * @author saguilel
  * @author Maraninchi jerôme
@@ -96,7 +96,7 @@ public final class MyJPanelQuery extends JPanel {
     // display max xml result format
     int maxresxml = 1000;
 
-    // Boutton du panneau Query
+    // Button of the Query panel
     private JButton buttonRun,
             buttonShacl,
             buttonPush,
@@ -115,20 +115,20 @@ public final class MyJPanelQuery extends JPanel {
             buttonProve;
     private JButton buttonSearch;
     private JButton buttonRefreshStyle, buttonDefaultStyle;
-    // panneau de la newQuery
+    // newQuery panel
     private JPanel paneQuery;
-    // Ajoute le scroll pour les différents panneaux
+    // Add scroll for the different panels
     private JScrollPane scrollPaneTreeResult;
     private JScrollPane scrollPaneXMLResult;
     private JScrollPane scrollPaneValidation;
     private JScrollPane scrollPaneTable;
     private JTable tableResults;
-    // Conteneur d'onglets de résultats et les onglets
+    // Results tab container and the tabs
     private JTabbedPane tabbedPaneResults;
     private JTextArea textAreaXMLResult;
     private JTextPane textPaneValidation;
     private JTextPane textPaneStyleGraph;
-    // Pour le graphe
+    // For the graph
     private MultiGraph graph;
     private boolean excepCatch = false;
     private JTextArea textAreaLinesGraph;
@@ -226,7 +226,7 @@ public final class MyJPanelQuery extends JPanel {
         textPaneValidation = new JTextPane();
         textPaneStyleGraph = new JTextPane();
 
-        // compteur de ligne pour la feuille de style de graphe
+        // line counter for the graph stylesheet
         textAreaLinesGraph = new JTextArea();
         textAreaLinesGraph.setFont(new Font("Sanserif", Font.BOLD, 12));
         textAreaLinesGraph.setEditable(false);
@@ -243,9 +243,9 @@ public final class MyJPanelQuery extends JPanel {
         buttonDefaultStyle.setEnabled(false);
 
         /**
-         * ActionListener sur le Bouton refresh Stylesheet Refresh stylesheet du Graphe Permet de
-         * mettre a jour le style du Graphe ou d'afficher une exception sous forme de PopUp lors
-         * d'un problème syntaxique
+         * ActionListener on the Refresh Stylesheet Button. Refreshes graph stylesheet. Allows
+         * updating the graph style or displaying an exception as a PopUp when there is a syntactic
+         * problem
          */
         ActionListener refreshListener =
                 new ActionListener() {
@@ -332,8 +332,8 @@ public final class MyJPanelQuery extends JPanel {
         sparqlQueryEditor = new SparqlQueryEditor(mainFrame);
         // sparqlQueryEditor.setPreferredSize(new Dimension(200,200));
         sparqlQueryEditor.refreshColoring();
-        /** Bouttons et leurs actions * */
-        // Lancer une requête
+        /** Buttons and their actions * */
+        // Launch a query
         // copy current result into new query panel (template)
         buttonPush.setText("Push");
         buttonHeader.setText("Header");
@@ -509,8 +509,8 @@ public final class MyJPanelQuery extends JPanel {
 
     private void installListenersOnMainFrame(final MainFrame coreseFrame) {
         /**
-         * ActionListener sur le bouton DefaultStylesheet Permet d'attribuer un style par défaut
-         * défini au niveau de la MainFrame au graphe
+         * ActionListener on the DefaultStylesheet button. Allows assigning a default style defined
+         * at the MainFrame level to the graph
          */
         ActionListener defaultListener =
                 new ActionListener() {
@@ -875,7 +875,7 @@ public final class MyJPanelQuery extends JPanel {
         graph.addAttribute("ui.antialias");
         textPaneStyleGraph.setText(stylesheet);
 
-        // permet de visualiser correctement le graphe dans l'onglet de Corese
+        // allows properly visualizing the graph in the Corese tab
         LinLog lLayout = new LinLog();
         lLayout.setQuality(0.9);
         lLayout.setGravityFactor(0.9);
@@ -1079,7 +1079,7 @@ public final class MyJPanelQuery extends JPanel {
                         exec.setMappings(getQueryMappings());
 
                         exec.process();
-                        // Permet de passer a true toutes les options du trace KGram
+                        // Allows setting all KGram trace options to true
                         for (int i = 0; i < coreseFrame.getListCheckbox().size(); i++) {
                             coreseFrame.getListCheckbox().get(i).setEnabled(true);
                         }

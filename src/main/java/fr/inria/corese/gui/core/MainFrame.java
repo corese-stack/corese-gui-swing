@@ -95,7 +95,7 @@ import fr.inria.corese.gui.query.MyJPanelQuery;
 import fr.inria.corese.gui.util.GuiPropertyUtils;
 import fr.inria.corese.gui.util.GuiPropertyUtils.Pair;
 
-/** Fenêtre principale, avec le conteneur d'onglets et le menu */
+/** Main window, with the tab container and menu */
 public class MainFrame extends JFrame implements ActionListener {
 
     /** */
@@ -104,19 +104,19 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
     private static final int LOAD = 1;
     private static final String TITLE = "Corese 4.5.1 - Inria UCA I3S - 2023-10-14";
-    // On déclare notre conteneur d'onglets
+    // Declare the tab container
     protected static JTabbedPane conteneurOnglets;
-    // Compteur pour le nombre d'onglets query créés
+    // Counter for the number of query tabs created
     private ArrayList<Integer> nbreTab = new ArrayList<>();
     private String lCurrentPath = "user/home";
     private String lCurrentProperty = "user/home";
 
     private String lPath;
     private String fileName = "";
-    // Variable true ou false pour déterminer le mode Kgram ou Corese
+    // Boolean variable to determine Kgram or Corese mode
     private boolean isKgram = true;
     boolean trace = false;
-    // Pour le menu
+    // For the menu
     private JMenuItem loadRDF;
     private JMenuItem loadProperty;
     private JMenuItem loadSHACL;
@@ -297,7 +297,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     /**
-     * Crée la fenêtre principale, initialise Corese
+     * Creates the main window, initializes Corese
      *
      * @param aCapturer
      * @param args
@@ -483,7 +483,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return this;
     }
 
-    /** Crée un onglet Query * */
+    /** Creates a Query tab * */
     MyJPanelQuery newQuery(String query) {
         return newQuery(query, "");
     }
@@ -569,24 +569,23 @@ public class MainFrame extends JFrame implements ActionListener {
         conteneurOnglets.add("+", plus);
 
         /**
-         * ajoute le bouton de fermeture Juste après la création de l'onglet Query il y a donc 5
-         * composants au conteneur d'onglet (Listener, Shacl , turtle, Query, +) On différencie si
-         * c'est le 1er onglet créé ou non car le fait d'ajouter le croix fermante à l'onglet ajoute
-         * un composant au conteneur d'onglet (1 onglets = 1 composants onglet + 1 composant "croix
-         * fermante" = 2 composants) mais ceci une seule fois (2 onglets = 2 composants onglet + 1
-         * composant "croix fermante" = 3 composants) initTabComponent(0); appliquerait la croix
-         * fermante au 1er onglet du conteneur cad à "Listener"
-         * initTabComponent(conteneurOnglets.getComponentCount()-1); l'appliquerait au dernier
-         * composant du conteneur cad à "+"
-         * initTabComponent(conteneurOnglets.getComponentCount()-3); car il faut retirer la croix et
-         * l'onglet "+" dans le compte
+         * adds the close button. Right after creating the Query tab, there are 5 components in the
+         * tab container (Listener, Shacl, turtle, Query, +). We differentiate if this is the 1st
+         * tab created or not because adding the close cross to the tab adds a component to the tab
+         * container (1 tab = 1 tab component + 1 "close cross" component = 2 components) but this
+         * only once (2 tabs = 2 tab components + 1 "close cross" component = 3 components).
+         * initTabComponent(0); would apply the close cross to the 1st tab of the container i.e. to
+         * "Listener" initTabComponent(conteneurOnglets.getComponentCount()-1); would apply it to
+         * the last component of the container i.e. to "+"
+         * initTabComponent(conteneurOnglets.getComponentCount()-3); because we need to remove the
+         * cross and the "+" tab from the count
          */
-        // Si c'est le 1er onglet Query créé
+        // If this is the 1st Query tab created
         if (conteneurOnglets.getComponentCount() == 5) {
-            // On applique la croix fermante sur le 4eme composant (l'onglet tout juste
-            // créé)
+            // We apply the close cross on the 4th component (the tab just
+            // created)
             initTabComponent(3);
-        } // S'il y en avait déjà
+        } // If there were already some
         else {
             initTabComponent(conteneurOnglets.getComponentCount() - 3);
         }
@@ -1579,7 +1578,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     void saveQuery() {
-        // Créer un JFileChooser
+        // Create a JFileChooser
         JFileChooser filechoose = new JFileChooser(getPath());
         // Le bouton pour valider l’enregistrement portera la mention enregistrer
         String approve = "Save";
@@ -1641,12 +1640,12 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     void write(String str, String path) throws IOException {
-        // Créer un objet java.io.FileWriter avec comme argument le mon du fichier dans
-        // lequel enregsitrer
+        // Create a java.io.FileWriter object with the file name as argument in
+        // which to save
         FileWriter lu = new FileWriter(path);
-        // Mettre le flux en tampon (en cache)
+        // Put the stream in buffer (in cache)
         BufferedWriter out = new BufferedWriter(lu);
-        // Mettre dans le flux le contenu de la zone de texte
+        // Put the content of the text area in the stream
         out.write(str);
         // Fermer le flux
         out.close();
@@ -1706,7 +1705,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     /**
-     * Permet de récupérer sous forme de String l'extension du fichier
+     * Allows retrieving the file extension as a String
      *
      * @param o
      * @return
