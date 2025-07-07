@@ -642,7 +642,6 @@ public final class MyJPanelQuery extends JPanel {
         for (fr.inria.corese.core.kgram.api.core.Node var : vars) {
             if (accept(ast, var.getLabel())) {
                 String columnName = var.getLabel();
-                // System.out.println(sv);
                 String[] colmunData = new String[size];
                 for (int j = 0; j < map.size(); j++) {
                     if (j >= maxres) {

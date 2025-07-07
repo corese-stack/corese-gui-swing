@@ -1984,7 +1984,6 @@ public class MainFrame extends JFrame implements ActionListener {
             myCorese.load(fichier);
             Date d2 = new Date();
             appendMsg(myCapturer.getContent());
-            System.out.println("Load time: " + (d2.getTime() - d1.getTime()) / 1000.0);
             LOGGER.info("Load time: " + (d2.getTime() - d1.getTime()) / 1000.0);
         } catch (EngineException | LoadException e) {
             appendMsg(e.toString());

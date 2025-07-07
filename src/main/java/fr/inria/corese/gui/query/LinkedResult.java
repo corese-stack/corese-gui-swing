@@ -170,7 +170,6 @@ public class LinkedResult implements URLParam {
     // display json message
     void display(JSONObject json) {
         for (String key : json.keySet()) {
-            //System.out.println(key + " = " + json.get(key));
             msg(key + " = " + json.get(key)).msg(NL);
         }
         

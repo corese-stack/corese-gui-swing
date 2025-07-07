@@ -49,7 +49,6 @@ public class DocumentResult {
         msg(NL);
         msg("Resource URI found in the graph").msg(NL); 
         for (String key : json.keySet()) {
-            //System.out.println(key + " = " + json.get(key));
             msg(key + " -> " + json.get(key)).msg(NL);
         }
     }
