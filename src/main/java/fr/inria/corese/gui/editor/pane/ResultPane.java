@@ -28,10 +28,12 @@ public class ResultPane {
     }
 
     public JScrollPane getPane() {
-        JScrollPane scrollResult = new JScrollPane(this.result, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JScrollPane scrollResult =
+                new JScrollPane(
+                        this.result,
+                        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         return scrollResult;
     }
-
 }

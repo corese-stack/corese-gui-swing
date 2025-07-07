@@ -26,35 +26,36 @@ public class LoadButton extends Button {
     @Override
     protected ActionListener action() {
 
-        ActionListener buttonLoadListener = new ActionListener() {
+        ActionListener buttonLoadListener =
+                new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
 
-                String editorContent = editor.getContent();
+                        String editorContent = editor.getContent();
 
-                // Test if empty
-                if (editorContent.strip().isEmpty()) {
-                    result.setContent("Error : Document is empty.");
-                    return;
-                }
+                        // Test if empty
+                        if (editorContent.strip().isEmpty()) {
+                            result.setContent("Error : Document is empty.");
+                            return;
+                        }
 
-                // Load editor content in Corese
-                try {
-                    LoadButton.this.mainFrame.getMyCorese().loadRDF(editorContent, Load.format.TURTLE_FORMAT);
-                } catch (EngineException | LoadException e1) {
-                    e1.printStackTrace();
-                    return;
-                }
+                        // Load editor content in Corese
+                        try {
+                            LoadButton.this
+                                    .mainFrame
+                                    .getMyCorese()
+                                    .loadRDF(editorContent, Load.format.TURTLE_FORMAT);
+                        } catch (EngineException | LoadException e1) {
+                            e1.printStackTrace();
+                            return;
+                        }
 
-                // Confirmation
-                result.setContent("Document is loaded in Corese");
-                LoadButton.this.mainFrame.appendMsg("Loaded from editor …");
-
-            }
-
-        };
+                        // Confirmation
+                        result.setContent("Document is loaded in Corese");
+                        LoadButton.this.mainFrame.appendMsg("Loaded from editor …");
+                    }
+                };
         return buttonLoadListener;
     }
-
 }

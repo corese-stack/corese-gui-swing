@@ -22,19 +22,23 @@ public class ClearButton extends Button {
     @Override
     protected ActionListener action() {
 
-        ActionListener buttonClearListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int input = JOptionPane.showConfirmDialog(null, "Clear editor contents?", "Confirmation",
-                        JOptionPane.OK_CANCEL_OPTION);
+        ActionListener buttonClearListener =
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int input =
+                                JOptionPane.showConfirmDialog(
+                                        null,
+                                        "Clear editor contents?",
+                                        "Confirmation",
+                                        JOptionPane.OK_CANCEL_OPTION);
 
-                if (input == 0) {
-                    ClearButton.this.editor.setContent("");
-                    ClearButton.this.result.setContent("");
-                }
-            }
-        };
+                        if (input == 0) {
+                            ClearButton.this.editor.setContent("");
+                            ClearButton.this.result.setContent("");
+                        }
+                    }
+                };
         return buttonClearListener;
     }
-
 }

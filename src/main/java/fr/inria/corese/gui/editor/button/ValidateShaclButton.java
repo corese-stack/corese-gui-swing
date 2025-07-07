@@ -19,7 +19,8 @@ public class ValidateShaclButton extends Button {
     private ResultPane resultPane;
     private MainFrame mainFrame;
 
-    public ValidateShaclButton(EditorPane editorPane, ResultPane resultPane, final MainFrame coreseFrame) {
+    public ValidateShaclButton(
+            EditorPane editorPane, ResultPane resultPane, final MainFrame coreseFrame) {
         super("Validate");
         this.editorPane = editorPane;
         this.resultPane = resultPane;
@@ -29,50 +30,50 @@ public class ValidateShaclButton extends Button {
     @Override
     protected ActionListener action() {
 
-        ActionListener buttonValidateListener = new ActionListener() {
+        ActionListener buttonValidateListener =
+                new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
 
-                String editorShaclContent = editorPane.getContent();
-                Graph coreseGraph = mainFrame.getMyCorese().getGraph();
+                        String editorShaclContent = editorPane.getContent();
+                        Graph coreseGraph = mainFrame.getMyCorese().getGraph();
 
-                // Test if empty
-                if (editorShaclContent.strip().isEmpty()) {
-                    resultPane.setContent("Error : SHACL document is empty.");
-                    return;
-                }
+                        // Test if empty
+                        if (editorShaclContent.strip().isEmpty()) {
+                            resultPane.setContent("Error : SHACL document is empty.");
+                            return;
+                        }
 
-                // Try to load SHACL file
-                Graph shapeGraph = Graph.create();
-                Load ld = Load.create(shapeGraph);
-                try {
-                    ld.loadString(editorShaclContent, Load.format.TURTLE_FORMAT);
-                } catch (LoadException e1) {
-                    resultPane.setContent("Error : malformed SHACL document.");
-                    e1.printStackTrace();
-                    return;
-                }
+                        // Try to load SHACL file
+                        Graph shapeGraph = Graph.create();
+                        Load ld = Load.create(shapeGraph);
+                        try {
+                            ld.loadString(editorShaclContent, Load.format.TURTLE_FORMAT);
+                        } catch (LoadException e1) {
+                            resultPane.setContent("Error : malformed SHACL document.");
+                            e1.printStackTrace();
+                            return;
+                        }
 
-                // Eval
-                Shacl shacl = new Shacl(coreseGraph, shapeGraph);
-                shacl.setDataManager(mainFrame.getMyCorese().getDataManager());
+                        // Eval
+                        Shacl shacl = new Shacl(coreseGraph, shapeGraph);
+                        shacl.setDataManager(mainFrame.getMyCorese().getDataManager());
 
-                Graph result = null;
-                try {
-                    result = shacl.eval();
-                } catch (EngineException e2) {
-                    resultPane.setContent("Error : engine exception.");
-                    e2.printStackTrace();
-                    return;
-                }
+                        Graph result = null;
+                        try {
+                            result = shacl.eval();
+                        } catch (EngineException e2) {
+                            resultPane.setContent("Error : engine exception.");
+                            e2.printStackTrace();
+                            return;
+                        }
 
-                // Format and export result
-                Transformer transformer = Transformer.create(result, Transformer.TURTLE);
-                resultPane.setContent(transformer.toString());
-            }
-        };
+                        // Format and export result
+                        Transformer transformer = Transformer.create(result, Transformer.TURTLE);
+                        resultPane.setContent(transformer.toString());
+                    }
+                };
         return buttonValidateListener;
     }
-
 }

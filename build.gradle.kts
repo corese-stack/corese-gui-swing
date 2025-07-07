@@ -11,6 +11,7 @@ plugins {
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
     id("com.gradleup.shadow") version "8.3.6"                   // Bundles dependencies into a single JAR
+    id("com.diffplug.spotless") version "6.25.0"                // Code formatting and style checking
 }
 
 /////////////////////////
@@ -26,11 +27,11 @@ object Meta {
     // Project description
     const val desc = "A graphical desktop application for exploring, querying, and visualizing RDF data using SPARQL and SHACL with the Corese engine."
     const val githubRepo = "corese-stack/corese-gui-swing"
-  
+
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-  
+
     // Sonatype OSSRH publishing settings
     const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
     const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -89,7 +90,7 @@ publishing {
             // Configure the publication to include JAR, sources, and Javadoc
             from(components["java"])
 
-            // Configures version mapping to control how dependency versions are resolved 
+            // Configures version mapping to control how dependency versions are resolved
             // for different usage contexts (API and runtime).
             versionMapping {
                 // Defines version mapping for Java API usage.
@@ -172,7 +173,7 @@ nexusPublishing {
             // Retrieve Sonatype OSSRH credentials from environment variables.
             val ossrhUsername = providers.environmentVariable("OSSRH_USERNAME")
             val ossrhPassword = providers.environmentVariable("OSSRH_PASSWORD")
-            
+
             // Set the credentials for Sonatype OSSRH if they are available.
             if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
                 username.set(ossrhUsername.get())
@@ -245,4 +246,34 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 // This guarantees that artifacts are signed before they are published to Maven repositories.
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
+}
+
+/////////////////////////
+// Code formatting     //
+/////////////////////////
+
+// Configure Spotless for consistent code formatting across the project
+spotless {
+    // Java source files formatting
+    java {
+        target("src/**/*.java")
+
+        // Use Google Java Format as the base formatter
+        googleJavaFormat("1.22.0").aosp()
+
+        // Remove unused imports
+        removeUnusedImports()
+
+        // Organize imports
+        importOrder("java", "javax", "org", "com", "fr.inria.corese", "")
+
+        // Ensure consistent line endings and formatting
+        endWithNewline()
+        trimTrailingWhitespace()
+    }
+}
+
+// Make sure spotless check runs as part of the check task
+tasks.check {
+    dependsOn(tasks.spotlessCheck)
 }

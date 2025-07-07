@@ -23,32 +23,32 @@ public class SyntaxCheckButton extends Button {
     @Override
     protected ActionListener action() {
 
-        ActionListener buttonSyntaxListener = new ActionListener() {
+        ActionListener buttonSyntaxListener =
+                new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
 
-                String editorTurtleContent = editorPane.getContent();
+                        String editorTurtleContent = editorPane.getContent();
 
-                // Test if empty
-                if (editorTurtleContent.strip().isEmpty()) {
-                    resultPane.setContent("Error : Turtle document is empty.");
-                    return;
-                }
+                        // Test if empty
+                        if (editorTurtleContent.strip().isEmpty()) {
+                            resultPane.setContent("Error : Turtle document is empty.");
+                            return;
+                        }
 
-                // Try to load Turtle file
-                Graph turtleGraph = Graph.create();
-                Load ld = Load.create(turtleGraph);
-                try {
-                    ld.loadString(editorTurtleContent, Load.format.TURTLE_FORMAT);
-                    resultPane.setContent("Turtle is syntactically valid");
-                } catch (LoadException e1) {
-                    resultPane.setContent(e1.getMessage());
-                    return;
-                }
-            }
-        };
+                        // Try to load Turtle file
+                        Graph turtleGraph = Graph.create();
+                        Load ld = Load.create(turtleGraph);
+                        try {
+                            ld.loadString(editorTurtleContent, Load.format.TURTLE_FORMAT);
+                            resultPane.setContent("Turtle is syntactically valid");
+                        } catch (LoadException e1) {
+                            resultPane.setContent(e1.getMessage());
+                            return;
+                        }
+                    }
+                };
         return buttonSyntaxListener;
     }
-
 }

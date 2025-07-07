@@ -48,23 +48,18 @@ import org.graphstream.ui.layout.springbox.implementations.LinLog;
 import org.graphstream.ui.swingViewer.View;
 import org.graphstream.ui.swingViewer.Viewer;
 
-import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.print.LogManager;
-import fr.inria.corese.core.print.ResultFormat;
-import fr.inria.corese.core.print.XMLFormat;
-import fr.inria.corese.core.transform.Transformer;
-import fr.inria.corese.core.util.CompareMappings;
-import fr.inria.corese.core.util.Property;
-import fr.inria.corese.core.util.SPINProcess;
-import fr.inria.corese.gui.core.MainFrame;
+import fr.inria.corese.core.compiler.parser.Pragma;
 import fr.inria.corese.core.kgram.api.core.ExpType;
 import fr.inria.corese.core.kgram.core.Mapping;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.core.SparqlException;
+import fr.inria.corese.core.load.Load;
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.print.LogManager;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.print.XMLFormat;
 import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.datatype.RDF;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
@@ -73,6 +68,11 @@ import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
 import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
+import fr.inria.corese.core.transform.Transformer;
+import fr.inria.corese.core.util.CompareMappings;
+import fr.inria.corese.core.util.Property;
+import fr.inria.corese.core.util.SPINProcess;
+import fr.inria.corese.gui.core.MainFrame;
 
 /**
  * Onglet Query avec tout ce qu'il contient.
@@ -97,13 +97,22 @@ public final class MyJPanelQuery extends JPanel {
     int maxresxml = 1000;
 
     // Boutton du panneau Query
-    private JButton buttonRun, buttonShacl, buttonPush,
+    private JButton buttonRun,
+            buttonShacl,
+            buttonPush,
             buttonHeader,
             buttonLog,
-            buttonCopy, buttonBrowse,
-            buttonSort, buttonCompare,
-            buttonKill, buttonStop, buttonValidate, buttonToSPIN, buttonToSPARQL,
-            buttonTKgram, buttonProve;
+            buttonCopy,
+            buttonBrowse,
+            buttonSort,
+            buttonCompare,
+            buttonKill,
+            buttonStop,
+            buttonValidate,
+            buttonToSPIN,
+            buttonToSPARQL,
+            buttonTKgram,
+            buttonProve;
     private JButton buttonSearch;
     private JButton buttonRefreshStyle, buttonDefaultStyle;
     // panneau de la newQuery
@@ -136,7 +145,8 @@ public final class MyJPanelQuery extends JPanel {
     private Exec current;
     private static final String KGSTYLE = ExpType.KGRAM + "style";
     private static final String KGGRAPH = Pragma.GRAPH;
-    private static final Logger logger = org.apache.logging.log4j.LogManager.getLogger(MyJPanelQuery.class.getName());
+    private static final Logger logger =
+            org.apache.logging.log4j.LogManager.getLogger(MyJPanelQuery.class.getName());
     private boolean displayLink = true;
     private Mappings mappings;
     private JPanel loadPanel;
@@ -233,92 +243,96 @@ public final class MyJPanelQuery extends JPanel {
         buttonDefaultStyle.setEnabled(false);
 
         /**
-         * ActionListener sur le Bouton refresh Stylesheet Refresh stylesheet du
-         * Graphe Permet de mettre a jour le style du Graphe ou d'afficher une
-         * exception sous forme de PopUp lors d'un problème syntaxique
+         * ActionListener sur le Bouton refresh Stylesheet Refresh stylesheet du Graphe Permet de
+         * mettre a jour le style du Graphe ou d'afficher une exception sous forme de PopUp lors
+         * d'un problème syntaxique
          */
-        ActionListener refreshListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String style = textPaneStyleGraph.getText();
-                JTextArea areaException = new JTextArea();
-                StyleSheet sh = new StyleSheet();
-                try {
-                    sh.parseFromString(style);
-                    areaException.setText("");
-                    excepCatch = false;
-                } catch (Exception e1) {
-                    areaException.setText(e1.getMessage());
-                    areaException.setEditable(false);
-                    areaException.setForeground(Color.red);
-                    JOptionPane.showMessageDialog(null, areaException, "Error Syntax", JOptionPane.WARNING_MESSAGE);
-                    excepCatch = true;
-                } /*
-                   * catch (TokenMgrError e1) {
-                   * areaException.setText(e1.getMessage());
-                   * areaException.setEditable(false);
-                   * areaException.setForeground(Color.red);
-                   * JOptionPane.showMessageDialog(null, areaException, "Error Syntax",
-                   * JOptionPane.WARNING_MESSAGE);
-                   * excepCatch = true;
-                   * }
-                   */
-                if (!excepCatch) {
-                    graph.addAttribute("ui.stylesheet", style);
-                    textPaneStyleGraph.setText(style);
-                    stylesheet = style;
-                }
-
-            }
-        };
+        ActionListener refreshListener =
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String style = textPaneStyleGraph.getText();
+                        JTextArea areaException = new JTextArea();
+                        StyleSheet sh = new StyleSheet();
+                        try {
+                            sh.parseFromString(style);
+                            areaException.setText("");
+                            excepCatch = false;
+                        } catch (Exception e1) {
+                            areaException.setText(e1.getMessage());
+                            areaException.setEditable(false);
+                            areaException.setForeground(Color.red);
+                            JOptionPane.showMessageDialog(
+                                    null,
+                                    areaException,
+                                    "Error Syntax",
+                                    JOptionPane.WARNING_MESSAGE);
+                            excepCatch = true;
+                        } /*
+                           * catch (TokenMgrError e1) {
+                           * areaException.setText(e1.getMessage());
+                           * areaException.setEditable(false);
+                           * areaException.setForeground(Color.red);
+                           * JOptionPane.showMessageDialog(null, areaException, "Error Syntax",
+                           * JOptionPane.WARNING_MESSAGE);
+                           * excepCatch = true;
+                           * }
+                           */
+                        if (!excepCatch) {
+                            graph.addAttribute("ui.stylesheet", style);
+                            textPaneStyleGraph.setText(style);
+                            stylesheet = style;
+                        }
+                    }
+                };
         buttonRefreshStyle.addActionListener(refreshListener);
 
         checkLines(textPaneStyleGraph, textAreaLinesGraph);
         /**
-         * DocumentListener sur le textPaneStyleGraph Listener sur le
-         * textPaneStyleGraph afin d'actualiser le nombre de lignes
+         * DocumentListener sur le textPaneStyleGraph Listener sur le textPaneStyleGraph afin
+         * d'actualiser le nombre de lignes
          */
-        DocumentListener l_paneGraphListener = new DocumentListener() {
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                checkLines(textPaneStyleGraph, textAreaLinesGraph);
-            }
+        DocumentListener l_paneGraphListener =
+                new DocumentListener() {
+                    @Override
+                    public void removeUpdate(DocumentEvent e) {
+                        checkLines(textPaneStyleGraph, textAreaLinesGraph);
+                    }
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                checkLines(textPaneStyleGraph, textAreaLinesGraph);
-            }
+                    @Override
+                    public void insertUpdate(DocumentEvent e) {
+                        checkLines(textPaneStyleGraph, textAreaLinesGraph);
+                    }
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                checkLines(textPaneStyleGraph, textAreaLinesGraph);
-            }
-        };
+                    @Override
+                    public void changedUpdate(DocumentEvent e) {
+                        checkLines(textPaneStyleGraph, textAreaLinesGraph);
+                    }
+                };
         Document doc3 = textPaneStyleGraph.getDocument();
         doc3.addDocumentListener(l_paneGraphListener);
 
         /**
-         * FocusListener sur le textPaneStyleGraph Permet d'actualiser le
-         * compteur de ligne lors d'un FocusGained et FocusLost
+         * FocusListener sur le textPaneStyleGraph Permet d'actualiser le compteur de ligne lors
+         * d'un FocusGained et FocusLost
          */
-        FocusListener paneGraphFocusListener = new FocusListener() {
-            @Override
-            public void focusLost(final FocusEvent e) {
-                checkLines(textPaneStyleGraph, textAreaLinesGraph);
-            }
+        FocusListener paneGraphFocusListener =
+                new FocusListener() {
+                    @Override
+                    public void focusLost(final FocusEvent e) {
+                        checkLines(textPaneStyleGraph, textAreaLinesGraph);
+                    }
 
-            @Override
-            public void focusGained(final FocusEvent e) {
-                checkLines(textPaneStyleGraph, textAreaLinesGraph);
-            }
-        };
+                    @Override
+                    public void focusGained(final FocusEvent e) {
+                        checkLines(textPaneStyleGraph, textAreaLinesGraph);
+                    }
+                };
         textPaneStyleGraph.addFocusListener(paneGraphFocusListener);
 
         sparqlQueryEditor = new SparqlQueryEditor(mainFrame);
         // sparqlQueryEditor.setPreferredSize(new Dimension(200,200));
         sparqlQueryEditor.refreshColoring();
-        /**
-         * Bouttons et leurs actions *
-         */
+        /** Bouttons et leurs actions * */
         // Lancer une requête
         // copy current result into new query panel (template)
         buttonPush.setText("Push");
@@ -342,24 +356,28 @@ public final class MyJPanelQuery extends JPanel {
         // Pour chercher un string dans la fenêtre de résultat XML
         buttonSearch.setText("Search");
 
-        ActionListener searchListener = new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                // textAreaXMLResult.setText(resultXML.toString());
-                String toSearch = "";
-                String message = "";
+        ActionListener searchListener =
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        // textAreaXMLResult.setText(resultXML.toString());
+                        String toSearch = "";
+                        String message = "";
 
-                String temps = textAreaXMLResult.getText();
-                toSearch = JOptionPane.showInputDialog("Search", message);
+                        String temps = textAreaXMLResult.getText();
+                        toSearch = JOptionPane.showInputDialog("Search", message);
 
-                if (toSearch != null) {
-                    sparqlQueryEditor.search(temps, toSearch, textAreaXMLResult, message);
-                } else {
-                    JOptionPane.showMessageDialog(getPaneQuery(), "Veuillez entrer une chaine de caracteres", "info",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        };
+                        if (toSearch != null) {
+                            sparqlQueryEditor.search(temps, toSearch, textAreaXMLResult, message);
+                        } else {
+                            JOptionPane.showMessageDialog(
+                                    getPaneQuery(),
+                                    "Veuillez entrer une chaine de caracteres",
+                                    "info",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                };
         buttonSearch.addActionListener(searchListener);
 
         // Résultat sous forme d'arbre
@@ -386,15 +404,18 @@ public final class MyJPanelQuery extends JPanel {
         tabbedPaneResults.addTab("Validate", scrollPaneValidation);
 
         // Mise en forme
-        final JSplitPane jp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, sparqlQueryEditor, tabbedPaneResults);
+        final JSplitPane jp =
+                new JSplitPane(JSplitPane.VERTICAL_SPLIT, sparqlQueryEditor, tabbedPaneResults);
         jp.setContinuousLayout(true);
 
         GroupLayout pane_listenerLayout = new GroupLayout(paneQuery);
         paneQuery.setLayout(pane_listenerLayout);
 
-        GroupLayout.ParallelGroup hParallel1 = pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
+        GroupLayout.ParallelGroup hParallel1 =
+                pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
         GroupLayout.SequentialGroup hSeq1 = pane_listenerLayout.createSequentialGroup();
-        GroupLayout.ParallelGroup hParallel2 = pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
+        GroupLayout.ParallelGroup hParallel2 =
+                pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
         GroupLayout.SequentialGroup hSeq2 = pane_listenerLayout.createSequentialGroup();
 
         hSeq2.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 257, Short.MAX_VALUE);
@@ -425,17 +446,21 @@ public final class MyJPanelQuery extends JPanel {
         service.setMaximumSize(new Dimension(400, 10));
         service.add(serviceEditor);
         service.setName("service");
-        hParallel2.addComponent(service, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
+        hParallel2.addComponent(
+                service, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
 
-        hParallel2.addComponent(jp, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
+        hParallel2.addComponent(
+                jp, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
         hSeq1.addContainerGap();
         hSeq1.addGroup(hParallel2);
         hParallel1.addGroup(hSeq1);
 
         pane_listenerLayout.setHorizontalGroup(hParallel1);
 
-        GroupLayout.ParallelGroup vParallel1 = pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
-        GroupLayout.ParallelGroup vParallel2 = pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
+        GroupLayout.ParallelGroup vParallel1 =
+                pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
+        GroupLayout.ParallelGroup vParallel2 =
+                pane_listenerLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
         GroupLayout.SequentialGroup vSeq1 = pane_listenerLayout.createSequentialGroup();
 
         vParallel2.addComponent(buttonRun);
@@ -468,7 +493,6 @@ public final class MyJPanelQuery extends JPanel {
         vParallel1.addGroup(vSeq1);
 
         pane_listenerLayout.setVerticalGroup(vParallel1);
-
     }
 
     public String getSparqlRequest() {
@@ -485,16 +509,17 @@ public final class MyJPanelQuery extends JPanel {
 
     private void installListenersOnMainFrame(final MainFrame coreseFrame) {
         /**
-         * ActionListener sur le bouton DefaultStylesheet Permet d'attribuer un
-         * style par défaut défini au niveau de la MainFrame au graphe
+         * ActionListener sur le bouton DefaultStylesheet Permet d'attribuer un style par défaut
+         * défini au niveau de la MainFrame au graphe
          */
-        ActionListener defaultListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                stylesheet = coreseFrame.getDefaultStylesheet();
-                textPaneStyleGraph.setText(stylesheet);
-                graph.addAttribute("ui.stylesheet", stylesheet);
-            }
-        };
+        ActionListener defaultListener =
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        stylesheet = coreseFrame.getDefaultStylesheet();
+                        textPaneStyleGraph.setText(stylesheet);
+                        graph.addAttribute("ui.stylesheet", stylesheet);
+                    }
+                };
         buttonDefaultStyle.addActionListener(defaultListener);
 
         ActionListener l_RunListener = createListener(coreseFrame, false);
@@ -530,9 +555,7 @@ public final class MyJPanelQuery extends JPanel {
         }
     }
 
-    /**
-     * Max number of xml results to display can be set by Property
-     */
+    /** Max number of xml results to display can be set by Property */
     int maxResXML() {
         if (Property.intValue(GUI_XML_MAX) != null) {
             return Property.intValue(GUI_XML_MAX);
@@ -554,7 +577,10 @@ public final class MyJPanelQuery extends JPanel {
                     str = "";
                 }
                 if (map.size() > maxResXML()) {
-                    logger.info(String.format("GUI display %s XML results out of %s", maxResXML(), map.size()));
+                    logger.info(
+                            String.format(
+                                    "GUI display %s XML results out of %s",
+                                    maxResXML(), map.size()));
                 }
                 if (str.isEmpty() && ast.getErrors() != null) {
                     return ast.getErrorString();
@@ -571,11 +597,14 @@ public final class MyJPanelQuery extends JPanel {
         if (Property.stringValue(GUI_SELECT_FORMAT) != null) {
             switch (Property.stringValue(GUI_SELECT_FORMAT)) {
                 case Property.JSON:
-                    return clean(ResultFormat.create(map, ResultFormat.format.JSON_FORMAT)
-                            .setNbResult(maxResXML()).toString());
+                    return clean(
+                            ResultFormat.create(map, ResultFormat.format.JSON_FORMAT)
+                                    .setNbResult(maxResXML())
+                                    .toString());
                 case Property.XML:
                     return ResultFormat.create(map, ResultFormat.format.XML_FORMAT)
-                            .setNbResult(maxResXML()).toString();
+                            .setNbResult(maxResXML())
+                            .toString();
             }
         }
         ResultFormat rf = ResultFormat.create(map).setNbResult(maxResXML());
@@ -591,17 +620,22 @@ public final class MyJPanelQuery extends JPanel {
                 case Property.RDF_XML:
                     return ResultFormat.create(g, ResultFormat.format.RDF_XML_FORMAT).toString();
                 case Property.TURTLE:
-                    return ResultFormat.create(g, map.getQuery().getAST().getNSM(),
-                            ResultFormat.format.TURTLE_FORMAT).toString();
+                    return ResultFormat.create(
+                                    g,
+                                    map.getQuery().getAST().getNSM(),
+                                    ResultFormat.format.TURTLE_FORMAT)
+                            .toString();
                 case Property.TRIG:
                     return ResultFormat.create(g, ResultFormat.format.TRIG_FORMAT).toString();
                 case Property.JSON:
-                    return clean(ResultFormat.create(g, ResultFormat.format.JSONLD_FORMAT).toString());
+                    return clean(
+                            ResultFormat.create(g, ResultFormat.format.JSONLD_FORMAT).toString());
             }
         }
         // default
-        return ResultFormat.create(g,
-                map.getQuery().getAST().getNSM(), ResultFormat.format.TRIG_FORMAT).toString();
+        return ResultFormat.create(
+                        g, map.getQuery().getAST().getNSM(), ResultFormat.format.TRIG_FORMAT)
+                .toString();
         // return turtle(g);
     }
 
@@ -645,7 +679,8 @@ public final class MyJPanelQuery extends JPanel {
                 String[] colmunData = new String[size];
                 for (int j = 0; j < map.size(); j++) {
                     if (j >= maxres) {
-                        logger.warn("Stop display after " + maxres + " results out of " + map.size());
+                        logger.warn(
+                                "Stop display after " + maxres + " results out of " + map.size());
                         break;
                     }
                     Mapping m = map.get(j);
@@ -720,8 +755,8 @@ public final class MyJPanelQuery extends JPanel {
     }
 
     String prettyLiteral(IDatatype dt) {
-        if (dt.getCode() == IDatatype.STRING ||
-                (dt.getCode() == IDatatype.LITERAL && !dt.hasLang())) {
+        if (dt.getCode() == IDatatype.STRING
+                || (dt.getCode() == IDatatype.LITERAL && !dt.hasLang())) {
             return dt.stringValue();
         }
         if (dt.isDecimalInteger()) {
@@ -818,9 +853,7 @@ public final class MyJPanelQuery extends JPanel {
         }
     }
 
-    /**
-     * template return turtle graph description display as graph
-     */
+    /** template return turtle graph description display as graph */
     void display(Mappings map, NSManager nsm) {
         fr.inria.corese.core.kgram.api.core.Node res = map.getTemplateResult();
         if (res != null) {
@@ -874,7 +907,6 @@ public final class MyJPanelQuery extends JPanel {
 
         // pointe sur l'onglet Graph
         tabbedPaneResults.setSelectedIndex(GRAPH_PANEL);
-
     }
 
     MultiGraph create(fr.inria.corese.core.Graph g, NSManager nsm) {
@@ -944,9 +976,7 @@ public final class MyJPanelQuery extends JPanel {
         return edge.getEdgeLabel().equals(KGSTYLE);
     }
 
-    /**
-     * Display result using Mappings
-     */
+    /** Display result using Mappings */
     void display(DefaultMutableTreeNode root, Mappings map) {
         int i = 1;
         for (Mapping res : map) {
@@ -1023,8 +1053,9 @@ public final class MyJPanelQuery extends JPanel {
                         modifier(query);
                     } else if (ev.getSource() == buttonCompare) {
                         compare();
-                    } else if (ev.getSource() == buttonRun || ev.getSource() == buttonValidate
-                            || ev.getSource() == buttonShacl ) {
+                    } else if (ev.getSource() == buttonRun
+                            || ev.getSource() == buttonValidate
+                            || ev.getSource() == buttonShacl) {
                         // buttonRun
 
                         // Print load message
@@ -1063,8 +1094,9 @@ public final class MyJPanelQuery extends JPanel {
 
                 } catch (EngineException e) {
                     e.printStackTrace();
-                    textAreaXMLResult.setText(coreseFrame.getMyCapturer().getContent() + e.getMessage()); // display
-                                                                                                          // errors
+                    textAreaXMLResult.setText(
+                            coreseFrame.getMyCapturer().getContent() + e.getMessage()); // display
+                    // errors
                 }
                 textPaneValidation.setText(l_message + "Done.");
             }
@@ -1117,8 +1149,8 @@ public final class MyJPanelQuery extends JPanel {
     }
 
     /**
-     * User edit order by clause and click button Sort
-     * Execute order by on current Mappings, assuming query is "the same"
+     * User edit order by clause and click button Sort Execute order by on current Mappings,
+     * assuming query is "the same"
      */
     void modifier(String query) {
         if (getCurrent() == null) {
@@ -1134,7 +1166,6 @@ public final class MyJPanelQuery extends JPanel {
             logger.error(ex);
         } catch (SparqlException ex) {
             logger.error(ex);
-
         }
         // }
     }
@@ -1175,7 +1206,9 @@ public final class MyJPanelQuery extends JPanel {
 
                 if (!v1.equals(v2)) {
                     found = true;
-                    show("Different value at: (row=%s, var=%s): %s != %s", i, fst.getColumnName(j), v1, v2);
+                    show(
+                            "Different value at: (row=%s, var=%s): %s != %s",
+                            i, fst.getColumnName(j), v1, v2);
                 }
             }
         }
@@ -1247,7 +1280,7 @@ public final class MyJPanelQuery extends JPanel {
         textComponentOutput.setText(text);
     }
 
-    static public void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         JFrame frame = new JFrame("MyJPanelQuery");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         MyJPanelQuery panelQuery = new MyJPanelQuery();
@@ -1270,9 +1303,8 @@ public final class MyJPanelQuery extends JPanel {
     }
 
     /**
-     * Query result accessible by xt:mappings()
-     * Use case: Previous Query Result has been Copied (Copy button)
-     * here to be processed by xt:mappings()
+     * Query result accessible by xt:mappings() Use case: Previous Query Result has been Copied
+     * (Copy button) here to be processed by xt:mappings()
      */
     Mappings getQueryMappings() {
         return getMappings();
@@ -1300,5 +1332,4 @@ public final class MyJPanelQuery extends JPanel {
     public void setGraphEngine(GraphEngine graphEngine) {
         this.graphEngine = graphEngine;
     }
-
 }

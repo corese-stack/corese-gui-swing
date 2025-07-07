@@ -9,8 +9,8 @@ import java.util.Map;
 import fr.inria.corese.core.util.Property;
 
 /**
- * Utilities for accessing Corese properties on the GUI side,
- * without relying on package-private methods/constructors.
+ * Utilities for accessing Corese properties on the GUI side, without relying on package-private
+ * methods/constructors.
  */
 public final class GuiPropertyUtils {
 
@@ -48,9 +48,7 @@ public final class GuiPropertyUtils {
         for (String entry : raw.split(";")) {
             String[] parts = entry.split("=", 2);
             if (parts.length == 2) {
-                pairs.add(new Pair(
-                        parts[0].trim(),
-                        expand(parts[1].trim())));
+                pairs.add(new Pair(parts[0].trim(), expand(parts[1].trim())));
             }
         }
         return pairs;
@@ -72,8 +70,7 @@ public final class GuiPropertyUtils {
     private static final String VAR_CHAR = "$";
 
     private static String expand(String value) {
-        if (value == null)
-            return null;
+        if (value == null) return null;
 
         // 1) Variables $var:
         Map<String, String> varMap = variableMap();
@@ -96,15 +93,13 @@ public final class GuiPropertyUtils {
     private static Map<String, String> variableMap() {
         String raw = Property.stringValue(Property.Value.VARIABLE);
         Map<String, String> map = new HashMap<>();
-        if (raw == null)
-            return map;
+        if (raw == null) return map;
 
         for (String entry : raw.split(";")) {
             String[] parts = entry.split("=", 2);
             if (parts.length == 2) {
                 String key = parts[0].trim();
-                if (!key.startsWith(VAR_CHAR))
-                    key = VAR_CHAR + key;
+                if (!key.startsWith(VAR_CHAR)) key = VAR_CHAR + key;
                 map.put(key, parts[1].trim());
             }
         }

@@ -2,14 +2,10 @@ package fr.inria.corese.gui.query;
 
 import fr.inria.corese.core.query.DatasetManager;
 
-/**
- *
- */
-public class DatasetManagerGui
-        extends DatasetManager {
+/** */
+public class DatasetManagerGui extends DatasetManager {
 
-    public DatasetManagerGui() {
-    }
+    public DatasetManagerGui() {}
 
     @Override
     public DatasetManagerGui init() {
@@ -23,12 +19,12 @@ public class DatasetManagerGui
         super.defineDataManager(typeDB, id, param);
 
         if (typeDB == TypeDataBase.JENA_TDB1) {
-            // DataManager dataManager = new JenaTdb1DataManagerBuilder().storagePath(param).build();
+            // DataManager dataManager = new
+            // JenaTdb1DataManagerBuilder().storagePath(param).build();
             // StorageFactory.defineDataManager(id, dataManager);
         } else if (typeDB == TypeDataBase.RDF4J_MODEL) {
             // DataManager dataManager = new Rdf4jModelDataManagerBuilder().build();
             // StorageFactory.defineDataManager(id, dataManager);
         }
     }
-
 }

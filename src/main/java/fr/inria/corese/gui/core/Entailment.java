@@ -1,18 +1,16 @@
 package fr.inria.corese.gui.core;
 
-import fr.inria.corese.core.load.LoadException;
-import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.rule.RuleError;
-import fr.inria.corese.gui.query.GraphEngine;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.rule.RuleEngine;
+import fr.inria.corese.core.rule.RuleError;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
+import fr.inria.corese.gui.query.GraphEngine;
 
 /**
- *
  * @author Olivier Corby, Wimmics INRIA I3S, 2014
- *
  */
 public class Entailment extends Thread {
     private static final Logger logger = LogManager.getLogger(MainFrame.class.getName());
@@ -21,23 +19,22 @@ public class Entailment extends Thread {
     private String path;
     GraphEngine engine;
     private boolean trace = false;
-    
-    Entailment(GraphEngine e){
+
+    Entailment(GraphEngine e) {
         engine = e;
     }
-    
-    Entailment(GraphEngine e, boolean b){
+
+    Entailment(GraphEngine e, boolean b) {
         this(e);
         inThread = b;
     }
-    
+
     @Override
-    public void run(){
+    public void run() {
         try {
-            if (getPath()==null) {
+            if (getPath() == null) {
                 engine.setOWLRL(owl, trace);
-            }
-            else {
+            } else {
                 engine.runRule(getPath());
             }
         } catch (EngineException ex) {
@@ -56,14 +53,13 @@ public class Entailment extends Thread {
 
     void setOWLRL(int owl) {
         this.owl = owl;
-    }   
-    
-    void process(){
-        if (inThread){
+    }
+
+    void process() {
+        if (inThread) {
             // in a // thread
             start();
-        }  
-        else {
+        } else {
             run();
         }
     }
@@ -79,5 +75,4 @@ public class Entailment extends Thread {
     public void setPath(String path) {
         this.path = path;
     }
-
 }

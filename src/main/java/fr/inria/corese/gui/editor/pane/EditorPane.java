@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 public class EditorPane {
 
     private static final Logger logger = LogManager.getLogger(EditorPane.class);
-    
+
     private JTextPane editor;
     private JTextArea lineCounter;
     private Font font;
@@ -55,75 +55,92 @@ public class EditorPane {
         this.editor.setFont(this.font);
         // Activate undo/redo features
         this.undoRedoOperations();
-       
-        this.editor.getDocument().addDocumentListener(new DocumentListener() {
 
-            private void updatelineCounter() {
+        this.editor
+                .getDocument()
+                .addDocumentListener(
+                        new DocumentListener() {
 
-                String editor_text = editor.getText();
-                int nb_line = editor_text.length() - editor_text.replace("\n", "").length() + 2;
+                            private void updatelineCounter() {
 
-                if (nb_line != old_line_number) {
-                    old_line_number = nb_line;
-                    String text = "\n";
-                    for (int i = 1; i < nb_line; i++) {
-                        text += String.valueOf(i);
-                        if (i != nb_line - 1) {
-                            text += "\n";
-                        }
-                    }
-                    lineCounter.setText(text);
+                                String editor_text = editor.getText();
+                                int nb_line =
+                                        editor_text.length()
+                                                - editor_text.replace("\n", "").length()
+                                                + 2;
 
-                    lineCounter.setColumns(Integer.toString(nb_line - 1).length());
-                }
-            }
+                                if (nb_line != old_line_number) {
+                                    old_line_number = nb_line;
+                                    String text = "\n";
+                                    for (int i = 1; i < nb_line; i++) {
+                                        text += String.valueOf(i);
+                                        if (i != nb_line - 1) {
+                                            text += "\n";
+                                        }
+                                    }
+                                    lineCounter.setText(text);
 
-            @Override
-            public void changedUpdate(DocumentEvent arg0) {
-                updatelineCounter();
-            }
+                                    lineCounter.setColumns(Integer.toString(nb_line - 1).length());
+                                }
+                            }
 
-            @Override
-            public void insertUpdate(DocumentEvent arg0) {
-                updatelineCounter();
-            }
+                            @Override
+                            public void changedUpdate(DocumentEvent arg0) {
+                                updatelineCounter();
+                            }
 
-            @Override
-            public void removeUpdate(DocumentEvent arg0) {
-                updatelineCounter();
-            }
-        });
+                            @Override
+                            public void insertUpdate(DocumentEvent arg0) {
+                                updatelineCounter();
+                            }
+
+                            @Override
+                            public void removeUpdate(DocumentEvent arg0) {
+                                updatelineCounter();
+                            }
+                        });
     }
 
-    private void undoRedoOperations(){
-        this.editor.getDocument().addUndoableEditListener(
-                new UndoableEditListener() {
-                    public void undoableEditHappened(UndoableEditEvent e) {
-                        undoManager.addEdit(e.getEdit());
-                    }
-                });
+    private void undoRedoOperations() {
+        this.editor
+                .getDocument()
+                .addUndoableEditListener(
+                        new UndoableEditListener() {
+                            public void undoableEditHappened(UndoableEditEvent e) {
+                                undoManager.addEdit(e.getEdit());
+                            }
+                        });
         // Detect ctrl-z and ctrl-y to undo and redo
         this.editor.getInputMap().put(KeyStroke.getKeyStroke("control Z"), "undo");
-        this.editor.getActionMap().put("undo", new AbstractAction() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                try {
-                    undoManager.undo();
-                } catch (CannotUndoException ex) {
-                    logger.info("Unable to undo: " + ex);
-                }
-            }
-        });
+        this.editor
+                .getActionMap()
+                .put(
+                        "undo",
+                        new AbstractAction() {
+                            public void actionPerformed(java.awt.event.ActionEvent e) {
+                                try {
+                                    undoManager.undo();
+                                } catch (CannotUndoException ex) {
+                                    logger.info("Unable to undo: " + ex);
+                                }
+                            }
+                        });
         this.editor.getInputMap().put(KeyStroke.getKeyStroke("control Y"), "redo");
-        this.editor.getActionMap().put("redo", new AbstractAction() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                try {
-                    undoManager.redo();
-                } catch (CannotRedoException ex) {
-                    logger.info("Unable to redo: " + ex);
-                }
-            }
-        });
+        this.editor
+                .getActionMap()
+                .put(
+                        "redo",
+                        new AbstractAction() {
+                            public void actionPerformed(java.awt.event.ActionEvent e) {
+                                try {
+                                    undoManager.redo();
+                                } catch (CannotRedoException ex) {
+                                    logger.info("Unable to redo: " + ex);
+                                }
+                            }
+                        });
     }
+
     public String getContent() {
         return this.editor.getText();
     }
@@ -133,11 +150,13 @@ public class EditorPane {
     }
 
     public JScrollPane getPane() {
-        JScrollPane scrollEditor = new JScrollPane(this.editor, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JScrollPane scrollEditor =
+                new JScrollPane(
+                        this.editor,
+                        JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollEditor.setRowHeaderView(this.lineCounter);
         scrollEditor.setViewportView(this.editor);
         return scrollEditor;
     }
-
 }

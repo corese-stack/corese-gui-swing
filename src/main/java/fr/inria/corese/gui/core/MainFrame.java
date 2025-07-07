@@ -95,15 +95,12 @@ import fr.inria.corese.gui.query.MyJPanelQuery;
 import fr.inria.corese.gui.util.GuiPropertyUtils;
 import fr.inria.corese.gui.util.GuiPropertyUtils.Pair;
 
-/**
- * Fenêtre principale, avec le conteneur d'onglets et le menu
- */
+/** Fenêtre principale, avec le conteneur d'onglets et le menu */
 public class MainFrame extends JFrame implements ActionListener {
 
-    /**
-     *
-     */
+    /** */
     private static MainFrame singleton;
+
     private static final long serialVersionUID = 1L;
     private static final int LOAD = 1;
     private static final String TITLE = "Corese 4.5.1 - Inria UCA I3S - 2023-10-14";
@@ -170,25 +167,55 @@ public class MainFrame extends JFrame implements ActionListener {
     private JMenuItem map;
     private JMenuItem success;
     private JMenuItem quit;
-    private JMenuItem iselect, igraph,
-            iconstruct, iconstructgraph, idescribe_query, idescribe_uri, iask,
-            iserviceLocal, iserviceCorese, imapcorese, ifederate,
-            iinsertdata, ideleteinsert,
-            iturtle, in3, irdfxml, ijson, itrig, ispin, iowl,
-            ientailment, irule, ierror, ifunction, ical, iowlrl;
+    private JMenuItem iselect,
+            igraph,
+            iconstruct,
+            iconstructgraph,
+            idescribe_query,
+            idescribe_uri,
+            iask,
+            iserviceLocal,
+            iserviceCorese,
+            imapcorese,
+            ifederate,
+            iinsertdata,
+            ideleteinsert,
+            iturtle,
+            in3,
+            irdfxml,
+            ijson,
+            itrig,
+            ispin,
+            iowl,
+            ientailment,
+            irule,
+            ierror,
+            ifunction,
+            ical,
+            iowlrl;
     private JMenuItem itypecheck, ipredicate, ipredicatepath;
     HashMap<Object, DefQuery> itable;
     private JCheckBox checkBoxQuery;
     private JCheckBox checkBoxRule;
     private JCheckBox checkBoxVerbose;
     private JCheckBox checkBoxLoad;
-    private JCheckBox cbrdfs, cbowlrl, cbclean, cbrdfsrl, cbowlrltest, cbowlrllite, cbowlrlext, cbtrace, cbnamed,
+    private JCheckBox cbrdfs,
+            cbowlrl,
+            cbclean,
+            cbrdfsrl,
+            cbowlrltest,
+            cbowlrllite,
+            cbowlrlext,
+            cbtrace,
+            cbnamed,
             cbindex;
     private JMenuItem validate;
     // style correspondant au graphe
     private String defaultStylesheet, saveStylesheet;
-    private ArrayList<JCheckBox> listCheckbox; // list qui stocke les JCheckBoxs présentes sur le JPanelListener
-    private ArrayList<JMenuItem> listJMenuItems; // list qui stocke les Boutons présents sur le JPanelListener
+    private ArrayList<JCheckBox>
+            listCheckbox; // list qui stocke les JCheckBoxs présentes sur le JPanelListener
+    private ArrayList<JMenuItem>
+            listJMenuItems; // list qui stocke les Boutons présents sur le JPanelListener
     // Les 4 types d'onglets
     private ArrayList<MyJPanelQuery> monTabOnglet;
     private JPanel plus;
@@ -267,7 +294,6 @@ public class MainFrame extends JFrame implements ActionListener {
         public void setName(String name) {
             this.name = name;
         }
-
     }
 
     /**
@@ -298,7 +324,8 @@ public class MainFrame extends JFrame implements ActionListener {
         myCapturer = aCapturer;
         setMyCoreseNewInstance(Graph.RDFS_ENTAILMENT_DEFAULT);
 
-        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        System.setProperty(
+                "org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
         // Initialise le menu
         initMenu();
@@ -332,7 +359,8 @@ public class MainFrame extends JFrame implements ActionListener {
                         // c est le composant sélectionné
                         Component c = conteneurOnglets.getSelectedComponent();
 
-                        // selected est l'indice du composant sélectionné dans le conteneur d'onglets
+                        // selected est l'indice du composant sélectionné dans le conteneur
+                        // d'onglets
                         selected = conteneurOnglets.getSelectedIndex();
 
                         // Si l'onglet sélectionné est un onglet Query il devient l'onglet "courant"
@@ -349,7 +377,8 @@ public class MainFrame extends JFrame implements ActionListener {
                             saveQuery.setEnabled(true);
                             fileMenuSaveResult.setEnabled(true);
 
-                            MyJPanelQuery temp = (MyJPanelQuery) getConteneurOnglets().getComponentAt(selected);
+                            MyJPanelQuery temp =
+                                    (MyJPanelQuery) getConteneurOnglets().getComponentAt(selected);
 
                             if (isKgram) {
                                 temp.getButtonTKgram().setEnabled(true);
@@ -376,12 +405,13 @@ public class MainFrame extends JFrame implements ActionListener {
                 });
         this.setVisible(true);
 
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
+        addWindowListener(
+                new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
         appendMsg("Initialization:\n\n" + myCapturer.getContent() + "\n\n");
 
         // On remplit notre liste de JCheckBox
@@ -433,9 +463,7 @@ public class MainFrame extends JFrame implements ActionListener {
         defaultStylesheet = saveStylesheet;
     }
 
-    /**
-     * Affiche du texte dans le panel logs *
-     */
+    /** Affiche du texte dans le panel logs * */
     public void appendMsg(String msg) {
         Document currentDoc = ongletListener.getTextPaneLogs().getDocument();
         try {
@@ -455,9 +483,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return this;
     }
 
-    /**
-     * Crée un onglet Query *
-     */
+    /** Crée un onglet Query * */
     MyJPanelQuery newQuery(String query) {
         return newQuery(query, "");
     }
@@ -480,10 +506,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return getLastQueryPanel(0);
     }
 
-    /**
-     * n=0 : last panel
-     * n=1 : last-1 panel
-     */
+    /** n=0 : last panel n=1 : last-1 panel */
     public MyJPanelQuery getLastQueryPanel(int n) {
         int i = 0;
         int last = conteneurOnglets.getComponentCount() - 1;
@@ -501,14 +524,15 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     /**
-     * Last element is "+" at length-1, current query panel at length-2, previous
-     * query panel at length-3
-     * 
+     * Last element is "+" at length-1, current query panel at length-2, previous query panel at
+     * length-3
+     *
      * @return
      */
     public MyJPanelQuery getPreviousQueryPanel() {
         if (conteneurOnglets.getComponents().length >= 3) {
-            Component cp = conteneurOnglets.getComponent(conteneurOnglets.getComponents().length - 3);
+            Component cp =
+                    conteneurOnglets.getComponent(conteneurOnglets.getComponents().length - 3);
             if (cp instanceof MyJPanelQuery) {
                 return (MyJPanelQuery) cp;
             }
@@ -545,19 +569,17 @@ public class MainFrame extends JFrame implements ActionListener {
         conteneurOnglets.add("+", plus);
 
         /**
-         * ajoute le bouton de fermeture Juste après la création de l'onglet
-         * Query il y a donc 5 composants au conteneur d'onglet (Listener, Shacl
-         * , turtle, Query, +) On différencie si c'est le 1er onglet créé ou non car le
-         * fait d'ajouter le croix fermante à l'onglet ajoute un composant au
-         * conteneur d'onglet (1 onglets = 1 composants onglet + 1 composant
-         * "croix fermante" = 2 composants) mais ceci une seule fois (2 onglets
-         * = 2 composants onglet + 1 composant "croix fermante" = 3 composants)
-         * initTabComponent(0); appliquerait la croix fermante au 1er onglet du
-         * conteneur cad à "Listener"
-         * initTabComponent(conteneurOnglets.getComponentCount()-1);
-         * l'appliquerait au dernier composant du conteneur cad à "+"
-         * initTabComponent(conteneurOnglets.getComponentCount()-3); car il faut
-         * retirer la croix et l'onglet "+" dans le compte
+         * ajoute le bouton de fermeture Juste après la création de l'onglet Query il y a donc 5
+         * composants au conteneur d'onglet (Listener, Shacl , turtle, Query, +) On différencie si
+         * c'est le 1er onglet créé ou non car le fait d'ajouter le croix fermante à l'onglet ajoute
+         * un composant au conteneur d'onglet (1 onglets = 1 composants onglet + 1 composant "croix
+         * fermante" = 2 composants) mais ceci une seule fois (2 onglets = 2 composants onglet + 1
+         * composant "croix fermante" = 3 composants) initTabComponent(0); appliquerait la croix
+         * fermante au 1er onglet du conteneur cad à "Listener"
+         * initTabComponent(conteneurOnglets.getComponentCount()-1); l'appliquerait au dernier
+         * composant du conteneur cad à "+"
+         * initTabComponent(conteneurOnglets.getComponentCount()-3); car il faut retirer la croix et
+         * l'onglet "+" dans le compte
          */
         // Si c'est le 1er onglet Query créé
         if (conteneurOnglets.getComponentCount() == 5) {
@@ -953,59 +975,68 @@ public class MainFrame extends JFrame implements ActionListener {
         aboutMenu.add(doc);
 
         aboutMenu.add(help);
-        ActionListener lHelpListener = (ActionEvent l_Event) -> {
-            set(Event.HELP);
-        };
+        ActionListener lHelpListener =
+                (ActionEvent l_Event) -> {
+                    set(Event.HELP);
+                };
         help.addActionListener(lHelpListener);
 
         debugMenu.add(next);
-        ActionListener lNextListener = (ActionEvent l_Event) -> {
-            set(Event.STEP);
-        };
+        ActionListener lNextListener =
+                (ActionEvent l_Event) -> {
+                    set(Event.STEP);
+                };
         next.addActionListener(lNextListener);
 
         debugMenu.add(complete);
-        ActionListener lSkipListener = (ActionEvent l_Event) -> {
-            set(Event.COMPLETE);
-        };
+        ActionListener lSkipListener =
+                (ActionEvent l_Event) -> {
+                    set(Event.COMPLETE);
+                };
         complete.addActionListener(lSkipListener);
 
         debugMenu.add(forward);
-        ActionListener lPlusListener = (ActionEvent l_Event) -> {
-            set(Event.FORWARD);
-        };
+        ActionListener lPlusListener =
+                (ActionEvent l_Event) -> {
+                    set(Event.FORWARD);
+                };
         forward.addActionListener(lPlusListener);
 
         debugMenu.add(map);
-        ActionListener lMapListener = (ActionEvent l_Event) -> {
-            set(Event.MAP);
-        };
+        ActionListener lMapListener =
+                (ActionEvent l_Event) -> {
+                    set(Event.MAP);
+                };
         map.addActionListener(lMapListener);
 
         debugMenu.add(success);
-        ActionListener lSuccessListener = (ActionEvent e) -> {
-            set(Event.SUCCESS);
-        };
+        ActionListener lSuccessListener =
+                (ActionEvent e) -> {
+                    set(Event.SUCCESS);
+                };
         success.addActionListener(lSuccessListener);
 
         debugMenu.add(quit);
-        ActionListener lQuitListener = (ActionEvent l_Event) -> {
-            set(Event.QUIT);
-        };
+        ActionListener lQuitListener =
+                (ActionEvent l_Event) -> {
+                    set(Event.QUIT);
+                };
         quit.addActionListener(lQuitListener);
 
         debugMenu.add(checkBoxLoad);
 
         cbtrace.setEnabled(true);
-        cbtrace.addItemListener((ItemEvent e) -> {
-            trace = cbtrace.isSelected();
-        });
+        cbtrace.addItemListener(
+                (ItemEvent e) -> {
+                    trace = cbtrace.isSelected();
+                });
         cbtrace.setSelected(false);
 
         cbrdfs.setEnabled(true);
-        cbrdfs.addItemListener((ItemEvent e) -> {
-            setRDFSEntailment(cbrdfs.isSelected());
-        });
+        cbrdfs.addItemListener(
+                (ItemEvent e) -> {
+                    setRDFSEntailment(cbrdfs.isSelected());
+                });
         // default is true, may be set by property file
         cbrdfs.setSelected(Graph.RDFS_ENTAILMENT_DEFAULT);
 
@@ -1013,73 +1044,77 @@ public class MainFrame extends JFrame implements ActionListener {
         // Property is for load file in default graph, hence the negation
         cbnamed.setSelected(!Property.getBooleanValue(LOAD_IN_DEFAULT_GRAPH));
         cbnamed.setEnabled(true);
-        cbnamed.addItemListener((ItemEvent e) -> {
-            Load.setDefaultGraphValue(!cbnamed.isSelected());
-        });
+        cbnamed.addItemListener(
+                (ItemEvent e) -> {
+                    Load.setDefaultGraphValue(!cbnamed.isSelected());
+                });
 
         cbowlrl.setEnabled(true);
         cbowlrl.setSelected(false);
-        cbowlrl.addItemListener((ItemEvent e) -> {
-            setOWLRL(cbowlrl.isSelected(), RuleEngine.OWL_RL);
-        });
+        cbowlrl.addItemListener(
+                (ItemEvent e) -> {
+                    setOWLRL(cbowlrl.isSelected(), RuleEngine.OWL_RL);
+                });
 
         cbowlrltest.setEnabled(true);
         cbowlrltest.setSelected(false);
-        cbowlrltest.addItemListener((ItemEvent e) -> {
-            setOWLRL(cbowlrltest.isSelected(), RuleEngine.OWL_RL_TEST);
-        });
+        cbowlrltest.addItemListener(
+                (ItemEvent e) -> {
+                    setOWLRL(cbowlrltest.isSelected(), RuleEngine.OWL_RL_TEST);
+                });
 
         cbclean.setEnabled(true);
         cbclean.setSelected(false);
-        cbclean.addItemListener((ItemEvent e) -> {
-            if (cbclean.isSelected()) {
-                cleanOWL();
-            }
-        });
+        cbclean.addItemListener(
+                (ItemEvent e) -> {
+                    if (cbclean.isSelected()) {
+                        cleanOWL();
+                    }
+                });
 
         cbindex.setEnabled(true);
         cbindex.setSelected(false);
-        cbindex.addItemListener((ItemEvent e) -> {
-            if (cbindex.isSelected()) {
-                graphIndex();
-            }
-        });
+        cbindex.addItemListener(
+                (ItemEvent e) -> {
+                    if (cbindex.isSelected()) {
+                        graphIndex();
+                    }
+                });
 
         cbrdfsrl.setEnabled(true);
         cbrdfsrl.setSelected(false);
-        cbrdfsrl.addItemListener((ItemEvent e) -> {
-            setOWLRL(cbrdfsrl.isSelected(), RuleEngine.RDFS_RL);
-        });
+        cbrdfsrl.addItemListener(
+                (ItemEvent e) -> {
+                    setOWLRL(cbrdfsrl.isSelected(), RuleEngine.RDFS_RL);
+                });
 
         cbowlrlext.setEnabled(true);
         cbowlrlext.setSelected(false);
-        cbowlrlext.addItemListener((ItemEvent e) -> {
-            // OWL RL + extension: a owl:Restriction -> a owl:Class
-            setOWLRL(cbowlrlext.isSelected(), RuleEngine.OWL_RL_EXT, false);
-            setOWLRL(cbowlrlext.isSelected(), RuleEngine.OWL_RL);
-        });
+        cbowlrlext.addItemListener(
+                (ItemEvent e) -> {
+                    // OWL RL + extension: a owl:Restriction -> a owl:Class
+                    setOWLRL(cbowlrlext.isSelected(), RuleEngine.OWL_RL_EXT, false);
+                    setOWLRL(cbowlrlext.isSelected(), RuleEngine.OWL_RL);
+                });
 
         checkBoxLoad.addItemListener(
                 new ItemListener() {
                     @Override
-                    public void itemStateChanged(ItemEvent e) {
-                    }
+                    public void itemStateChanged(ItemEvent e) {}
                 });
 
         debugMenu.add(checkBoxQuery);
         checkBoxQuery.addItemListener(
                 new ItemListener() {
                     @Override
-                    public void itemStateChanged(ItemEvent e) {
-                    }
+                    public void itemStateChanged(ItemEvent e) {}
                 });
 
         debugMenu.add(checkBoxRule);
         checkBoxRule.addItemListener(
                 new ItemListener() {
                     @Override
-                    public void itemStateChanged(ItemEvent e) {
-                    }
+                    public void itemStateChanged(ItemEvent e) {}
                 });
 
         debugMenu.add(checkBoxVerbose);
@@ -1096,22 +1131,24 @@ public class MainFrame extends JFrame implements ActionListener {
                 });
 
         debugMenu.add(validate);
-        ActionListener l_validateListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent l_Event) {
-                lPath = null;
-                JFileChooser fileChooser = new JFileChooser(getPath());
-                fileChooser.setMultiSelectionEnabled(true);
-                int returnValue = fileChooser.showOpenDialog(null);
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File l_Files[] = fileChooser.getSelectedFiles();
-                    for (File f : l_Files) {
-                        lPath = f.getAbsolutePath();
-                        setPath(f.getParent()); // recupere le dossier parent du fichier que l'on charge
+        ActionListener l_validateListener =
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent l_Event) {
+                        lPath = null;
+                        JFileChooser fileChooser = new JFileChooser(getPath());
+                        fileChooser.setMultiSelectionEnabled(true);
+                        int returnValue = fileChooser.showOpenDialog(null);
+                        if (returnValue == JFileChooser.APPROVE_OPTION) {
+                            File l_Files[] = fileChooser.getSelectedFiles();
+                            for (File f : l_Files) {
+                                lPath = f.getAbsolutePath();
+                                setPath(f.getParent()); // recupere le dossier parent du
+                                // fichier que l'on charge
+                            }
+                        }
                     }
-                }
-            }
-        };
+                };
         validate.addActionListener(l_validateListener);
         validate.setToolTipText("to validate loading of file");
 
@@ -1179,10 +1216,10 @@ public class MainFrame extends JFrame implements ActionListener {
 
     JMenuItem defDisplay(String name, ResultFormatDef.format format) {
         JMenuItem it = new JMenuItem(name);
-        it.addActionListener((ActionEvent event) -> {
-            getCurrentQueryPanel().getTextArea().setText(
-                    displayMenu(name, format));
-        });
+        it.addActionListener(
+                (ActionEvent event) -> {
+                    getCurrentQueryPanel().getTextArea().setText(displayMenu(name, format));
+                });
         return it;
     }
 
@@ -1190,8 +1227,7 @@ public class MainFrame extends JFrame implements ActionListener {
         if (format.equals(ResultFormat.format.UNDEF_FORMAT)) {
             return displayGraph(name, format);
         } else {
-            ResultFormat ft = ResultFormat.create(getGraph(), format)
-                    .setNbTriple(getTripleMax());
+            ResultFormat ft = ResultFormat.create(getGraph(), format).setNbTriple(getTripleMax());
             return ft.toString();
         }
     }
@@ -1377,10 +1413,15 @@ public class MainFrame extends JFrame implements ActionListener {
                 for (int i = 0; i < current.getTextAreaLines().getLineCount() - 1; i++) {
                     try {
                         int lineStartOffset = getLineStartOffset(current.getTextPaneQuery(), i);
-                        line = current.getTextPaneQuery().getText(lineStartOffset,
-                                getLineOfOffset(current.getTextPaneQuery(), i) - lineStartOffset);
+                        line =
+                                current.getTextPaneQuery()
+                                        .getText(
+                                                lineStartOffset,
+                                                getLineOfOffset(current.getTextPaneQuery(), i)
+                                                        - lineStartOffset);
 
-                        if (lineStartOffset >= selectedTextSartPosition && lineStartOffset <= selectedTextEndPosition
+                        if (lineStartOffset >= selectedTextSartPosition
+                                && lineStartOffset <= selectedTextEndPosition
                                 && !line.startsWith("#")) {
                             // on regarde si la ligne est deja commentée ou non
                             // on commente
@@ -1438,7 +1479,8 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     public void browse(String url) {
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        if (Desktop.isDesktopSupported()
+                && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
             } catch (IOException | URISyntaxException e) {
@@ -1470,7 +1512,10 @@ public class MainFrame extends JFrame implements ActionListener {
                         Date d2 = new Date();
                         LOGGER.info("Time: " + (d2.getTime() - d1.getTime()) / 1000.0);
                         if (b) {
-                            appendMsg("\n rules applied... \n" + myCapturer.getContent() + "\ndone.\n");
+                            appendMsg(
+                                    "\n rules applied... \n"
+                                            + myCapturer.getContent()
+                                            + "\ndone.\n");
                         }
                     } catch (EngineException | LoadException e1) {
                         LOGGER.error(e1);
@@ -1502,7 +1547,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     /**
      * Save the graph in canonic format with the specified algorithm
-     * 
+     *
      * @param format the format in which the graph will be saved
      */
     void saveGraphCanonic(HashAlgorithm algo) {
@@ -1524,9 +1569,9 @@ public class MainFrame extends JFrame implements ActionListener {
 
     /**
      * Save the result of a query in the specified format
-     * 
-     * @param format the format in which the result will be saved
-     *               (See ResultFormat.java for the list of formats)
+     *
+     * @param format the format in which the result will be saved (See ResultFormat.java for the
+     *     list of formats)
      */
     void saveResult(ResultFormat.format format) {
         ResultFormat ft = ResultFormat.create(current.getMappings(), format);
@@ -1538,7 +1583,8 @@ public class MainFrame extends JFrame implements ActionListener {
         JFileChooser filechoose = new JFileChooser(getPath());
         // Le bouton pour valider l’enregistrement portera la mention enregistrer
         String approve = "Save";
-        int resultatEnregistrer = filechoose.showDialog(filechoose, approve); // Pour afficher le JFileChooser…
+        int resultatEnregistrer =
+                filechoose.showDialog(filechoose, approve); // Pour afficher le JFileChooser…
         // Si l’utilisateur clique sur le bouton enregistrer
         if (resultatEnregistrer == JFileChooser.APPROVE_OPTION) {
             File file = filechoose.getSelectedFile();
@@ -1550,8 +1596,8 @@ public class MainFrame extends JFrame implements ActionListener {
                 myFile = myFile + RQ;
             }
 
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(myFile),
-                    StandardCharsets.UTF_8)) {
+            try (OutputStreamWriter writer =
+                    new OutputStreamWriter(new FileOutputStream(myFile), StandardCharsets.UTF_8)) {
                 writer.write(current.getTextPaneQuery().getText());
                 current.setFileName(file.getName());
                 writer.close();
@@ -1559,7 +1605,6 @@ public class MainFrame extends JFrame implements ActionListener {
             } catch (IOException er) {
                 LOGGER.error(er);
             }
-
         }
     }
 
@@ -1575,21 +1620,22 @@ public class MainFrame extends JFrame implements ActionListener {
         JFileChooser filechoose = new JFileChooser(getPath());
         // Le bouton pour valider l’enregistrement portera la mention enregistrer
         String approve = "Save";
-        int resultatEnregistrer = filechoose.showDialog(filechoose, approve); // Pour afficher le JFileChooser…
+        int resultatEnregistrer =
+                filechoose.showDialog(filechoose, approve); // Pour afficher le JFileChooser…
         // Si l’utilisateur clique sur le bouton enregistrer
         if (resultatEnregistrer == JFileChooser.APPROVE_OPTION) {
             // Récupérer le nom du fichier qu’il a spécifié
             File f = filechoose.getSelectedFile();
             String myFile = f.toString();
             setPath(f.getParent());
-            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(myFile),
-                    StandardCharsets.UTF_8)) {
+            try (OutputStreamWriter writer =
+                    new OutputStreamWriter(new FileOutputStream(myFile), StandardCharsets.UTF_8)) {
                 writer.write(str);
                 writer.close();
                 appendMsg("Writing the file : " + myFile + "\n");
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
-                        ex);
+                java.util.logging.Logger.getLogger(MainFrame.class.getName())
+                        .log(java.util.logging.Level.SEVERE, null, ex);
             }
         }
     }
@@ -1639,7 +1685,8 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
-    public int getLineOfOffset(final JTextComponent textComponent, final int line) throws BadLocationException {
+    public int getLineOfOffset(final JTextComponent textComponent, final int line)
+            throws BadLocationException {
         final Document doc = textComponent.getDocument();
         final int lineCount = doc.getDefaultRootElement().getElementCount();
         if (line < 0) {
@@ -1714,8 +1761,8 @@ public class MainFrame extends JFrame implements ActionListener {
         }
         if (Property.stringValue(GUI_DEFAULT_QUERY) != null) {
             try {
-                defaultQuery = QueryLoad.create()
-                        .readWE(GuiPropertyUtils.pathValue(GUI_DEFAULT_QUERY));
+                defaultQuery =
+                        QueryLoad.create().readWE(GuiPropertyUtils.pathValue(GUI_DEFAULT_QUERY));
             } catch (LoadException ex) {
                 LOGGER.error(ex);
             }
@@ -1740,17 +1787,14 @@ public class MainFrame extends JFrame implements ActionListener {
         load(FilterRDF, true, false, run);
     }
 
-    /**
-     * Charge un fichier dans CORESE
-     */
+    /** Charge un fichier dans CORESE */
     void load(Filter... filter) {
         load(false, false, false, filter);
     }
 
     /**
-     * wf: load a Workflow
-     * exec: run Workflow using std Worklow engine
-     * run: set the queries in query panels an run the queries in the GUI
+     * wf: load a Workflow exec: run Workflow using std Worklow engine run: set the queries in query
+     * panels an run the queries in the GUI
      */
     public void load(Filter filter, boolean wf, boolean exec, boolean run) {
         load(wf, exec, run, filter);
@@ -1783,7 +1827,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
                 if (extension(lPath) == null) {
                     appendMsg("Error: No extension for file: " + lPath + "\n");
-                    appendMsg("Please select a file with an extension (e.g: .ttl, .rdf, .trig, .jsonld, .html, ...)\n");
+                    appendMsg(
+                            "Please select a file with an extension (e.g: .ttl, .rdf, .trig, .jsonld, .html, ...)\n");
                     appendMsg("Load is aborted\n");
                     return;
                 }
@@ -1898,9 +1943,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return null;
     }
 
-    /**
-     * Compile a transformation
-     */
+    /** Compile a transformation */
     public void compile() {
         lPath = null;
         JFileChooser fileChooser = new JFileChooser(getPath());
@@ -1939,12 +1982,10 @@ public class MainFrame extends JFrame implements ActionListener {
 
     void controler(int event) {
         switch (event) {
-
             case LOAD:
                 this.resetOwlCheckBox();
                 // @todo: user rule check box
                 break;
-
         }
     }
 
@@ -1969,9 +2010,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
-    /**
-     * Crée un nouvel onglet requête avec le texte contenu dans un fichier
-     */
+    /** Crée un nouvel onglet requête avec le texte contenu dans un fichier */
     public String loadText() {
         return loadText(null);
     }
@@ -2053,9 +2092,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
-    /**
-     * Charge un fichier Rule dans CORESE
-     */
+    /** Charge un fichier Rule dans CORESE */
     public void loadRule() {
         Filter FilterRUL = new Filter("Rule", "rul", "brul");
         load(FilterRUL);
@@ -2131,7 +2168,8 @@ public class MainFrame extends JFrame implements ActionListener {
         try {
             init();
         } catch (EngineException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainFrame.class.getName())
+                    .log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         if (cmd.getQuery() != null) {
@@ -2270,10 +2308,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return lCurrentProperty;
     }
 
-    /**
-     *
-     * For interacting with listener
-     */
+    /** For interacting with listener */
     public void setBuffer(Buffer b) {
         buffer = b;
     }
@@ -2332,3 +2367,4 @@ public class MainFrame extends JFrame implements ActionListener {
         singleton = aSingleton;
     }
 }
+// Test comment

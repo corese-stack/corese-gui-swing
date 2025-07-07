@@ -1,36 +1,34 @@
 package fr.inria.corese.gui.query;
 
-import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import java.util.Date;
 
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.gui.core.MainFrame;
-import fr.inria.corese.gui.event.MyEvalListener;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.event.Event;
-import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.util.SPINProcess;
-import fr.inria.corese.core.util.Tool;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
-import org.apache.logging.log4j.Level;
+import fr.inria.corese.core.util.SPINProcess;
+import fr.inria.corese.core.util.Tool;
+import fr.inria.corese.gui.core.MainFrame;
+import fr.inria.corese.gui.event.MyEvalListener;
 
-/**
- * Exec KGRAM Query in a // thread to enable interacting with EvalListener
- * through the GUI
- */
+/** Exec KGRAM Query in a // thread to enable interacting with EvalListener through the GUI */
 public class Exec extends Thread {
 
     private static Logger logger = LogManager.getLogger(Exec.class);
 
-    static final String qvalidate = "template { st:apply-templates-with(st:spintypecheck) } where {}";
+    static final String qvalidate =
+            "template { st:apply-templates-with(st:spintypecheck) } where {}";
     static final String qshacl = "template { xt:turtle(?g) } where { bind (sh:shacl() as ?g) }";
 
     // static final String qvalidate = "template
@@ -57,17 +55,15 @@ public class Exec extends Thread {
     }
 
     /**
-     * run the thread in // the buffer is used by listener to wait for user
-     * interaction with buttons: next, quit, etc.
+     * run the thread in // the buffer is used by listener to wait for user interaction with
+     * buttons: next, quit, etc.
      */
     public void process() {
         buffer = new Buffer();
         start();
     }
 
-    /**
-     * run the thread in //
-     */
+    /** run the thread in // */
     @Override
     public void run() {
         Mappings res = null;
@@ -125,8 +121,8 @@ public class Exec extends Thread {
             Mappings map = exec.SPARQLQuery(q, getMappings());
             Date d2 = new Date();
             trace(map);
-            logger.info(String.format("** Time: %s ; nb result: %s",
-                    Tool.time(d1, d2), map.size()));
+            logger.info(
+                    String.format("** Time: %s ; nb result: %s", Tool.time(d1, d2), map.size()));
             return map;
         } catch (EngineException e) {
             e.printStackTrace();
@@ -169,8 +165,8 @@ public class Exec extends Thread {
             }
             Date d2 = new Date();
             trace(map);
-            logger.info(String.format("** Time: %s ; nb result: %s",
-                    Tool.time(d1, d2), map.size()));
+            logger.info(
+                    String.format("** Time: %s ; nb result: %s", Tool.time(d1, d2), map.size()));
             return map.getResult();
         } catch (EngineException e) {
             e.printStackTrace();
@@ -179,9 +175,7 @@ public class Exec extends Thread {
         return null;
     }
 
-    /**
-     * Translate SPARQL query to SPIN graph Apply spin typecheck transformation
-     */
+    /** Translate SPARQL query to SPIN graph Apply spin typecheck transformation */
     Mappings validate() {
         try {
             SPINProcess sp = SPINProcess.create();
@@ -198,9 +192,7 @@ public class Exec extends Thread {
         return new Mappings();
     }
 
-    /**
-     * Create EvalListener
-     */
+    /** Create EvalListener */
     void debug(QueryExec exec) {
         MyEvalListener el = MyEvalListener.create();
         el.handle(Event.ALL, true);
@@ -259,5 +251,4 @@ public class Exec extends Thread {
         // return frame.getMyCorese();
         return graphEngine;
     }
-
 }

@@ -30,8 +30,13 @@ public class OpenButton extends Button {
         this.mainFrame = coreseFrame;
     }
 
-    public OpenButton(EditorPane editor, final MainFrame coreseFrame, String dialogTitle, Boolean acceptAllFileFilter,
-            String filterName, String filterExtension) {
+    public OpenButton(
+            EditorPane editor,
+            final MainFrame coreseFrame,
+            String dialogTitle,
+            Boolean acceptAllFileFilter,
+            String filterName,
+            String filterExtension) {
         this(editor, coreseFrame);
         this.hasFilter = true;
         this.acceptAllFileFilter = acceptAllFileFilter;
@@ -42,43 +47,44 @@ public class OpenButton extends Button {
     @Override
     protected ActionListener action() {
 
-        ActionListener buttonOpenListener = new ActionListener() {
+        ActionListener buttonOpenListener =
+                new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
 
-                JFileChooser fileChooser = new JFileChooser(OpenButton.this.mainFrame.getPath());
-                fileChooser.setDialogTitle(OpenButton.this.dialogTitle);
+                        JFileChooser fileChooser =
+                                new JFileChooser(OpenButton.this.mainFrame.getPath());
+                        fileChooser.setDialogTitle(OpenButton.this.dialogTitle);
 
-                if (OpenButton.this.hasFilter) {
-                    fileChooser.setAcceptAllFileFilterUsed(OpenButton.this.acceptAllFileFilter);
-                    FileNameExtensionFilter filter = new FileNameExtensionFilter(OpenButton.this.filterName,
-                            OpenButton.this.filterExtension);
-                    fileChooser.addChoosableFileFilter(filter);
+                        if (OpenButton.this.hasFilter) {
+                            fileChooser.setAcceptAllFileFilterUsed(
+                                    OpenButton.this.acceptAllFileFilter);
+                            FileNameExtensionFilter filter =
+                                    new FileNameExtensionFilter(
+                                            OpenButton.this.filterName,
+                                            OpenButton.this.filterExtension);
+                            fileChooser.addChoosableFileFilter(filter);
+                        }
+                        int returnValue = fileChooser.showOpenDialog(null);
 
-                }
-                int returnValue = fileChooser.showOpenDialog(null);
+                        if (returnValue == JFileChooser.APPROVE_OPTION) {
+                            File selectedFile = fileChooser.getSelectedFile();
 
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
+                            // save current path
+                            OpenButton.this.mainFrame.setPath(selectedFile.getParent());
 
-                    // save current path
-                    OpenButton.this.mainFrame.setPath(selectedFile.getParent());
-
-                    String pathSelectFile = selectedFile.toString();
-                    String content = null;
-                    try {
-                        content = new String(Files.readAllBytes(Paths.get(pathSelectFile)));
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                            String pathSelectFile = selectedFile.toString();
+                            String content = null;
+                            try {
+                                content = new String(Files.readAllBytes(Paths.get(pathSelectFile)));
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                            OpenButton.this.editor.setContent(content);
+                        }
                     }
-                    OpenButton.this.editor.setContent(content);
-                }
-
-            }
-
-        };
+                };
         return buttonOpenListener;
     }
-
 }

@@ -44,7 +44,6 @@ import fr.inria.corese.gui.core.Command;
  * Lite implementation of IEngine using kgraph and kgram
  *
  * @author Olivier Corby, Edelweiss, INRIA 2011
- *
  */
 public class GraphEngine {
 
@@ -59,8 +58,7 @@ public class GraphEngine {
     // manage db or dataset storage access
     private DatasetManagerGui datasetManager;
 
-    private boolean isListGroup = false,
-            isDebug = false, linkedFunction = false;
+    private boolean isListGroup = false, isDebug = false, linkedFunction = false;
 
     GraphEngine(boolean b) {
         graph = GraphStore.create(b);
@@ -75,13 +73,12 @@ public class GraphEngine {
         try {
             setVisitor(new QuerySolverVisitor(exec.getCreateEval()));
         } catch (EngineException ex) {
-            java.util.logging.Logger.getLogger(GraphEngine.class.getName()).log(Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(GraphEngine.class.getName())
+                    .log(Level.SEVERE, null, ex);
         }
     }
 
-    /**
-     * Before creating a new Corese, tell the old one to finish
-     */
+    /** Before creating a new Corese, tell the old one to finish */
     public void finish() {
         graph.getEventManager().process(Event.Finish);
     }
@@ -135,7 +132,6 @@ public class GraphEngine {
                 case Command.RDF_STAR:
                     Property.set(RDF_STAR, true);
                     break;
-
             }
         }
     }
@@ -318,8 +314,6 @@ public class GraphEngine {
         return false;
     }
 
-
-
     public void loadRDF(String rdf, Loader.format format) throws EngineException, LoadException {
 
         InputStream stream = new ByteArrayInputStream(rdf.getBytes(StandardCharsets.UTF_8));
@@ -328,11 +322,7 @@ public class GraphEngine {
         ld.parse(stream, "", format);
     }
 
-
-
-    
     // SPARQLProve functionality removed - obsolete implementation
-
 
     public Mappings SPARQLQuery(String query) throws EngineException {
         QueryExec exec = QueryExec.create(this);
@@ -379,9 +369,7 @@ public class GraphEngine {
      * @deprecated
      */
     @Deprecated
-    public void setProperty(String name, String value) {
-
-    }
+    public void setProperty(String name, String value) {}
 
     public String getProperty(String name) {
 
@@ -398,9 +386,7 @@ public class GraphEngine {
         return null;
     }
 
-    public void start() {
-
-    }
+    public void start() {}
 
     /**
      * @return the visitor
@@ -469,5 +455,4 @@ public class GraphEngine {
     public DataManager getDataManager() {
         return getDatasetManager().getDataManager();
     }
-
 }

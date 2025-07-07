@@ -44,8 +44,11 @@ public class ShaclEditor extends JPanel {
     }
 
     private void initEditorPanel() {
-        final JSplitPane splitPlane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.editorPane.getPane(),
-                this.resultPane.getPane());
+        final JSplitPane splitPlane =
+                new JSplitPane(
+                        JSplitPane.VERTICAL_SPLIT,
+                        this.editorPane.getPane(),
+                        this.resultPane.getPane());
         splitPlane.setContinuousLayout(true);
 
         JPanel editorPanel = new JPanel();
@@ -60,8 +63,14 @@ public class ShaclEditor extends JPanel {
         buttonsPanel.setLayout(new FlowLayout());
 
         // Open button
-        OpenButton openButton = new OpenButton(this.editorPane, this.mainFrame, "Select a SHACL file", true, "Turtle",
-                "ttl");
+        OpenButton openButton =
+                new OpenButton(
+                        this.editorPane,
+                        this.mainFrame,
+                        "Select a SHACL file",
+                        true,
+                        "Turtle",
+                        "ttl");
         buttonsPanel.add(openButton);
 
         // Save button
@@ -75,7 +84,8 @@ public class ShaclEditor extends JPanel {
         buttonsPanel.add(syntaxButton);
 
         // Validate button
-        ValidateShaclButton validateButton = new ValidateShaclButton(this.editorPane, this.resultPane, this.mainFrame);
+        ValidateShaclButton validateButton =
+                new ValidateShaclButton(this.editorPane, this.resultPane, this.mainFrame);
         buttonsPanel.add(validateButton);
 
         buttonsPanel.add(Box.createRigidArea(new Dimension(15, 0)));
@@ -86,5 +96,4 @@ public class ShaclEditor extends JPanel {
 
         add(buttonsPanel);
     }
-
 }

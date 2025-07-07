@@ -44,8 +44,11 @@ public class TurtleEditor extends JPanel {
     }
 
     private void initEditorPanel() {
-        final JSplitPane splitPlane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, this.editorPane.getPane(),
-                this.resultPane.getPane());
+        final JSplitPane splitPlane =
+                new JSplitPane(
+                        JSplitPane.VERTICAL_SPLIT,
+                        this.editorPane.getPane(),
+                        this.resultPane.getPane());
         splitPlane.setContinuousLayout(true);
 
         JPanel editorPanel = new JPanel();
@@ -60,8 +63,14 @@ public class TurtleEditor extends JPanel {
         buttonsPanel.setLayout(new FlowLayout());
 
         // Open button
-        OpenButton openButton = new OpenButton(this.editorPane, this.mainFrame, "Select a Turtle file", true, "Turtle",
-                "ttl");
+        OpenButton openButton =
+                new OpenButton(
+                        this.editorPane,
+                        this.mainFrame,
+                        "Select a Turtle file",
+                        true,
+                        "Turtle",
+                        "ttl");
         buttonsPanel.add(openButton);
 
         // Save button
@@ -86,5 +95,4 @@ public class TurtleEditor extends JPanel {
 
         add(buttonsPanel);
     }
-
 }
