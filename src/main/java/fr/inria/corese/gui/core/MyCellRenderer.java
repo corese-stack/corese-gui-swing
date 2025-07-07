@@ -18,9 +18,9 @@ import javax.swing.ListCellRenderer;
  */
 
 
-public class MyCellRenderer extends JPanel implements ListCellRenderer{
+public class MyCellRenderer extends JPanel implements ListCellRenderer<String>{
 
-	private JList maList;
+	private JList<String> maList;
 	
 	/**
 	 * 
@@ -61,7 +61,7 @@ public class MyCellRenderer extends JPanel implements ListCellRenderer{
 	}
 	
 	@Override	
-	public Component getListCellRendererComponent(JList maList, Object value,
+	public Component getListCellRendererComponent(JList<? extends String> maList, String value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 		
 		path=value.toString();
@@ -94,7 +94,7 @@ public class MyCellRenderer extends JPanel implements ListCellRenderer{
 		return new Dimension(100,20);
 	}
 	
-	public JList getMaList() {
+	public JList<String> getMaList() {
 		return maList;
 	}
 

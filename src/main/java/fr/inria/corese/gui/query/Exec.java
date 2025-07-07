@@ -33,7 +33,9 @@ public class Exec extends Thread {
     static final String qvalidate = "template { st:apply-templates-with(st:spintypecheck) } where {}";
     static final String qshacl = "template { xt:turtle(?g) } where { bind (sh:shacl() as ?g) }";
 
-    //static final String qvalidate = "template {st:apply-templates-with('/home/corby/AData/template/spintypecheck/template/')} where {}";
+    // static final String qvalidate = "template
+    // {st:apply-templates-with('/home/corby/AData/template/spintypecheck/template/')}
+    // where {}";
     static final String qgraph = NSManager.STL + "query";
 
     MainFrame frame;
@@ -86,7 +88,7 @@ public class Exec extends Thread {
 
     public void finish(boolean kill) {
         if (kill) {
-            stop();
+            interrupt();
         } else if (current != null) {
             current.finish();
         }
@@ -95,18 +97,18 @@ public class Exec extends Thread {
     void setCurrent(QueryExec exec) {
         current = exec;
     }
-    
+
     QueryExec getCurrent() {
         return current;
     }
-    
+
     QueryExec getQueryExec() {
         if (getCurrent() == null) {
             setCurrent(QueryExec.create(getGraphEngine()));
         }
         return getCurrent();
     }
-    
+
     Mappings query() {
         QueryExec exec = QueryExec.create(getGraphEngine());
         setCurrent(exec);
@@ -123,24 +125,22 @@ public class Exec extends Thread {
             Mappings map = exec.SPARQLQuery(q, getMappings());
             Date d2 = new Date();
             trace(map);
-            logger.info(String.format("** Time: %s ; nb result: %s", 
-                    Tool.time(d1, d2), map.size()));            
+            logger.info(String.format("** Time: %s ; nb result: %s",
+                    Tool.time(d1, d2), map.size()));
             return map;
         } catch (EngineException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             frame.getPanel().getTextArea().setText(e.toString());
         }
         return null;
     }
-    
+
     void trace(Mappings map) {
-        ASTQuery ast = map.getAST();
-        //if (ast.isFederateIndex()) {
-            if (!FederateVisitor.getBlacklist().isEmpty()) {
-                logger.info("Blacklist:\n" + FederateVisitor.getBlacklist());
-            }
-        //}
+        // if (ast.isFederateIndex()) {
+        if (!FederateVisitor.getBlacklist().isEmpty()) {
+            logger.info("Blacklist:\n" + FederateVisitor.getBlacklist());
+        }
+        // }
     }
 
     Mappings compile() {
@@ -159,17 +159,17 @@ public class Exec extends Thread {
             // in two different Binding
             // hence we get compile time log
             // during std eval, service clause manage this duality of log
-            // here it is validation, hence no service clause is executed 
+            // here it is validation, hence no service clause is executed
             // by eval
             exec.getQueryProcess().getCreateBinding().setLog(log);
             ASTQuery ast = exec.getQueryProcess().getAST(map);
-            if (ast!=null && !ast.hasMetadata(Metadata.EXPLAIN)) {
+            if (ast != null && !ast.hasMetadata(Metadata.EXPLAIN)) {
                 // display mappings will check existence of query resource URI in the graph
                 ast.setMetadata(Metadata.EXPLAIN);
             }
             Date d2 = new Date();
             trace(map);
-            logger.info(String.format("** Time: %s ; nb result: %s", 
+            logger.info(String.format("** Time: %s ; nb result: %s",
                     Tool.time(d1, d2), map.size()));
             return map.getResult();
         } catch (EngineException e) {
@@ -179,7 +179,6 @@ public class Exec extends Thread {
         return null;
     }
 
-    
     /**
      * Translate SPARQL query to SPIN graph Apply spin typecheck transformation
      */
@@ -255,11 +254,10 @@ public class Exec extends Thread {
     public void setGraphEngine(GraphEngine graphEngine) {
         this.graphEngine = graphEngine;
     }
-    
+
     public GraphEngine getGraphEngine() {
-        //return frame.getMyCorese();
+        // return frame.getMyCorese();
         return graphEngine;
     }
-    
 
 }

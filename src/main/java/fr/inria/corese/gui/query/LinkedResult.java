@@ -194,7 +194,6 @@ public class LinkedResult implements URLParam {
         }  
         
         if (json.has(HISTORY) && json.get(HISTORY) instanceof JSONObject) {
-            JSONObject history = json.getJSONObject(HISTORY);
             //displayHistory(history);            
         }
     }
@@ -205,7 +204,7 @@ public class LinkedResult implements URLParam {
             logger.debug("GUI: " + ip);
             String command = String.format("whois %s", ip);
             try {
-                Process process = Runtime.getRuntime().exec(command);
+                Process process = new ProcessBuilder(command.split("\\s+")).start();
                 BufferedReader reader = new BufferedReader(
                         new InputStreamReader(process.getInputStream()));
                 String line;

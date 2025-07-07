@@ -1,10 +1,6 @@
 package fr.inria.corese.gui.query;
 
 import fr.inria.corese.core.query.DatasetManager;
-import fr.inria.corese.core.query.StorageFactory;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
-// import fr.inria.corese.jena.JenaTdb1DataManagerBuilder;
-// import fr.inria.corese.rdf4j.Rdf4jModelDataManagerBuilder;
 
 /**
  *

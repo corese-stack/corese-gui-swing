@@ -58,7 +58,6 @@ public class QueryExec {
     /**
      * Draft with several engine
      *
-     * TODO: add is done in first engine (see constructor in set() )
      */
     public void add(GraphEngine engine) {
         if (exec == null) {

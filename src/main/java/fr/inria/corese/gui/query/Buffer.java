@@ -9,7 +9,7 @@ import fr.inria.corese.core.kgram.event.EventImpl;
 import fr.inria.corese.core.kgram.event.User;
 
 /**
- * Synchronized buffer to interact with GUI & Listener
+ * Synchronized buffer to interact with GUI and Listener
  * 
  * @author Olivier Corby
  * C INRIA 2010

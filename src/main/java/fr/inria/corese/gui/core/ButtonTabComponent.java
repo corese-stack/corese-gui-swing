@@ -9,7 +9,6 @@ import java.awt.event.*;
  * Crée la croix fermante sur les onglets Contient un JButton pour fermer
  * l'onglet et un JLabel pour montrer le texte lorsqu'on passe sur le bouton
  */
-@SuppressWarnings("serial")
 public class ButtonTabComponent extends JPanel {
 
     private final JTabbedPane pane;

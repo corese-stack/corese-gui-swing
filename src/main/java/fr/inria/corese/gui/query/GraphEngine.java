@@ -30,7 +30,6 @@ import fr.inria.corese.core.query.QueryEngine;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.core.rule.Cleaner;
 import fr.inria.corese.core.rule.RuleEngine;
-import fr.inria.corese.core.sparql.api.IDatatype;
 import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Access;
@@ -145,7 +144,7 @@ public class GraphEngine {
     void param(String path) {
         try {
             new Parameter().load(path).process();
-            IDatatype dt = getVisitor().initServer("http://ns.inria.fr/corese/gui");
+            getVisitor().initServer("http://ns.inria.fr/corese/gui");
         } catch (LoadException ex) {
             logger.error(ex);
         }
@@ -296,7 +295,6 @@ public class GraphEngine {
         return true;
     }
 
-    // TODO: clean timestamp, clean graph index
     public void setOWLRL(int owl, boolean trace) throws EngineException {
         setOwlEngine(getDatasetManager().createRuleEngine(graph));
         getOwlEngine().setProfile(owl);
@@ -440,6 +438,7 @@ public class GraphEngine {
     /**
      * @deprecated
      */
+    @Deprecated
     public void setProperty(String name, String value) {
 
     }

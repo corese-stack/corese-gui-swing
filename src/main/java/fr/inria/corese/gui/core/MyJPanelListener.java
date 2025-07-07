@@ -43,9 +43,9 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
     private JScrollPane scrollPaneList;
     private JScrollPane scrollPaneLogs;
     private JTextPane textPaneLogs;
-    private DefaultListModel model;
+    private DefaultListModel<String> model;
     private boolean frameShow = true;
-    protected static JList listLoadedFiles;		//list présent dans le JpanelListener
+    protected static JList<String> listLoadedFiles;		//list présent dans le JpanelListener
     private JFrameDebug myPop;
     MyPopup popupMenu = new MyPopup();				//On instancie la pop-up
 
@@ -66,8 +66,8 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
         buttonDebug = new JButton();
         scrollPaneList = new JScrollPane();
 
-        model = new DefaultListModel();
-        listLoadedFiles = new JList(model);
+        model = new DefaultListModel<>();
+        listLoadedFiles = new JList<>(model);
         listLoadedFiles.addMouseListener(this);
         scrollPaneList = new JScrollPane(listLoadedFiles);
         scrollPaneList.setPreferredSize(new Dimension(100, 120));
@@ -261,7 +261,7 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
 
     }
 
-    public JList getListLoadedFiles() {
+    public JList<String> getListLoadedFiles() {
         return listLoadedFiles;
     }
 
@@ -307,7 +307,7 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
         this.paneListener = pane_listener;
     }
 
-    public DefaultListModel getModel() {
+    public DefaultListModel<String> getModel() {
         return model;
     }
 
@@ -361,7 +361,6 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
 
     @Override
     public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
     }
 
     @Override
@@ -370,7 +369,6 @@ public class MyJPanelListener extends JPanel implements MouseListener, ActionLis
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
     }
 
     @Override

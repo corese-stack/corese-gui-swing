@@ -5,7 +5,7 @@ import fr.inria.corese.core.sparql.datatype.DatatypeMap;
 
 /**
  * Display message in Corese GUI
- * prefix fun: <function://fr.inria.corese.gui.core.Callback>
+ * prefix fun: &lt;function://fr.inria.corese.gui.core.Callback&gt;
  * fun:display("message:", ?x, ?y)
  * 
  * @author corby

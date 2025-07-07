@@ -29,7 +29,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,9 +58,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.xml.sax.SAXException;
 
 import fr.inria.corese.core.Graph;
@@ -116,7 +112,6 @@ public class MainFrame extends JFrame implements ActionListener {
     // Compteur pour le nombre d'onglets query créés
     private ArrayList<Integer> nbreTab = new ArrayList<>();
     private String lCurrentPath = "user/home";
-    private String lCurrentRule = "user/home";
     private String lCurrentProperty = "user/home";
 
     private String lPath;
@@ -175,10 +170,10 @@ public class MainFrame extends JFrame implements ActionListener {
     private JMenuItem map;
     private JMenuItem success;
     private JMenuItem quit;
-    private JMenuItem iselect, iselecttuple, igraph,
+    private JMenuItem iselect, igraph,
             iconstruct, iconstructgraph, idescribe_query, idescribe_uri, iask,
-            iserviceLocal, iserviceCorese, imapcorese, iserviceDBpedia, ifederate,
-            iinsert, iinsertdata, idelete, ideleteinsert,
+            iserviceLocal, iserviceCorese, imapcorese, ifederate,
+            iinsertdata, ideleteinsert,
             iturtle, in3, irdfxml, ijson, itrig, ispin, iowl,
             ientailment, irule, ierror, ifunction, ical, iowlrl;
     private JMenuItem itypecheck, ipredicate, ipredicatepath;
@@ -208,17 +203,13 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final String SHACL_SHACL = NSManager.SHACL_SHACL;
     // Texte par défaut dans l'onglet requête
     private static final String DEFAULT_SELECT_QUERY = "select.rq";
-    private static final String DEFAULT_TUPLE_QUERY = "selecttuple.rq";
     private static final String DEFAULT_GRAPH_QUERY = "graph.rq";
     private static final String DEFAULT_CONSTRUCT_QUERY = "construct.rq";
     private static final String DEFAULT_ASK_QUERY = "ask.rq";
     private static final String DEFAULT_DESCRIBE_QUERY = "describe.rq";
     private static final String DEFAULT_DESCRIBE_URI = "describe_uri.rq";
     private static final String DEFAULT_SERVICE_CORESE_QUERY = "servicecorese.rq";
-    private static final String DEFAULT_SERVICE_DBPEDIA_QUERY = "servicedbpedia.rq";
-    private static final String DEFAULT_INSERT_QUERY = "insert.rq";
     private static final String DEFAULT_INSERT_DATA_QUERY = "insertdata.rq";
-    private static final String DEFAULT_DELETE_QUERY = "delete.rq";
     private static final String DEFAULT_DELETE_INSERT_QUERY = "deleteinsert.rq";
     private static final String DEFAULT_ENTAILMENT_QUERY = "entailment.rq";
     private static final String DEFAULT_RULE_QUERY = "rule.rq";
@@ -228,9 +219,6 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final String DEFAULT_TRIG_QUERY = "trig.rq";
     private static final String DEFAULT_OWL_QUERY = "owl.rq";
     private static final String DEFAULT_SPIN_QUERY = "spin.rq";
-    private static final String DEFAULT_TYPECHECK_QUERY = "typecheck.rq";
-    private static final String DEFAULT_SYSTEM_QUERY = "introspect.rq";
-    private static final String DEFAULT_PROVENANCE_QUERY = "provenance.rq";
     private String defaultQuery = DEFAULT_SELECT_QUERY;
     private GraphEngine myCorese = null;
     private CaptureOutput myCapturer = null;
@@ -286,7 +274,7 @@ public class MainFrame extends JFrame implements ActionListener {
      * Crée la fenêtre principale, initialise Corese
      *
      * @param aCapturer
-     * @param pPropertyPath
+     * @param args
      */
     public MainFrame(CaptureOutput aCapturer, String[] args) {
         super();
@@ -484,9 +472,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     // test
     MyJPanelQuery getPreviousQueryPanel2() {
-        MyJPanelQuery jp = (MyJPanelQuery) conteneurOnglets.getSelectedComponent();
         conteneurOnglets.getComponentCount();
-        int i = conteneurOnglets.getSelectedIndex();
         return null;
     }
 
@@ -696,7 +682,6 @@ public class MainFrame extends JFrame implements ActionListener {
         itable = new HashMap<>();
 
         iselect = defItem("Select", DEFAULT_SELECT_QUERY);
-        iselecttuple = defItem("Select Tuple", DEFAULT_TUPLE_QUERY);
         igraph = defItem("Graph", DEFAULT_GRAPH_QUERY);
         iconstruct = defItem("Construct", DEFAULT_CONSTRUCT_QUERY);
         iconstructgraph = defItem("Construct graph", "constructgraph.rq");
@@ -706,14 +691,11 @@ public class MainFrame extends JFrame implements ActionListener {
         iserviceLocal = defItem("Service Local", "servicelocal.rq");
         iserviceCorese = defItem("Service Corese", DEFAULT_SERVICE_CORESE_QUERY);
         imapcorese = defItem("Map", "mapcorese.rq");
-        iserviceDBpedia = defItem("Service DBpedia", DEFAULT_SERVICE_DBPEDIA_QUERY);
         ifederate = defItem("Federate", "federate.rq");
         ifunction = defItem("Function", DEFAULT_FUN_QUERY);
         ical = defItem("Calendar", "cal.rq");
 
-        iinsert = defItem("Insert", DEFAULT_INSERT_QUERY);
         iinsertdata = defItem("Insert Data", DEFAULT_INSERT_DATA_QUERY);
-        idelete = defItem("Delete", DEFAULT_DELETE_QUERY);
         ideleteinsert = defItem("Delete Insert", DEFAULT_DELETE_INSERT_QUERY);
 
         ientailment = defItem("RDFS Entailment", DEFAULT_ENTAILMENT_QUERY);
@@ -1786,7 +1768,7 @@ public class MainFrame extends JFrame implements ActionListener {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File[] lFiles = fileChooser.getSelectedFiles();
 
-            DefaultListModel model = getOngletListener().getModel();
+            DefaultListModel<String> model = getOngletListener().getModel();
             for (File f : lFiles) {
                 lPath = f.getAbsolutePath();
                 if (lPath == null) {
@@ -1822,7 +1804,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     void basicLoad(String path) {
-        DefaultListModel model = getOngletListener().getModel();
+        DefaultListModel<String> model = getOngletListener().getModel();
         if (!model.contains(path)) {
             model.addElement(path);
         }
@@ -1907,7 +1889,6 @@ public class MainFrame extends JFrame implements ActionListener {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File l_Files[] = fileChooser.getSelectedFiles();
 
-            DefaultListModel model = getOngletListener().getModel();
             for (File f : l_Files) {
                 lPath = f.getAbsolutePath();
                 setPath(f.getParent());
@@ -1919,8 +1900,6 @@ public class MainFrame extends JFrame implements ActionListener {
 
     /**
      * Compile a transformation
-     *
-     * @param filter
      */
     public void compile() {
         lPath = null;
@@ -1931,7 +1910,6 @@ public class MainFrame extends JFrame implements ActionListener {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File l_Files[] = fileChooser.getSelectedFiles();
 
-            DefaultListModel model = getOngletListener().getModel();
             for (File f : l_Files) {
                 lPath = f.getAbsolutePath();
                 setPath(f.getParent());
@@ -2322,10 +2300,6 @@ public class MainFrame extends JFrame implements ActionListener {
 
     public static void main(String[] p_args) {
         CaptureOutput aCapturer = new CaptureOutput();
-        LoggerContext context = (LoggerContext) LogManager.getContext();
-        Configuration config = context.getConfiguration();
-        PatternLayout layout = PatternLayout.createLayout("%m%n", null, config, null, Charset.defaultCharset(), false,
-                false, null, null);
         MainFrame coreseFrame = new MainFrame(aCapturer, p_args);
         coreseFrame.setStyleSheet();
         coreseFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

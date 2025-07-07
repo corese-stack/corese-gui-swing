@@ -8,6 +8,7 @@
 - Migration from Maven to Gradle for build management.
 - Updated dependencies to their latest versions.
 - Removed all `module-info` files.
+- Clean up of unused imports and code comments.
 
 ### Removed
 
