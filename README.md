@@ -16,14 +16,6 @@ Corese-GUI-Swing is the graphical user interface for the Corese platform, provid
 
 ## Getting Started
 
-### For Developers
-
-**First time setup** - Install automatic code formatting:
-```bash
-./install-formatting.sh
-```
-This ensures consistent code formatting across the team. See [CODE_FORMATTING.md](CODE_FORMATTING.md) for details.
-
 ### Download and Install
 
 You can run Corese-GUI-Swing using Flathub or by downloading and executing the JAR file.
