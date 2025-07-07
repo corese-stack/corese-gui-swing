@@ -1,46 +1,48 @@
-# Formatage du Code
+# Code Formatting
 
-Ce projet utilise **Spotless** pour maintenir un formatage uniforme du code Java.
+This project uses **Spotless** to maintain consistent Java code formatting.
 
-## � Installation (une seule fois)
+## Installation (one time only)
 
 ```bash
-# Installer le formatage automatique à chaque commit
+# Set up automatic formatting on every commit
 ./install-formatting.sh
 ```
 
-## �🚀 Commandes manuelles (optionnelles)
+## Manual commands (optional)
 
 ```bash
-# Formater automatiquement tout le code
+# Automatically format all code
 ./gradlew spotlessApply
 
-# Vérifier que le code est bien formaté
+# Check that the code is properly formatted
 ./gradlew spotlessCheck
 ```
 
-## 📏 Règles de formatage
+## Formatting rules
 
-- **Indentation** : 4 espaces (défini dans `.editorconfig`)
-- **Longueur de ligne** : 120 caractères max
-- **Formatage** : Google Java Format (style AOSP)
-- **Imports** : Organisés automatiquement (pas de wildcards *)
+- **Indentation**: 4 spaces (set in `.editorconfig`)
+- **Line length**: 120 characters max
+- **Formatting**: Google Java Format (AOSP style)
+- **Imports**: Automatically organized (no wildcards *)
 
-## 💡 Workflow automatique
+## Automatic workflow
 
-1. **Installez une fois** : `./install-formatting.sh`
-2. **Codez normalement** dans votre IDE
-3. **Commitez** : Le code est automatiquement formaté !
+1. **Install once**: `./install-formatting.sh`
+2. **Code as usual** in your IDE
+3. **Commit**: The code is automatically formatted!
 
-Le formatage se fait automatiquement :
-- ✅ À chaque commit (grâce au hook Git)
-- ✅ Dans VS Code lors de la sauvegarde (grâce à `.vscode/settings.json`)
+Formatting happens automatically:
 
-## 🛠️ Pour les nouveaux développeurs
+- On every commit (thanks to the Git hook)
+- In VS Code on save (thanks to `.vscode/settings.json`)
 
-Chaque nouveau développeur doit juste lancer :
+## For new developers
+
+Each new developer just needs to run:
+
 ```bash
 ./install-formatting.sh
 ```
 
-Et c'est tout ! Le formatage devient transparent.
+And that's it! Formatting becomes seamless.
