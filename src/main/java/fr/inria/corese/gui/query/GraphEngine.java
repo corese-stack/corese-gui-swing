@@ -49,7 +49,6 @@ import fr.inria.corese.gui.core.Command;
 public class GraphEngine {
 
     private static Logger logger = LogManager.getLogger(GraphEngine.class);
-    static final String BRUL = "brul";
 
     private Graph graph;
     private RuleEngine rengine, owlEngine;
@@ -319,23 +318,7 @@ public class GraphEngine {
         return false;
     }
 
-    public void load(InputStream rdf, String source) throws EngineException {
 
-    }
-
-    public void load(String path, String exclude) throws EngineException {
-
-    }
-
-    public void load(String path, String include, String exclude)
-            throws EngineException {
-
-    }
-
-    public void load(String path, String include, String exclude,
-            boolean bexclude) throws EngineException {
-
-    }
 
     public void loadRDF(String rdf, Loader.format format) throws EngineException, LoadException {
 
@@ -345,54 +328,11 @@ public class GraphEngine {
         ld.parse(stream, "", format);
     }
 
-    public void loadRDFRule(String rdf, String source) throws EngineException {
 
-    }
 
-    public void loadTriple(String triple) throws EngineException {
+    
+    // SPARQLProve functionality removed - obsolete implementation
 
-    }
-
-    public void translate(String pathToRDF, String pathToTriples)
-            throws EngineException {
-
-    }
-
-    // public Mappings SPARQLProve(String query) throws EngineException {
-    // LBind res = bengine.SPARQLProve(query);
-    // if (res == null) return null;
-    // Mappings lMap = translate(res);
-    // return lMap;
-    // }
-    //
-    //
-    //
-    // Mappings translate(LBind lb){
-    // ASTQuery ast = lb.getAST();
-    // Query query = exec.compile(ast);
-    // Mappings lMap = Mappings.create(query);
-    // for (Bind b : lb){
-    // List<Node> list = new ArrayList<Node>();
-    //
-    // for (Node qNode : query.getSelect()){
-    // IDatatype dt = b.getDatatypeValue(qNode.getLabel());
-    // if (dt == null){
-    // list.add(null);
-    // }
-    // else {
-    // Node node = graph.getNode(dt, true, false);
-    // list.add(node);
-    // }
-    // }
-    // Mapping map = Mapping.create(query.getSelect(), list);
-    // lMap.add(map);
-    // }
-    // return lMap;
-    // }
-    public Mappings SPARQLProve(ASTQuery ast) throws EngineException {
-
-        return null;
-    }
 
     public Mappings SPARQLQuery(String query) throws EngineException {
         QueryExec exec = QueryExec.create(this);

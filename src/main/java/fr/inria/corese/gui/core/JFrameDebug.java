@@ -13,8 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-//import fr.inria.corese.core.sparql.gui.event.MyLoadListener;
-//import fr.inria.corese.core.sparql.gui.event.MyQueryListener;
 import fr.inria.corese.core.kgram.event.Event;
 
 public class JFrameDebug extends JFrame{
@@ -36,9 +34,6 @@ public class JFrameDebug extends JFrame{
     private JCheckBox checkBoxLoad;
     private JPanel p;
 
-//    private MyLoadListener ell;
-//    private MyQueryListener eql;
-    
 	public JFrameDebug(final MainFrame coreseFrame){
 		toolBarDebug = new JToolBar();
 
@@ -123,14 +118,7 @@ public class JFrameDebug extends JFrame{
         checkBoxLoad.addItemListener (
         		new ItemListener() {
         			public void itemStateChanged(ItemEvent e) {
-        				
-//        				if(checkBoxLoad.isSelected() == true){        					
-//        					ell = MyLoadListener.create();
-//        					coreseFrame.getMyCorese().addEventListener(ell);
-//        				}
-//        				else{
-//        					coreseFrame.getMyCorese().removeEventListener(ell);        				
-//        				}
+        				// Load event listener functionality disabled
         			}
         		}
         );
@@ -140,14 +128,7 @@ public class JFrameDebug extends JFrame{
         checkBoxQuery.addItemListener (
         		new ItemListener() {
         			public void itemStateChanged(ItemEvent e) {
-        				
-//        				if(checkBoxQuery.isSelected() == true){
-//        					eql = MyQueryListener.create();
-//        					coreseFrame.getMyCorese().addEventListener(eql);
-//        				}
-//        				else{        					
-//        					coreseFrame.getMyCorese().removeEventListener(eql);        				
-//        				}
+        				// Query event listener functionality disabled
         			}
         		}
         );
@@ -156,8 +137,7 @@ public class JFrameDebug extends JFrame{
         checkBoxRule.addItemListener (
         		new ItemListener() {
         			public void itemStateChanged(ItemEvent e) {
-        				
-   
+        				// Rule event listener functionality not implemented
         			}
         		}
         );
