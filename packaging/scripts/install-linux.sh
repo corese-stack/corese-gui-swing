@@ -26,6 +26,7 @@ GITHUB_REPO="corese-stack/corese-gui-swing"
 RELEASE_API="https://api.github.com/repos/$GITHUB_REPO/releases"
 DESKTOP_FILE="$HOME/.local/share/applications/corese-gui.desktop"
 ICON_FILE="$HOME/.local/share/icons/fr.inria.corese.CoreseGui.svg"
+AUTO_YES=0
 
 check_internet() {
     echo "🌐 Checking internet connection..."
@@ -54,12 +55,13 @@ check_java() {
     fi
 
     # Check if AWT is supported (i.e., not headless)
-    echo "🧪 Checking Java GUI support..."
-    if ! java -XshowSettings:properties -version 2>&1 | grep -q 'awt.toolkit'; then
-        echo "⚠️  Java seems to be a headless version (no GUI support)."
-        echo "    You need a full JDK with AWT/Swing (not 'openjdk-headless')."
-        prompt_install_java
-        return
+    JAVA_HOME=$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")
+    if java --list-modules 2>/dev/null | grep -q '^java.desktop' \
+    && find "$JAVA_HOME" -type f -name 'libawt_xawt.so' -print -quit | grep -q . ; then
+    echo "✅ AWT / Swing OK"
+    else
+    echo "⚠️  Pas de support GUI"
+    prompt_install_java
     fi
 
     echo "✅ Java version $JAVA_VERSION with GUI support detected."
@@ -67,6 +69,11 @@ check_java() {
 }
 
 prompt_install_java() {
+    if [[ "$AUTO_YES" -eq 1 ]]; then
+        install_java_by_distro
+        return
+    fi
+
     echo -n "→ Install OpenJDK 21 now? [Y/n] "
     read -r answer
     if [[ "$answer" =~ ^[Nn]$ ]]; then
@@ -261,10 +268,14 @@ download_and_install() {
     download_icon
     create_desktop_file
 
-    echo -n "→ Add Corese-GUI to PATH for command-line usage? [Y/n] "
-    read -r add_to_path
-    if [[ ! "$add_to_path" =~ ^[Nn]$ ]]; then
+    if [[ "$AUTO_YES" -eq 1 ]]; then
         add_to_all_available_shell_rcs
+    else
+        echo -n "→ Add Corese-GUI to PATH for command-line usage? [Y/n] "
+        read -r add_to_path
+        if [[ ! "$add_to_path" =~ ^[Nn]$ ]]; then
+            add_to_all_available_shell_rcs
+        fi
     fi
 
     echo "✅ Corese-GUI $VERSION_TAG installed successfully!"
@@ -327,13 +338,15 @@ add_to_all_available_shell_rcs() {
 
 uninstall() {
     echo
-    echo "⚠️  This will completely remove Corese-GUI from your system."
-    echo -n "→ Are you sure? [y/N] "
-    read -r confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        echo "❌ Uninstall cancelled."
-        echo
-        exit 0
+    if [[ "$AUTO_YES" -ne 1 ]]; then
+        echo "⚠️  This will completely remove Corese-GUI from your system."
+        echo -n "→ Are you sure? [y/N] "
+        read -r confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo "❌ Uninstall cancelled."
+            echo
+            exit 0
+        fi
     fi
 
     echo "🗑️  Removing Corese-GUI files..."
@@ -368,12 +381,11 @@ uninstall() {
 main() {
     echo
     echo "╭────────────────────────────────────────╮"
-    echo "│          🎨 Corese-GUI                 │"
+    echo "│             Corese-GUI                 │"
     echo "│        Linux Installer & Updater       │"
     echo "╰────────────────────────────────────────╯"
     echo
 
-    check_internet
     display_installed_version
 
     echo "┌──────────── Menu ─────────────┐"
@@ -386,6 +398,7 @@ main() {
 
     case "$choice" in
         1)
+            check_internet
             check_java
             choose_version
             download_and_install
@@ -422,6 +435,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
 fi
 
 if [[ "$1" == "--install" && -n "$2" ]]; then
+    AUTO_YES=1
     VERSION_TAG="$2"
     check_java
     download_and_install
@@ -429,6 +443,7 @@ if [[ "$1" == "--install" && -n "$2" ]]; then
 fi
 
 if [[ "$1" == "--install-latest" ]]; then
+    AUTO_YES=1
     VERSION_TAG=$(list_versions | head -n 1)
     check_java
     download_and_install
@@ -436,6 +451,7 @@ if [[ "$1" == "--install-latest" ]]; then
 fi
 
 if [[ "$1" == "--uninstall" ]]; then
+    AUTO_YES=1
     uninstall
     exit 0
 fi

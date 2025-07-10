@@ -22,8 +22,9 @@ JAR_NAME="corese-gui-standalone.jar"
 VERSION_FILE="$INSTALL_DIR/version.txt"
 GITHUB_REPO="corese-stack/corese-gui-swing"
 RELEASE_API="https://api.github.com/repos/$GITHUB_REPO/releases"
-APP_DIR="/Applications/Corese-GUI.app"
+APP_DIR="/Applications/Corese-Gui.app"
 ICON_FILE="$INSTALL_DIR/fr.inria.corese.CoreseGui.svg"
+AUTO_YES=0
 
 check_internet() {
     echo "🌐 Checking internet connection..."
@@ -41,7 +42,6 @@ check_java() {
     if ! command -v java &> /dev/null; then
         echo "❌ Java is not installed."
         prompt_install_java
-        check_java
         return
     fi
 
@@ -85,6 +85,11 @@ check_java() {
 }
 
 prompt_install_java() {
+    if [[ "$AUTO_YES" -eq 1 ]]; then
+        install_java_by_distro
+        return
+    fi
+
     read -rp "→ Install OpenJDK 21 using Homebrew? [Y/n] " answer
     if [[ "$answer" =~ ^[Nn]$ ]]; then
         echo "❌ Java is required. Aborting."
@@ -281,6 +286,10 @@ download_and_install() {
     download_icon
     create_macos_app
 
+    if [[ "$AUTO_YES" -eq 1 ]]; then
+        add_to_all_available_shell_rcs
+    fi
+
     echo -n "→ Add Corese-GUI to PATH for command-line usage? [Y/n] "
     read -r add_to_path
     if [[ ! "$add_to_path" =~ ^[Nn]$ ]]; then
@@ -347,13 +356,15 @@ add_to_all_available_shell_rcs() {
 
 uninstall() {
     echo
-    echo "⚠️  This will completely remove Corese-GUI from your system."
-    echo -n "→ Are you sure? [y/N] "
-    read -r confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-        echo "❌ Uninstall cancelled."
-        echo
-        exit 0
+    if [[ "$AUTO_YES" -ne 1 ]]; then
+        echo "⚠️  This will completely remove Corese-GUI from your system."
+        echo -n "→ Are you sure? [y/N] "
+        read -r confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo "❌ Uninstall cancelled."
+            echo
+            exit 0
+        fi
     fi
 
     echo "🗑️  Removing Corese-GUI files..."
@@ -387,12 +398,11 @@ uninstall() {
 main() {
     echo
     echo "╭────────────────────────────────────────╮"
-    echo "│          🎨 Corese-GUI                 │"
+    echo "│             Corese-GUI                 │"
     echo "│        macOS Installer & Updater       │"
     echo "╰────────────────────────────────────────╯"
     echo
 
-    check_internet
     display_installed_version
 
     echo "┌──────────── Menu ─────────────┐"
@@ -405,6 +415,7 @@ main() {
 
     case "$choice" in
         1)
+            check_internet
             check_java
             choose_version
             download_and_install
@@ -441,6 +452,7 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
 fi
 
 if [[ "$1" == "--install" && -n "$2" ]]; then
+    AUTO_YES=1
     VERSION_TAG="$2"
     check_java
     download_and_install
@@ -448,6 +460,7 @@ if [[ "$1" == "--install" && -n "$2" ]]; then
 fi
 
 if [[ "$1" == "--install-latest" ]]; then
+    AUTO_YES=1
     VERSION_TAG=$(list_versions | head -n 1)
     check_java
     download_and_install
@@ -455,6 +468,7 @@ if [[ "$1" == "--install-latest" ]]; then
 fi
 
 if [[ "$1" == "--uninstall" ]]; then
+    AUTO_YES=1
     uninstall
     exit 0
 fi
