@@ -17,15 +17,16 @@
 
 set -e
 
-INSTALL_DIR="$HOME/.local/corese-gui"
+XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/corese-gui"
 BIN_NAME="corese-gui"
 WRAPPER_PATH="$INSTALL_DIR/$BIN_NAME"
 JAR_NAME="corese-gui-standalone.jar"
 VERSION_FILE="$INSTALL_DIR/version.txt"
 GITHUB_REPO="corese-stack/corese-gui-swing"
 RELEASE_API="https://api.github.com/repos/$GITHUB_REPO/releases"
-DESKTOP_FILE="$HOME/.local/share/applications/corese-gui.desktop"
-ICON_FILE="$HOME/.local/share/icons/fr.inria.corese.CoreseGui.svg"
+DESKTOP_FILE="$XDG_DATA_HOME/applications/corese-gui.desktop"
+ICON_FILE="$XDG_DATA_HOME/icons/fr.inria.corese.CoreseGui.svg"
 AUTO_YES=0
 
 check_internet() {

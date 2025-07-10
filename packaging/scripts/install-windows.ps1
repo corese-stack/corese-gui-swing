@@ -60,6 +60,7 @@ for ($i = 0; $i -lt $args.Length; $i++) {
         "--help"           { $Help = $true }
     }
 }
+$AutoYes = ($Install -or $InstallLatest) -or $Uninstall
 
 function Write-Centered($text) {
     $width = [console]::WindowWidth
@@ -292,9 +293,13 @@ function Download-And-Install($version) {
     Download-Icon $version
     Create-Shortcuts
 
-    $addToPath = Read-Host "`nAdd Corese-GUI to PATH for command-line usage? [Y/n]"
-    if ($addToPath -notmatch '^[Nn]') {
+    if ($Global:AutoYes) {
         Add-ToPath
+    } else {
+        $addToPath = Read-Host "`nAdd Corese-GUI to PATH for command-line usage? [Y/n]"
+        if ($addToPath -notmatch '^[Nn]') {
+            Add-ToPath
+        }
     }
 
     Write-Host ""
@@ -318,10 +323,14 @@ function Add-ToPath {
 }
 
 function Uninstall {
-    $confirm = Read-Host "`nThis will remove Corese-GUI from your system. Are you sure? [y/N]"
-    if ($confirm -notmatch '^[Yy]') {
-        Write-Host "Uninstall cancelled."
-        return
+    if (-not $Global:AutoYes) {
+        $confirm = Read-Host "`nThis will remove Corese-GUI from your system. Are you sure? [y/N]"
+        if ($confirm -notmatch '^[Yy]') {
+            Write-Host "Uninstall cancelled."
+            return
+        }
+    } else {
+        Write-Host "`nAuto-confirmed uninstallation (non-interactive mode)"
     }
 
     Write-Host "`nRemoving Corese-GUI files..."
