@@ -150,6 +150,8 @@
                     <li>Cleaned up unused imports and outdated code comments.</li>
                     <li>Dropped support for <code>shex</code>.</li>
                     <li>Removed the LUBM benchmark from the source code.</li>
+                    <li>Dropped support for alternative storage systems (Jena TDB1, Corese
+                        Graph,RDF4J Model).</li>
                 </ul>
                 <!-- French translation -->
                 <ul xml:lang="fr">
@@ -159,6 +161,8 @@
                     <li>Nettoyage des imports inutilisés et des commentaires obsolètes dans le code.</li>
                     <li>Abandon du support de <code>shex</code>.</li>
                     <li>Suppression du benchmark LUBM du code source.</li>
+                    <li>Abandon du support des systèmes de stockage alternatifs (Jena TDB1, Corese
+                        Graph,RDF4J Model).</li>
                 </ul>
             </description>
         </release>

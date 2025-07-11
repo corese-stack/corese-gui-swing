@@ -34,7 +34,6 @@ import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Access;
 import fr.inria.corese.core.sparql.triple.parser.Constant;
-import fr.inria.corese.core.storage.api.dataManager.DataManager;
 import fr.inria.corese.core.util.Parameter;
 import fr.inria.corese.core.util.Property;
 import fr.inria.corese.core.util.Tool;
@@ -55,8 +54,6 @@ public class GraphEngine {
     QueryProcess exec;
     private QuerySolverVisitor visitor;
     Build build;
-    // manage db or dataset storage access
-    private DatasetManagerGui datasetManager;
 
     private boolean isListGroup = false, isDebug = false, linkedFunction = false;
 
@@ -67,7 +64,6 @@ public class GraphEngine {
     }
 
     void init() {
-        datasetManager = new DatasetManagerGui().init();
         exec = createQueryProcess();
 
         try {
@@ -193,22 +189,9 @@ public class GraphEngine {
     public QueryProcess createQueryProcess() {
         QueryProcess qp;
 
-        if (getDatasetManager() == null || getDatasetManager().isDataset()) {
-            logger.info("std dataset");
-            qp = createBasicQueryProcess();
-        } else {
-            qp = createStorageQueryProcess();
-        }
+        logger.info("std dataset");
+        qp = createBasicQueryProcess();
 
-        return qp;
-    }
-
-    // db storage mode
-    public QueryProcess createStorageQueryProcess() {
-        QueryProcess qp = getDatasetManager().createQueryProcess(graph);
-        Load load = Load.create();
-        load.setDataManager(getDatasetManager().getDataManager());
-        qp.setLoader(load);
         return qp;
     }
 
@@ -223,9 +206,6 @@ public class GraphEngine {
 
     public Load loader() {
         Load load = Load.create(graph);
-        if (getDatasetManager() != null) {
-            load = getDatasetManager().createLoad(graph);
-        }
         load.setEngine(qengine);
         return load;
     }
@@ -291,7 +271,6 @@ public class GraphEngine {
     }
 
     public void setOWLRL(int owl, boolean trace) throws EngineException {
-        setOwlEngine(getDatasetManager().createRuleEngine(graph));
         getOwlEngine().setProfile(owl);
         getOwlEngine().setTrace(trace);
         Date d1 = new Date();
@@ -442,17 +421,5 @@ public class GraphEngine {
 
     public void setRuleEngine(RuleEngine rengine) {
         this.rengine = rengine;
-    }
-
-    public DatasetManagerGui getDatasetManager() {
-        return datasetManager;
-    }
-
-    public void setDatasetManager(DatasetManagerGui datasetManager) {
-        this.datasetManager = datasetManager;
-    }
-
-    public DataManager getDataManager() {
-        return getDatasetManager().getDataManager();
     }
 }

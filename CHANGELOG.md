@@ -14,6 +14,7 @@
 
 - Dropped support for `shex`.
 - Removed the LUBM benchmark from the source code.
+- Dropped support for alternative storage systems (Jena TDB1, Corese Graph, RDF4J Model).
 
 ## Version 4.5.0 - 2023-12-14
 
