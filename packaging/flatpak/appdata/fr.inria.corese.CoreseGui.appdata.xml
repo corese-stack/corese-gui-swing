@@ -152,6 +152,8 @@
                     <li>Removed the LUBM benchmark from the source code.</li>
                     <li>Dropped support for alternative storage systems (Jena TDB1, Corese
                         Graph,RDF4J Model).</li>
+                    <li>Fixed zooming and panning functionality of graph view.</li>
+                    <li>Allowed to zoom in/out/reset the view in the Corese GUI.</li>
                 </ul>
                 <!-- French translation -->
                 <ul xml:lang="fr">
@@ -163,6 +165,9 @@
                     <li>Suppression du benchmark LUBM du code source.</li>
                     <li>Abandon du support des systèmes de stockage alternatifs (Jena TDB1, Corese
                         Graph,RDF4J Model).</li>
+                    <li>Correction du zoom et du panoramique dans la vue graphique.</li>
+                    <li>Possibilité de zoomer avant/arrière/réinitialiser la vue dans l'interface
+                        Corese.</li>
                 </ul>
             </description>
         </release>

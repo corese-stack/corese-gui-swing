@@ -9,6 +9,7 @@
 
 ### Changed
 
+- Fix zooming and panning functionality of graph view.
 - Migration from Maven to Gradle for build management.
 - Updated dependencies to their latest versions.
 - Removed all `module-info` files.
