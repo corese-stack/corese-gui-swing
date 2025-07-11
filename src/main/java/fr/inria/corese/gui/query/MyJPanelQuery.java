@@ -6,12 +6,19 @@ import static fr.inria.corese.core.util.Property.Value.GUI_XML_MAX;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -44,7 +52,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.ui.graphicGraph.stylesheet.StyleSheet;
-import org.graphstream.ui.layout.springbox.implementations.LinLog;
+import org.graphstream.ui.layout.springbox.implementations.SpringBox;
 import org.graphstream.ui.swingViewer.View;
 import org.graphstream.ui.swingViewer.Viewer;
 
@@ -150,6 +158,10 @@ public final class MyJPanelQuery extends JPanel {
     private boolean displayLink = true;
     private Mappings mappings;
     private JPanel loadPanel;
+
+    // Nouveaux boutons pour l'interaction avec le graphique
+    @SuppressWarnings("unused")
+    private JButton buttonZoomIn, buttonZoomOut, buttonResetView, buttonFitView;
 
     public MyJPanelQuery() {
         super();
@@ -873,22 +885,26 @@ public final class MyJPanelQuery extends JPanel {
         graph = create(g, nsm);
         graph.addAttribute("ui.stylesheet", stylesheet);
         graph.addAttribute("ui.antialias");
+        graph.addAttribute("ui.quality");
         textPaneStyleGraph.setText(stylesheet);
-
-        // allows properly visualizing the graph in the Corese tab
-        LinLog lLayout = new LinLog();
-        lLayout.setQuality(0.9);
-        lLayout.setGravityFactor(0.9);
+        // Use a better layout for smoother visualization
+        SpringBox springLayout = new SpringBox();
+        springLayout.setQuality(0.95);
+        springLayout.setForce(0.85);
+        springLayout.setStabilizationLimit(0.8);
 
         Viewer sgv = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_SWING_THREAD);
-        sgv.enableAutoLayout(lLayout);
+        sgv.enableAutoLayout(springLayout);
         View sgr = sgv.addDefaultView(false);
 
-        // View myView = graph.display().getDefaultView();
-
+        // Advanced view configuration for better zoom and pan
         sgr.getCamera().setAutoFitView(true);
+        sgr.getCamera().setViewPercent(1.0);
 
-        // Dégrise le bouton et ajoute le texte dans le textPane
+        // Add enhanced controls for zoom and pan
+        enhanceGraphInteraction(sgr);
+
+        // Enable the buttons and set the text in the textPane
         buttonRefreshStyle.setEnabled(true);
         buttonDefaultStyle.setEnabled(true);
 
@@ -903,24 +919,105 @@ public final class MyJPanelQuery extends JPanel {
 
         final JSplitPane jpGraph = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsStyleGraph, sgr);
         jpGraph.setContinuousLayout(true);
+        jpGraph.setResizeWeight(0.3); // Donne plus d'espace au graphique
         scrollPaneTreeResult.setViewportView(jpGraph);
 
         // pointe sur l'onglet Graph
         tabbedPaneResults.setSelectedIndex(GRAPH_PANEL);
     }
 
+    /** Enhances interaction with the graph by adding advanced zoom and pan controls. */
+    private void enhanceGraphInteraction(View view) {
+        // Enable mouse interaction for zoom and pan
+        view.addMouseWheelListener(
+                new MouseWheelListener() {
+                    @Override
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        double zoomFactor = 1.0 + (e.getWheelRotation() * 0.1);
+                        view.getCamera()
+                                .setViewPercent(
+                                        Math.max(
+                                                0.1,
+                                                Math.min(
+                                                        10.0,
+                                                        view.getCamera().getViewPercent()
+                                                                * zoomFactor)));
+                    }
+                });
+
+        // Variables for panning
+        final Point[] lastMousePos = {null};
+        final boolean[] isDragging = {false};
+
+        view.addMouseListener(
+                new MouseListener() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            lastMousePos[0] = e.getPoint();
+                            isDragging[0] = true;
+                            view.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                        }
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            isDragging[0] = false;
+                            lastMousePos[0] = null;
+                            view.setCursor(Cursor.getDefaultCursor());
+                        }
+                    }
+
+                    @Override
+                    public void mouseClicked(MouseEvent e) {}
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {}
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {}
+                });
+
+        view.addMouseMotionListener(
+                new MouseMotionListener() {
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        if (isDragging[0] && lastMousePos[0] != null) {
+                            Point currentPos = e.getPoint();
+                            double dx = (currentPos.x - lastMousePos[0].x) * 0.01;
+                            double dy = (currentPos.y - lastMousePos[0].y) * 0.01;
+
+                            view.getCamera()
+                                    .setViewCenter(
+                                            view.getCamera().getViewCenter().x - dx,
+                                            view.getCamera().getViewCenter().y + dy,
+                                            view.getCamera().getViewCenter().z);
+
+                            lastMousePos[0] = currentPos;
+                        }
+                    }
+
+                    @Override
+                    public void mouseMoved(MouseEvent e) {}
+                });
+    }
+
     MultiGraph create(fr.inria.corese.core.Graph g, NSManager nsm) {
-        // graph.addNode(temp).addAttribute("ui.style", "fill-color:white;");
-        // gsub.addAttribute("ui.style",
-        // "fill-color:lightblue;size-mode:dyn-size;shape:rounded-box;");
-        // ee.addAttribute("ui.style", "size:0;edge-style:dashes;fill-color:white;");
         int num = 0;
         String sujetUri, predicat, objetUri;
-
         String sujet;
         String objet;
 
         MultiGraph graph = new MultiGraph(g.getName(), false, true);
+        // Configuration to improve rendering quality
+        graph.addAttribute("ui.quality");
+        graph.addAttribute("ui.antialias");
+
+        // Add improved default style if no style is defined
+        if (stylesheet == null || stylesheet.trim().isEmpty()) {
+            graph.addAttribute("ui.stylesheet", getDefaultGraphStylesheet());
+        }
 
         for (fr.inria.corese.core.kgram.api.core.Edge ent : g.getEdges()) {
             fr.inria.corese.core.kgram.api.core.Edge edge = ent.getEdge();
@@ -958,6 +1055,8 @@ public final class MyJPanelQuery extends JPanel {
 
                 Edge ee = graph.addEdge("edge" + num, sujetUri, objetUri, true);
                 ee.addAttribute("label", predicat);
+                // Améliore l'apparence des arêtes
+                ee.addAttribute("ui.class", "edge");
             }
         }
 
@@ -1331,5 +1430,88 @@ public final class MyJPanelQuery extends JPanel {
 
     public void setGraphEngine(GraphEngine graphEngine) {
         this.graphEngine = graphEngine;
+    }
+
+    /** Returns an improved default stylesheet for graphs */
+    private String getDefaultGraphStylesheet() {
+        return """
+                /* Style par défaut amélioré pour les graphiques Corese */
+                graph {
+                    fill-mode: gradient-radial;
+                    fill-color: #ffffff, #f0f0f0;
+                    padding: 30px;
+                }
+
+                node {
+                    size: 20px;
+                    fill-mode: gradient-radial;
+                    fill-color: #4a90e2, #357abd;
+                    stroke-mode: plain;
+                    stroke-color: #2c5282;
+                    stroke-width: 2px;
+                    shadow-mode: gradient-radial;
+                    shadow-color: #00000030;
+                    shadow-width: 4px;
+                    shadow-offset: 3px, 3px;
+                    text-mode: normal;
+                    text-color: #333333;
+                    text-style: bold;
+                    text-size: 12px;
+                    text-offset: 0px, -25px;
+                    text-background-mode: rounded-box;
+                    text-background-color: #ffffff90;
+                    text-padding: 3px;
+                    text-border-width: 1px;
+                    text-border-color: #cccccc;
+                }
+
+                node.Literal {
+                    fill-color: #67b26f, #4ca2cd;
+                    shape: box;
+                    size: 15px;
+                }
+
+                node.Blank {
+                    fill-color: #a8a8a8, #888888;
+                    shape: diamond;
+                    size: 12px;
+                }
+
+                edge {
+                    size: 2px;
+                    fill-color: #666666;
+                    arrow-size: 8px, 4px;
+                    arrow-shape: arrow;
+                    text-mode: normal;
+                    text-color: #444444;
+                    text-style: italic;
+                    text-size: 10px;
+                    text-background-mode: rounded-box;
+                    text-background-color: #ffffff80;
+                    text-padding: 2px;
+                    text-offset: 0px, -10px;
+                }
+
+                edge.edge {
+                    fill-color: #4a90e2;
+                    size: 1.5px;
+                }
+
+                node:selected {
+                    fill-color: #ff6b6b, #ee5a52;
+                    stroke-color: #c92a2a;
+                    stroke-width: 3px;
+                }
+
+                edge:selected {
+                    fill-color: #ff6b6b;
+                    size: 3px;
+                }
+
+                node:clicked {
+                    fill-color: #ffd93d, #ffcd3c;
+                    stroke-color: #fab005;
+                }
+                """;
     }
 }
