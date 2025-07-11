@@ -169,6 +169,10 @@ public class MainFrame extends JFrame implements ActionListener {
     private JMenuItem map;
     private JMenuItem success;
     private JMenuItem quit;
+    // Zoom functionality
+    private JMenuItem zoomIn;
+    private JMenuItem zoomOut;
+    private JMenuItem zoomReset;
     private JMenuItem iselect,
             igraph,
             iconstruct,
@@ -262,6 +266,13 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final String URI_CORESE = "http://project.inria.fr/corese";
     private static final String URI_GRAPHSTREAM = "http://graphstream-project.org/";
     int nbTabs = 0;
+
+    // Zoom settings
+    private float currentZoomFactor = 1.0f; // Default zoom factor (100%)
+    private static final float DEFAULT_ZOOM = 1.0f; // Default zoom level
+    private static final float MIN_ZOOM = 0.5f;
+    private static final float MAX_ZOOM = 3.0f;
+    private static final float ZOOM_STEP = 0.1f;
 
     Command cmd;
 
@@ -439,6 +450,14 @@ public class MainFrame extends JFrame implements ActionListener {
 
         // Set application icon for all operating systems
         setApplicationIcon();
+
+        // Initialize zoom to make interface more readable by default
+        currentZoomFactor = 1.1f; // Slightly bigger than default for better readability
+        updateZoom();
+        appendMsg(
+                "Interface initialisée avec zoom à "
+                        + String.format("%.0f", currentZoomFactor * 100)
+                        + "%\n");
     }
 
     public void focusMessagePanel() {
@@ -858,6 +877,20 @@ public class MainFrame extends JFrame implements ActionListener {
         checkBoxVerbose = new JCheckBox("Verbose");
         validate = new JMenuItem("Validate");
 
+        // Initialize zoom menu items
+        zoomIn = new JMenuItem("Zoom In");
+        zoomIn.addActionListener(this);
+        zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, ActionEvent.CTRL_MASK));
+        zoomIn.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, ActionEvent.CTRL_MASK));
+
+        zoomOut = new JMenuItem("Zoom Out");
+        zoomOut.addActionListener(this);
+        zoomOut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, ActionEvent.CTRL_MASK));
+
+        zoomReset = new JMenuItem("Reset Zoom");
+        zoomReset.addActionListener(this);
+        zoomReset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, ActionEvent.CTRL_MASK));
+
         cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
         copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
         paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
@@ -980,6 +1013,12 @@ public class MainFrame extends JFrame implements ActionListener {
         displayMenu.add(defDisplay("JSON LD", ResultFormat.format.JSONLD_FORMAT));
         displayMenu.add(defDisplay("Index", ResultFormat.format.UNDEF_FORMAT));
         displayMenu.add(defDisplay("Internal", ResultFormat.format.UNDEF_FORMAT));
+
+        // Add zoom functionality to display menu
+        displayMenu.addSeparator();
+        displayMenu.add(zoomIn);
+        displayMenu.add(zoomOut);
+        displayMenu.add(zoomReset);
 
         shaclMenu.add(itypecheck);
         shaclMenu.add(defItem("Fast Engine", "shacl/fastengine.rq"));
@@ -1533,6 +1572,13 @@ public class MainFrame extends JFrame implements ActionListener {
                 MyJPanelQuery temp = monTabOnglet.get(i);
                 temp.getButtonTKgram().setEnabled(true);
             }
+        } // Zoom functionality
+        else if (e.getSource() == zoomIn) {
+            zoomIn();
+        } else if (e.getSource() == zoomOut) {
+            zoomOut();
+        } else if (e.getSource() == zoomReset) {
+            zoomReset();
         } else if (itable.get(e.getSource()) != null) {
             // Button Explain
             DefQuery def = itable.get(e.getSource());
@@ -2428,6 +2474,153 @@ public class MainFrame extends JFrame implements ActionListener {
 
     public static void setSingleton(MainFrame aSingleton) {
         singleton = aSingleton;
+    }
+
+    /** Zoom in the interface */
+    private void zoomIn() {
+        if (currentZoomFactor < MAX_ZOOM) {
+            currentZoomFactor += ZOOM_STEP;
+            // Round to avoid floating point precision issues
+            currentZoomFactor = Math.round(currentZoomFactor * 10f) / 10f;
+            updateZoom();
+            appendMsg("Zoom augmenté à " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
+        } else {
+            appendMsg("Zoom maximum atteint (" + String.format("%.0f", MAX_ZOOM * 100) + "%)\n");
+        }
+    }
+
+    /** Zoom out the interface */
+    private void zoomOut() {
+        if (currentZoomFactor > MIN_ZOOM) {
+            currentZoomFactor -= ZOOM_STEP;
+            // Round to avoid floating point precision issues
+            currentZoomFactor = Math.round(currentZoomFactor * 10f) / 10f;
+            updateZoom();
+            appendMsg("Zoom réduit à " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
+        } else {
+            appendMsg("Zoom minimum atteint (" + String.format("%.0f", MIN_ZOOM * 100) + "%)\n");
+        }
+    }
+
+    /** Reset zoom to default level */
+    private void zoomReset() {
+        currentZoomFactor = DEFAULT_ZOOM; // Reset to default zoom
+        updateZoom();
+        appendMsg("Zoom remis à " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
+    }
+
+    /** Update the zoom level of all UI components */
+    private void updateZoom() {
+        // Get a base font size (12pt is a common default)
+        int baseFontSize = 12;
+
+        // Calculate new font size based on zoom factor
+        int newSize = Math.round(baseFontSize * currentZoomFactor);
+
+        // Ensure minimum readable size
+        newSize = Math.max(newSize, 8);
+
+        // Create the zoomed font
+        java.awt.Font zoomedFont =
+                new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.PLAIN, newSize);
+
+        // Update main window components
+        setFont(zoomedFont);
+
+        // Update tabbed pane
+        if (conteneurOnglets != null) {
+            conteneurOnglets.setFont(zoomedFont);
+
+            // Update all query panels
+            for (MyJPanelQuery panel : monTabOnglet) {
+                if (panel != null) {
+                    updatePanelZoom(panel, zoomedFont);
+                }
+            }
+
+            // Update system panels
+            if (ongletListener != null) {
+                updateSystemPanelZoom(ongletListener, zoomedFont);
+            }
+            if (ongletShacl != null) {
+                updateEditorZoom(ongletShacl, zoomedFont);
+            }
+            if (ongletTurtle != null) {
+                updateEditorZoom(ongletTurtle, zoomedFont);
+            }
+        }
+
+        // Update menu bar
+        if (getJMenuBar() != null) {
+            updateMenuZoom(getJMenuBar(), zoomedFont);
+        }
+
+        // Refresh the UI
+        revalidate();
+        repaint();
+    }
+
+    /** Update zoom for a query panel */
+    private void updatePanelZoom(MyJPanelQuery panel, java.awt.Font font) {
+        try {
+            // Use reflection to update font if possible
+            if (panel.getTextPaneQuery() != null) {
+                panel.getTextPaneQuery().setFont(font);
+            }
+            // Update the panel itself
+            panel.setFont(font);
+            updateComponentTreeZoom(panel, font);
+        } catch (Exception e) {
+            LOGGER.debug("Could not update panel zoom: " + e.getMessage());
+        }
+    }
+
+    /** Update zoom for system listener panel */
+    private void updateSystemPanelZoom(MyJPanelListener panel, java.awt.Font font) {
+        try {
+            panel.setFont(font);
+            if (panel.getTextPaneLogs() != null) {
+                panel.getTextPaneLogs().setFont(font);
+            }
+            updateComponentTreeZoom(panel, font);
+        } catch (Exception e) {
+            LOGGER.debug("Could not update system panel zoom: " + e.getMessage());
+        }
+    }
+
+    /** Update zoom for editor panels */
+    private void updateEditorZoom(java.awt.Component editor, java.awt.Font font) {
+        try {
+            editor.setFont(font);
+            updateComponentTreeZoom(editor, font);
+        } catch (Exception e) {
+            LOGGER.debug("Could not update editor zoom: " + e.getMessage());
+        }
+    }
+
+    /** Update zoom for menu bar */
+    private void updateMenuZoom(javax.swing.JMenuBar menuBar, java.awt.Font font) {
+        try {
+            menuBar.setFont(font);
+            updateComponentTreeZoom(menuBar, font);
+        } catch (Exception e) {
+            LOGGER.debug("Could not update menu zoom: " + e.getMessage());
+        }
+    }
+
+    /** Recursively update font for all components in a container */
+    private void updateComponentTreeZoom(java.awt.Component component, java.awt.Font font) {
+        try {
+            component.setFont(font);
+            if (component instanceof java.awt.Container) {
+                java.awt.Container container = (java.awt.Container) component;
+                for (java.awt.Component child : container.getComponents()) {
+                    updateComponentTreeZoom(child, font);
+                }
+            }
+        } catch (Exception e) {
+            // Ignore errors during font update
+        }
     }
 }
 // Test comment

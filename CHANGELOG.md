@@ -3,6 +3,10 @@
 
 ## Version 4.6.0 - 2025-07-07
 
+### Added
+
+- Allow to zoom in/out/reset the view in the Corese GUI.
+
 ### Changed
 
 - Migration from Maven to Gradle for build management.
