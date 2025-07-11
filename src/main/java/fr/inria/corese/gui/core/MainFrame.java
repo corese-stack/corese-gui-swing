@@ -10,6 +10,7 @@ import static fr.inria.corese.core.util.Property.Value.LOAD_QUERY;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
@@ -434,10 +436,73 @@ public class MainFrame extends JFrame implements ActionListener {
             listJMenuItems.get(i).setEnabled(false);
         }
         process(cmd);
+
+        // Set application icon for all operating systems
+        setApplicationIcon();
     }
 
     public void focusMessagePanel() {
         getConteneurOnglets().setSelectedIndex(0);
+    }
+
+    /** Sets the application icon for all operating systems */
+    private void setApplicationIcon() {
+        try {
+            // Load the icon from resources
+            Image icon = ImageIO.read(getClass().getResource("/icon/corese-icon.png"));
+
+            // Create multiple sizes for better compatibility
+            ArrayList<Image> iconList = new ArrayList<>();
+
+            // Add the original icon
+            iconList.add(icon);
+
+            // Add scaled versions for different contexts (16x16, 32x32, 48x48, 64x64,
+            // 128x128)
+            int[] sizes = {16, 32, 48, 64, 128};
+            for (int size : sizes) {
+                Image scaledIcon = icon.getScaledInstance(size, size, Image.SCALE_SMOOTH);
+                iconList.add(scaledIcon);
+            }
+
+            // Set the icon for the main window (works on Windows and Linux)
+            setIconImage(icon);
+
+            // Set multiple icon sizes for better system integration
+            setIconImages(iconList);
+
+            // For macOS: set the icon in the Dock
+            if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                try {
+                    if (java.awt.Taskbar.isTaskbarSupported()) {
+                        java.awt.Taskbar taskbar = java.awt.Taskbar.getTaskbar();
+                        if (taskbar.isSupported(java.awt.Taskbar.Feature.ICON_IMAGE)) {
+                            taskbar.setIconImage(icon);
+                        }
+                    }
+                } catch (UnsupportedOperationException | SecurityException e) {
+                    // Some systems may not support this or may have security restrictions
+                    LOGGER.warn("Unable to set Dock icon on macOS: " + e.getMessage());
+                }
+            }
+
+            // For Windows: Additional compatibility
+            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                // Windows automatically picks the best size from the icon list
+                setIconImages(iconList);
+            }
+
+            // For Linux: Additional support for window managers
+            if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+                // Many Linux window managers support multiple icon sizes
+                setIconImages(iconList);
+            }
+
+            LOGGER.info("Application icon set successfully for " + System.getProperty("os.name"));
+
+        } catch (IOException | IllegalArgumentException e) {
+            LOGGER.error("Unable to load the application icon: " + e.getMessage(), e);
+        }
     }
 
     public MyJPanelQuery execPlus() {
