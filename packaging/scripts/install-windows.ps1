@@ -233,7 +233,7 @@ function Create-Shortcuts {
     )) {
         $s = $WshShell.CreateShortcut($target.Path)
         $s.TargetPath  = $javaExe
-        $s.Arguments   = "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -jar `"$InstallDir\$JarName`""
+        $s.Arguments = "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dfile.encoding=UTF-8 -jar `"$InstallDir\$JarName`""
         $s.WorkingDirectory = $InstallDir
         $s.Description = "Corese-GUI - Graphical Semantic Web Platform"
         if (Test-Path $IconPath) {
