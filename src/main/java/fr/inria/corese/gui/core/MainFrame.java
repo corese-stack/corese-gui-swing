@@ -210,25 +210,25 @@ public class MainFrame extends JFrame implements ActionListener {
             cbnamed,
             cbindex;
     private JMenuItem validate;
-    // style correspondant au graphe
+    // Style corresponding to the graph
     private String defaultStylesheet, saveStylesheet;
     private ArrayList<JCheckBox>
-            listCheckbox; // list qui stocke les JCheckBoxs présentes sur le JPanelListener
+            listCheckbox; // list that stores the JCheckBoxes present on the JPanelListener
     private ArrayList<JMenuItem>
-            listJMenuItems; // list qui stocke les Boutons présents sur le JPanelListener
-    // Les 4 types d'onglets
+            listJMenuItems; // list that stores the Buttons present on the JPanelListener
+    // The 4 types of tabs
     private ArrayList<MyJPanelQuery> monTabOnglet;
     private JPanel plus;
     private MyJPanelQuery current;
     private MyJPanelListener ongletListener;
     private ShaclEditor ongletShacl;
     private TurtleEditor ongletTurtle;
-    // Pour connaître l'onglet selectionné
+    // To know the selected tab
     protected int selected;
-    // Texte dans l'onglet requête
+    // Text in the query tab
     private String textQuery;
     private static final String SHACL_SHACL = NSManager.SHACL_SHACL;
-    // Texte par défaut dans l'onglet requête
+    // Default text in the query tab
     private static final String DEFAULT_SELECT_QUERY = "select.rq";
     private static final String DEFAULT_GRAPH_QUERY = "graph.rq";
     private static final String DEFAULT_CONSTRUCT_QUERY = "construct.rq";
@@ -320,24 +320,24 @@ public class MainFrame extends JFrame implements ActionListener {
             LogManager.getLogger(MainFrame.class.getName()).log(Level.ERROR, "", ex);
         }
 
-        // Initialise Corese
+        // Initialize Corese
         myCapturer = aCapturer;
         setMyCoreseNewInstance(Graph.RDFS_ENTAILMENT_DEFAULT);
 
         System.setProperty(
                 "org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
-        // Initialise le menu
+        // Initialize the menu
         initMenu();
 
         listCheckbox = new ArrayList<>();
         listJMenuItems = new ArrayList<>();
 
-        // Création et ajout de notre conteneur d'onglets à la fenêtre
+        // Create and add our tab container to the window
         conteneurOnglets = new JTabbedPane();
         this.getContentPane().add(conteneurOnglets, BorderLayout.CENTER);
 
-        // Création et ajout des deux onglets "Listener" et "+"
+        // Create and add the two tabs "Listener" and "+"
         monTabOnglet = new ArrayList<>();
         ongletListener = new MyJPanelListener(this);
         ongletShacl = new ShaclEditor(this);
@@ -348,26 +348,25 @@ public class MainFrame extends JFrame implements ActionListener {
         conteneurOnglets.addTab("Turtle editor", ongletTurtle);
         conteneurOnglets.addTab("+", plus);
 
-        // Par défaut, l'onglet sélectionné est "listener"
+        // By default, the selected tab is "listener"
         conteneurOnglets.setSelectedIndex(0);
 
-        // S'applique lors d'un changement de selection d'onglet
+        // Applies when a tab selection changes
         conteneurOnglets.addChangeListener(
                 new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent changeEvent) {
-                        // c est le composant sélectionné
+                        // c is the selected component
                         Component c = conteneurOnglets.getSelectedComponent();
 
-                        // selected est l'indice du composant sélectionné dans le conteneur
-                        // d'onglets
+                        // selected is the index of the selected component in the tab container
                         selected = conteneurOnglets.getSelectedIndex();
 
-                        // Si l'onglet sélectionné est un onglet Query il devient l'onglet "courant"
+                        // If the selected tab is a Query tab, it becomes the "current" tab
                         if (c instanceof MyJPanelQuery) {
                             current = (MyJPanelQuery) c;
 
-                            // Certaines options du menu deviennent utilisables
+                            // Some menu options become usable
                             cut.setEnabled(true);
                             copy.setEnabled(true);
                             paste.setEnabled(true);
@@ -386,7 +385,7 @@ public class MainFrame extends JFrame implements ActionListener {
                                 temp.getButtonTKgram().setEnabled(false);
                             }
 
-                        } // Sinon elles restent grisées et inutilisables
+                        } // Otherwise, they remain grayed out and unusable
                         else {
                             cut.setEnabled(false);
                             copy.setEnabled(false);
@@ -397,7 +396,7 @@ public class MainFrame extends JFrame implements ActionListener {
                             saveQuery.setEnabled(false);
                             fileMenuSaveResult.setEnabled(false);
                         }
-                        // Si l'onglet sélectionné est le "+" on crée un nouvel onglet Query
+                        // If the selected tab is the "+", create a new Query tab
                         if (c == plus) {
                             execPlus();
                         }
@@ -414,7 +413,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 });
         appendMsg("Initialization:\n\n" + myCapturer.getContent() + "\n\n");
 
-        // On remplit notre liste de JCheckBox
+        // Fill our list of JCheckBox
         listCheckbox.add(checkBoxLoad);
         listCheckbox.add(checkBoxQuery);
         listCheckbox.add(checkBoxRule);
@@ -423,7 +422,7 @@ public class MainFrame extends JFrame implements ActionListener {
             listCheckbox.get(i).setEnabled(false);
         }
 
-        // on remplit notre liste de Bouton
+        // Fill our list of Buttons
         listJMenuItems.add(help);
         listJMenuItems.add(map);
         listJMenuItems.add(next);
@@ -446,9 +445,9 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     public MyJPanelQuery execPlus(String name, String str) {
-        // s : texte par défaut dans la requête
+        // s: default text in the query
         textQuery = str;
-        // Crée un nouvel onglet Query
+        // Create a new Query tab
         return newQuery(str, name);
     }
 
@@ -463,13 +462,13 @@ public class MainFrame extends JFrame implements ActionListener {
         defaultStylesheet = saveStylesheet;
     }
 
-    /** Affiche du texte dans le panel logs * */
+    /** Displays text in the logs panel */
     public void appendMsg(String msg) {
         Document currentDoc = ongletListener.getTextPaneLogs().getDocument();
         try {
             currentDoc.insertString(currentDoc.getLength(), msg, null);
 
-            // Place l'ascenceur en bas à chaque ajout de texte
+            // Scroll to the bottom after each text addition
             ongletListener.getScrollPaneLog().revalidate();
             int length = currentDoc.getLength();
             ongletListener.getTextPaneLogs().setCaretPosition(length);
@@ -483,7 +482,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return this;
     }
 
-    /** Creates a Query tab * */
+    /** Creates a Query tab */
     MyJPanelQuery newQuery(String query) {
         return newQuery(query, "");
     }
@@ -506,7 +505,7 @@ public class MainFrame extends JFrame implements ActionListener {
         return getLastQueryPanel(0);
     }
 
-    /** n=0 : last panel n=1 : last-1 panel */
+    /** n=0 : last panel, n=1 : last-1 panel */
     public MyJPanelQuery getLastQueryPanel(int n) {
         int i = 0;
         int last = conteneurOnglets.getComponentCount() - 1;
@@ -556,8 +555,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     public MyJPanelQuery newQuery(String query, String name) {
         nbTabs++;
-        // supprime l'onglet "+", ajoute un onglet Query, puis recrée l'onglet "+" à la
-        // suite
+        // Removes the "+" tab, adds a Query tab, then recreates the "+" tab afterwards
         conteneurOnglets.remove(plus);
         MyJPanelQuery temp = new MyJPanelQuery(this, query, name);
 
@@ -590,12 +588,12 @@ public class MainFrame extends JFrame implements ActionListener {
             initTabComponent(conteneurOnglets.getComponentCount() - 3);
         }
 
-        // sélectionne l'onglet fraichement créé
+        // Selects the newly created tab
         conteneurOnglets.setSelectedIndex(conteneurOnglets.getComponentCount() - 3);
         return temp;
     }
 
-    // Barre du menu
+    // Menu bar
     private void initMenu() {
         JMenuBar menuBar = new JMenuBar();
         // crée les options du menu et leurs listeners
@@ -1990,6 +1988,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private void resetOwlCheckBox() {
         cbowlrllite.setSelected(false);
+
         cbowlrl.setSelected(false);
         cbowlrlext.setSelected(false);
         cbowlrltest.setSelected(false);
