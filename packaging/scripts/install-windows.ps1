@@ -329,8 +329,6 @@ function Uninstall {
             Write-Host "Uninstall cancelled."
             return
         }
-    } else {
-        Write-Host "`nAuto-confirmed uninstallation (non-interactive mode)"
     }
 
     Write-Host "`nRemoving Corese-GUI files..."
@@ -367,12 +365,11 @@ function Uninstall {
 
 function Main {
     Write-Host ""
-    Write-Centered "----------------------------------------"
+    Write-Centered "-------------------------------------"
     Write-Centered "   Corese-GUI - Windows Installer"
-    Write-Centered "----------------------------------------"
+    Write-Centered "-------------------------------------"
     Write-Host ""
 
-    Check-Internet
     Show-Installed-Version
 
     Write-Host "-------------- Menu --------------"
@@ -384,6 +381,7 @@ function Main {
     $opt = Read-Host "`nSelect an option [1/2/3]"
     switch ($opt) {
         1 {
+            Check-Internet
             Check-Java
             $v = Choose-Version
             Download-And-Install $v
