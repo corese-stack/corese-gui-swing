@@ -3,7 +3,7 @@
 
 <p align="center">
     <a href="https://project.inria.fr/corese/">
-        <img src="docs/source/_static/logo/corese-gui-swing_doc_light.svg" width="200" alt="Corese-GUI-logo">
+        <img src="docs/source/_static/logo/corese-gui-swing.svg" width="200" alt="Corese-GUI-logo">
     </a>
     <br>
     <strong>Graphical User Interface for the Semantic Web of Linked Data</strong>

@@ -20,6 +20,19 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 project = 'Corese'
 author = 'Wimmics'
 
+version = ""
+release = ""
+
+def setup(app):
+    def set_version(app, config):
+        smv = getattr(app.config, 'smv_current_version', None)
+        config.version = smv
+        config.release = smv
+        html_theme_options["switcher"]["version_match"] = smv
+
+    app.connect("config-inited", set_version)
+
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -61,14 +74,16 @@ html_css_files = [
 html_js_files = []
 
 # Project logo, to place at the top of the sidebar.
-html_logo = "_static/logo/corese-gui-swing_doc_bar.svg"
+html_logo = "_static/logo/corese-gui-swing.svg"
 
 # Icon to put in the browser tab.
-html_favicon = "_static/logo/corese-gui-swing_doc_fav.svg"
+html_js_files = [
+    "js/favicon-theme.js"
+]
 
 # Modify the title to get good social-media links
-html_title = "CORESE"
-html_short_title = "CORESE"
+html_title = "Corese-gui-swing Documentation"
+html_short_title = "Corese-gui-swing Docs"
 
 # -- Theme Options -----------------------------------------------------------
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -76,8 +91,8 @@ html_short_title = "CORESE"
 # documentation.
 html_theme_options = {
      "logo": {
-         "image_light": "_static/logo/corese-gui-swing_doc_bar.svg",
-         "image_dark": "_static/logo/corese-gui-swing_doc_bar.svg"
+         "image_light": "_static/logo/corese-gui-swing.svg",
+         "image_dark": "_static/logo/corese-gui-swing.svg"
      },
     "theme_switcher": True,
     "navbar_center": [ "navbar-nav" ],
@@ -89,14 +104,12 @@ html_theme_options = {
             "icon": "fab fa-github-square"
         }
     ],
-    "switcher": {"json_url": "https://corese-stack.github.io/corese-gui-swing/switcher.json", "version_match": r"v\d+\.\d+\.\d+"}
+    "switcher": {"json_url": "https://corese-stack.github.io/corese-gui-swing/switcher.json", "version_match": version}
 }
 
 html_sidebars = {
     "install": [],
-    "user_guide": [],
 }
-
 
 # -- MySt-parcer extension Options -------------------------------------------
 # https://myst-parser.readthedocs.io/en/latest/
@@ -109,8 +122,6 @@ primary_domain = 'java'
 
 # Tell sphinx what the pygments highlight language should be.
 highlight_language = 'java'
-
-# Setup the sphinx.ext.todo extension
 
 # Set to false in the final version
 todo_include_todos = True

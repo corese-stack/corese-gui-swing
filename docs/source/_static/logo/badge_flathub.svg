@@ -7,7 +7,7 @@
    id="svg13"
    sodipodi:docname="badge_flathub.svg"
    xml:space="preserve"
-   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -20,9 +20,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="5.0381358"
-     inkscape:cx="141.32211"
-     inkscape:cy="87.532377"
+     inkscape:zoom="7.125"
+     inkscape:cx="117.19298"
+     inkscape:cy="93.403509"
      inkscape:window-width="3072"
      inkscape:window-height="1659"
      inkscape:window-x="0"
@@ -242,4 +242,10 @@
        style="fill:#ffffff" /><path
        d="m 336.10377,269.88184 h 7.87865 v -5.35571 h 0.46475 c 1.26147,2.47867 3.89506,5.95324 9.73766,5.95324 8.01143,0 14.00894,-6.3516 14.00894,-17.54991 0,-11.33109 -6.17456,-17.48352 -14.03107,-17.48352 -5.99751,0 -8.49832,3.60736 -9.71553,6.06391 h -0.33196 v -16.95238 h -8.01144 z m 7.85652,-16.99664 c 0,-6.59505 2.83277,-10.86634 7.9893,-10.86634 5.33358,0 8.07783,4.53686 8.07783,10.86634 0,6.37374 -2.78851,11.02126 -8.07783,11.02126 -5.11227,0 -7.9893,-4.42621 -7.9893,-11.02126 z"
        id="path1119"
-       style="fill:#ffffff" /></g></svg>
+       style="fill:#ffffff" /></g><rect
+     style="fill:none;stroke:#ffffff;stroke-width:3.99999;stroke-dasharray:none;stroke-opacity:1"
+     id="rect2-7"
+     height="80"
+     x="0"
+     y="0"
+     width="240" /></svg>

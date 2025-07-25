@@ -22,7 +22,7 @@ json_array=()
 # Initialize the HTML content
 html_content="<html>
 <head>
-  <meta http-equiv=\"refresh\" content=\"0; url=https://corese-stack.github.io/corese-gui-swing/{{ latest_version }}/\">
+  <meta http-equiv=\"refresh\" content=\"0; url=https://corese-stack.github.io/corese-command/{{ latest_version }}/\">
   <title>Documentation Versions</title>
 </head>
 <body>
@@ -32,7 +32,7 @@ html_content="<html>
 # Function to compare versions to minimal version
 version_greater_equal() {
     # Use sort -V for natural version comparison
-    test "$(echo -e "$1\n$2" | sort -V | head -n 1)" = "$2"
+    test "$(echo -e "$1\n$2" | sort -V | head -n 1)" = $2
 }
 
 # Initialize the first flag to identify the latest tag
@@ -53,44 +53,50 @@ for tag in $tags; do
             is_first=false
         else
             preferred="false"
-            name="$tag (stable)"
+            name="$tag"
         fi
 
         # Create a JSON object for the tag
-        json_object=$(cat <<EOF
+json_object=$(cat <<EOF
 {
     "name": "$name",
-    "version": "stable",
-    "url": "https://corese-stack.github.io/corese-gui-swing/$tag/",
+    "version": "$tag",
+    "url": "https://corese-stack.github.io/corese-command/$tag/",
     "preferred": $preferred
 }
 EOF
-        )
-
+)
         # Add the JSON object to the array
         json_array+=("$json_object")
 
-        # Add HTML list item
-        html_content="$html_content
-    <li><a href=\"https://corese-stack.github.io/corese-gui-swing/$tag/\">$name</a></li>"
+        # Add HTML list item for the version
+        if [ "$preferred" == "true" ]; then
+            html_content="$html_content
+    <li><a href=\"https://corese-stack.github.io/corese-command/$tag/\">$tag (latest)</a></li>"
+        else
+            html_content="$html_content
+    <li><a href=\"https://corese-stack.github.io/corese-command/$tag/\">$tag</a></li>"
+        fi
     fi
 done
 
 # Close the HTML content
 html_content="$html_content
   </ul>
-  <p>If you are not redirected, click <a href=\"https://corese-stack.github.io/corese-gui-swing/$latest_version/\">here</a>.</p>
+  <p>If you are not redirected, click <a href=\"https://corese-stack.github.io/corese-command/$latest_version/\">here</a>.</p>
 </body>
 </html>"
 
-# Combine JSON objects into array format
+# Join the JSON objects into a single array
 json_output=$(printf ",\n%s" "${json_array[@]}")
+
+# Write the JSON output to the provided file
 echo -e "[\n${json_output:2}\n]" > "$json_output_file"
 
-# Finalize and write HTML file
-html_content="${html_content//\{\{ latest_version \}\}/$latest_version}"
+# Write the HTML output to the provided file
+html_content=$(echo "$html_content" | sed "s/{{ latest_version }}/$latest_version/")
 echo "$html_content" > "$html_output_file"
 
-# Print confirmation
+# Print confirmation messages
 echo "JSON data has been written to $json_output_file"
 echo "HTML landing page has been written to $html_output_file"

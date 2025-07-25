@@ -7,6 +7,15 @@
 .. image:: _static/logo/corese-gui-swing_doc_light.svg
    :align: center
    :width: 400px
+   :class: only-light
+
+.. image:: _static/logo/corese-gui-swing_doc_dark.svg
+   :align: center
+   :width: 400px
+   :class: only-dark
+
+
+Corese is a software platform that implements and extends the standards of the Semantic Web. It enables users to create, manipulate, parse, serialize, query, reason about, and validate RDF data.
 
 Corese-GUI is a graphical interface for the Corese Semantic Web platform. It allows users to easily and visually use Corese's features, including manipulating, querying, reasoning, and validating RDF data.
 
@@ -21,28 +30,59 @@ Corese-GUI provides an intuitive interface to execute SPARQL queries, visualize 
       .. image:: _static/screenshots/query-graph.png
          :alt: Visualize RDF graph from SPARQL CONSTRUCT query
          :width: 100%
-         :class: sd-rounded-2
+         :class: only-dark
 
    .. grid-item::
 
       .. image:: _static/screenshots/query-table.png
          :alt: Display results of SPARQL SELECT in table view
          :width: 100%
-         :class: sd-rounded-2
+         :class: only-dark
 
    .. grid-item::
 
       .. image:: _static/screenshots/shacl-editor.png
          :alt: Validate RDF data using SHACL shapes
          :width: 100%
-         :class: sd-rounded-2
+         :class: only-dark
 
    .. grid-item::
 
       .. image:: _static/screenshots/shacl-validation.png
          :alt: Edit SHACL shapes and get real-time validation feedback
          :width: 100%
-         :class: sd-rounded-2
+         :class: only-dark
+
+.. grid:: 2
+   :gutter: 2
+
+   .. grid-item::
+
+      .. image:: _static/screenshots/query-graph.png
+         :alt: Visualize RDF graph from SPARQL CONSTRUCT query
+         :width: 100%
+         :class: only-light
+
+   .. grid-item::
+
+      .. image:: _static/screenshots/query-table.png
+         :alt: Display results of SPARQL SELECT in table view
+         :width: 100%
+         :class: only-light
+
+   .. grid-item::
+
+      .. image:: _static/screenshots/shacl-editor.png
+         :alt: Validate RDF data using SHACL shapes
+         :width: 100%
+         :class: only-light
+
+   .. grid-item::
+
+      .. image:: _static/screenshots/shacl-validation.png
+         :alt: Edit SHACL shapes and get real-time validation feedback
+         :width: 100%
+         :class: only-light
 
 .. Define named hyperlinks for the references of W3C standards
 .. _RDF: https://www.w3.org/RDF/
@@ -87,18 +127,15 @@ Corese-GUI provides an intuitive interface to execute SPARQL queries, visualize 
       :shadow: sm
       :class-card: sd-rounded-3
 
-      Corese-GUI offers several features
-      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      * Load and save RDF data in various formats (Turtle, RDF/XML, JSON-LD, etc.)
-      * Execution of SPARQL queries
-      * Visualization of RDF graphs
-      * Validation of RDF data with SHACL
-      * Application of reasoning and inference
-      * Extension with STTL SPARQL, SPARQL Rule, and LDscript
-      * Intuitive user interface for manipulating RDF data
+      Corese offers several interfaces
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      * `corese-core <https://corese-stack.github.io/corese-core/>`_: Java library to process RDF data and use Corese features via an API.
+      * `corese-command <https://corese-stack.github.io/corese-command/>`_: Command Line Interface for Corese that allows users to interact with Corese features from the terminal.
+      * `corese-gui <https://corese-stack.github.io/corese-gui-swing/>`_: Graphical interface that allows an easy and visual use of Corese features.
+      * `corese-server <https://corese-stack.github.io/corese-server-jetty/>`_: Tool to create, configure and manage SPARQL endpoints.
+      * `corese-python (beta) <https://corese-stack.github.io/corese-python/>`_: Python wrapper for accessing and manipulating RDF data with Corese features using py4j.
 
 .. raw:: html
-
 
    <h3>Contributions and discussions about Corese-GUI</h3>
 
@@ -111,7 +148,7 @@ For any questions, comments, or improvement ideas, please use our `discussion fo
 
 .. #############################################################################
 .. The statements below are to produce the title of the page in the tab
-   and a menu with links to the documentation pages
+   and a menu with the links to the pages of the documentation
 
 .. raw html below is used to hide the title of the page but retain it in the
    tab title. https://github.com/sphinx-doc/sphinx/issues/8356
@@ -129,5 +166,4 @@ Home Page
 .. toctree::
    :hidden:
 
-   Home <index.rst>
-   Installation <install.md>
+   Installation <install>
