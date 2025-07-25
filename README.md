@@ -11,7 +11,7 @@
 
 [![License: CECILL-C](https://img.shields.io/badge/License-CECILL--C-blue.svg)](https://cecill.info/licences/Licence_CeCILL-C_V1-en.html) [![Discussions](https://img.shields.io/badge/Discussions-GitHub-blue)](https://github.com/orgs/corese-stack/discussions)
 
-## ✨ Features
+## Features
 
 - Load and save RDF data in various formats (Turtle, RDF/XML, JSON-LD, etc.)
 - Execute SPARQL queries
@@ -21,14 +21,14 @@
 - Extend functionality with STTL SPARQL, SPARQL Rule, and LDScript
 - Intuitive user interface for manipulating RDF data
 
-## 🚀 Getting Started
+## Getting Started
 
 Install Corese-GUI using your preferred platform:
 
 ### Linux
 
-<a href="https://flathub.org/fr/apps/fr.inria.corese.CoreseGui">
-  <img src="docs/source/_static/logo/badge_flathub.svg" alt="Flathub" width="140">
+<a href='https://flathub.org/apps/fr.inria.corese.CoreseGui'>
+    <img width='140' alt='Get it on Flathub' src='docs/source/_static/logo/badge_flathub.svg'/>
 </a>
 
 ```bash
@@ -49,12 +49,16 @@ iwr -useb https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/p
 
 ### Manual Installation (cross-platform)
 
-Use Corese-GUI as a standalone `.jar` file.
+You can also use Corese-GUI as a standalone `.jar` file or add it to a Java project via Maven.
 
 > Requires Java 21 or higher.
 
-- [🔗 GitHub Releases](https://github.com/corese-stack/corese-gui-swing/releases)
-- [📦 Maven Central](https://central.sonatype.com/artifact/fr.inria.corese/corese-gui)
+<a href='https://github.com/corese-stack/corese-gui-swing/releases'>
+    <img width='140' alt='Get it on GitHub' src='docs/source/_static/logo/badge_github.svg'/>
+</a>
+<a href='https://central.sonatype.com/artifact/fr.inria.corese/corese-gui'>
+    <img width='140' alt='Get it on Maven Central' src='docs/source/_static/logo/badge_maven.svg'/>
+</a>
 
 Run manually with:
 
@@ -62,7 +66,7 @@ Run manually with:
 java -jar corese-gui-standalone.jar
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Here’s how to get involved:
 
@@ -70,7 +74,7 @@ We welcome contributions! Here’s how to get involved:
 - [Issue Tracker](https://github.com/corese-stack/corese-gui-swing/issues)
 - [Pull Requests](https://github.com/corese-stack/corese-gui-swing/pulls)
 
-## 🔗 Useful Links
+## Useful Links
 
 - [Corese Website](https://corese-stack.github.io/corese-gui-swing/)
 - Mailing List: <corese-users@inria.fr>
