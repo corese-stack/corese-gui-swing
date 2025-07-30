@@ -455,7 +455,7 @@ public class MainFrame extends JFrame implements ActionListener {
         currentZoomFactor = 1.1f; // Slightly bigger than default for better readability
         updateZoom();
         appendMsg(
-                "Interface initialisée avec zoom à "
+                "Interface initialized with zoom at "
                         + String.format("%.0f", currentZoomFactor * 100)
                         + "%\n");
     }
