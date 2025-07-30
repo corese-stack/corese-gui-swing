@@ -643,6 +643,12 @@ public class MainFrame extends JFrame implements ActionListener {
         conteneurOnglets.remove(plus);
         MyJPanelQuery temp = new MyJPanelQuery(this, query, name);
 
+        // Apply current zoom to the new query panel
+        if (currentZoomFactor != 1.0f) {
+            java.awt.Font zoomedFont = getCurrentZoomedFont();
+            updatePanelZoom(temp, zoomedFont);
+        }
+
         monTabOnglet.add(temp);
         nbreTab.add(nbTabs);
         for (int n = 1; n <= monTabOnglet.size(); n++) {
@@ -2512,18 +2518,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
     /** Update the zoom level of all UI components */
     private void updateZoom() {
-        // Get a base font size (12pt is a common default)
-        int baseFontSize = 12;
-
-        // Calculate new font size based on zoom factor
-        int newSize = Math.round(baseFontSize * currentZoomFactor);
-
-        // Ensure minimum readable size
-        newSize = Math.max(newSize, 8);
-
-        // Create the zoomed font
-        java.awt.Font zoomedFont =
-                new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.PLAIN, newSize);
+        // Get the current zoomed font
+        java.awt.Font zoomedFont = getCurrentZoomedFont();
 
         // Update main window components
         setFont(zoomedFont);
@@ -2531,6 +2527,7 @@ public class MainFrame extends JFrame implements ActionListener {
         // Update tabbed pane
         if (conteneurOnglets != null) {
             conteneurOnglets.setFont(zoomedFont);
+            updateTabTitlesZoom(zoomedFont);
 
             // Update all query panels
             for (MyJPanelQuery panel : monTabOnglet) {
@@ -2551,14 +2548,75 @@ public class MainFrame extends JFrame implements ActionListener {
             }
         }
 
-        // Update menu bar
+        // Update menu bar and all menu components
         if (getJMenuBar() != null) {
             updateMenuZoom(getJMenuBar(), zoomedFont);
+            updateMenuCheckboxes(zoomedFont);
         }
 
         // Refresh the UI
         revalidate();
         repaint();
+    }
+
+    /** Update zoom for tab titles */
+    private void updateTabTitlesZoom(java.awt.Font font) {
+        try {
+            if (conteneurOnglets != null) {
+                // Set font for the tabbed pane itself (affects tab titles)
+                conteneurOnglets.setFont(font);
+
+                // Force update of tab components for better compatibility
+                for (int i = 0; i < conteneurOnglets.getTabCount(); i++) {
+                    // Get the tab component (if any) and update its font
+                    java.awt.Component tabComponent = conteneurOnglets.getTabComponentAt(i);
+                    if (tabComponent != null) {
+                        updateComponentTreeZoom(tabComponent, font);
+                    }
+                }
+
+                // Revalidate to ensure the changes are applied
+                conteneurOnglets.revalidate();
+                conteneurOnglets.repaint();
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not update tab titles zoom: " + e.getMessage());
+        }
+    }
+
+    /** Update zoom for menu checkboxes and radio buttons */
+    private void updateMenuCheckboxes(java.awt.Font font) {
+        try {
+            // Update all checkboxes in menus
+            if (cbtrace != null) cbtrace.setFont(font);
+            if (cbrdfs != null) cbrdfs.setFont(font);
+            if (cbowlrlext != null) cbowlrlext.setFont(font);
+            if (cbowlrllite != null) cbowlrllite.setFont(font);
+            if (cbowlrl != null) cbowlrl.setFont(font);
+            if (cbowlrltest != null) cbowlrltest.setFont(font);
+            if (cbrdfsrl != null) cbrdfsrl.setFont(font);
+            if (cbindex != null) cbindex.setFont(font);
+            if (cbclean != null) cbclean.setFont(font);
+            if (cbnamed != null) cbnamed.setFont(font);
+            if (checkBoxLoad != null) checkBoxLoad.setFont(font);
+            if (checkBoxQuery != null) checkBoxQuery.setFont(font);
+            if (checkBoxRule != null) checkBoxRule.setFont(font);
+            if (checkBoxVerbose != null) checkBoxVerbose.setFont(font);
+
+            // Update radio buttons
+            if (kgramBox != null) kgramBox.setFont(font);
+
+            // Update any dynamically created checkboxes from rule lists
+            if (listCheckbox != null) {
+                for (JCheckBox checkbox : listCheckbox) {
+                    if (checkbox != null) {
+                        checkbox.setFont(font);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not update menu checkboxes zoom: " + e.getMessage());
+        }
     }
 
     /** Update zoom for a query panel */
@@ -2599,28 +2657,111 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
+    /** Get the current zoomed font */
+    private java.awt.Font getCurrentZoomedFont() {
+        // Get a base font size (12pt is a common default)
+        int baseFontSize = 12;
+
+        // Calculate new font size based on zoom factor
+        int newSize = Math.round(baseFontSize * currentZoomFactor);
+
+        // Ensure minimum readable size
+        newSize = Math.max(newSize, 8);
+
+        // Create and return the zoomed font
+        return new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.PLAIN, newSize);
+    }
+
     /** Update zoom for menu bar */
     private void updateMenuZoom(javax.swing.JMenuBar menuBar, java.awt.Font font) {
         try {
             menuBar.setFont(font);
-            updateComponentTreeZoom(menuBar, font);
+
+            // Update all menus in the menu bar
+            for (int i = 0; i < menuBar.getMenuCount(); i++) {
+                javax.swing.JMenu menu = menuBar.getMenu(i);
+                if (menu != null) {
+                    updateMenuComponentZoom(menu, font);
+                }
+            }
         } catch (Exception e) {
             LOGGER.debug("Could not update menu zoom: " + e.getMessage());
+        }
+    }
+
+    /** Helper method to update zoom for menu components */
+    private void updateMenuComponentZoom(javax.swing.JMenu menu, java.awt.Font font) {
+        try {
+            menu.setFont(font);
+
+            // Update all menu items
+            for (int i = 0; i < menu.getItemCount(); i++) {
+                javax.swing.JMenuItem item = menu.getItem(i);
+                if (item != null) {
+                    item.setFont(font);
+
+                    // Special handling for checkboxes and radio buttons in menus
+                    if (item instanceof javax.swing.JCheckBoxMenuItem) {
+                        javax.swing.JCheckBoxMenuItem checkBoxItem =
+                                (javax.swing.JCheckBoxMenuItem) item;
+                        checkBoxItem.setFont(font);
+                    } else if (item instanceof javax.swing.JRadioButtonMenuItem) {
+                        javax.swing.JRadioButtonMenuItem radioItem =
+                                (javax.swing.JRadioButtonMenuItem) item;
+                        radioItem.setFont(font);
+                    } else if (item instanceof javax.swing.JMenu) {
+                        // Recursively handle submenus
+                        updateMenuComponentZoom((javax.swing.JMenu) item, font);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not update menu component zoom: " + e.getMessage());
         }
     }
 
     /** Recursively update font for all components in a container */
     private void updateComponentTreeZoom(java.awt.Component component, java.awt.Font font) {
         try {
+            // Apply font to the component itself
             component.setFont(font);
+
+            // Special handling for specific component types
+            if (component instanceof javax.swing.JCheckBox) {
+                javax.swing.JCheckBox checkBox = (javax.swing.JCheckBox) component;
+                checkBox.setFont(font);
+            } else if (component instanceof javax.swing.JRadioButton) {
+                javax.swing.JRadioButton radioButton = (javax.swing.JRadioButton) component;
+                radioButton.setFont(font);
+            } else if (component instanceof javax.swing.JMenuItem) {
+                javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem) component;
+                menuItem.setFont(font);
+            } else if (component instanceof javax.swing.JMenu) {
+                javax.swing.JMenu menu = (javax.swing.JMenu) component;
+                menu.setFont(font);
+            }
+
+            // Recursively update all children if this is a container
             if (component instanceof java.awt.Container) {
                 java.awt.Container container = (java.awt.Container) component;
                 for (java.awt.Component child : container.getComponents()) {
                     updateComponentTreeZoom(child, font);
                 }
+
+                // Special handling for menu components
+                if (component instanceof javax.swing.JMenu) {
+                    javax.swing.JMenu menu = (javax.swing.JMenu) component;
+                    for (int i = 0; i < menu.getItemCount(); i++) {
+                        javax.swing.JMenuItem item = menu.getItem(i);
+                        if (item != null) {
+                            updateComponentTreeZoom(item, font);
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             // Ignore errors during font update
+            LOGGER.debug("Could not update component zoom: " + e.getMessage());
         }
     }
 }
