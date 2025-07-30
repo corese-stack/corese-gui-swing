@@ -2483,9 +2483,10 @@ public class MainFrame extends JFrame implements ActionListener {
             // Round to avoid floating point precision issues
             currentZoomFactor = Math.round(currentZoomFactor * 10f) / 10f;
             updateZoom();
-            appendMsg("Zoom augmenté à " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
+            appendMsg(
+                    "Zoom increased to " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
         } else {
-            appendMsg("Zoom maximum atteint (" + String.format("%.0f", MAX_ZOOM * 100) + "%)\n");
+            appendMsg("Maximum zoom reached (" + String.format("%.0f", MAX_ZOOM * 100) + "%)\n");
         }
     }
 
@@ -2496,9 +2497,9 @@ public class MainFrame extends JFrame implements ActionListener {
             // Round to avoid floating point precision issues
             currentZoomFactor = Math.round(currentZoomFactor * 10f) / 10f;
             updateZoom();
-            appendMsg("Zoom réduit à " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
+            appendMsg("Zoom reduced to " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
         } else {
-            appendMsg("Zoom minimum atteint (" + String.format("%.0f", MIN_ZOOM * 100) + "%)\n");
+            appendMsg("Minimum zoom reached (" + String.format("%.0f", MIN_ZOOM * 100) + "%)\n");
         }
     }
 
@@ -2506,7 +2507,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private void zoomReset() {
         currentZoomFactor = DEFAULT_ZOOM; // Reset to default zoom
         updateZoom();
-        appendMsg("Zoom remis à " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
+        appendMsg("Zoom reset to " + String.format("%.0f", currentZoomFactor * 100) + "%\n");
     }
 
     /** Update the zoom level of all UI components */
