@@ -63,7 +63,7 @@ repositories {
 dependencies {
 
     // === Corese GUI dependencies ===
-    implementation("fr.inria.corese:corese-core:4.6.4-SNAPSHOT")     // Core module of Corese
+    implementation("fr.inria.corese:corese-core:4.6.4")              // Core module of Corese
     implementation("org.graphstream:gs-ui:1.2")                      // GraphStream UI library
     implementation("org.json:json:20250517")                         // JSON processing library for handling JSON data
 

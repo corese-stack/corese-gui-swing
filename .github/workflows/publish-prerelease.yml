@@ -12,9 +12,9 @@ on:
       - develop
 
 jobs:
-  prerelease:
+  prerelease-github:
     name: Build and Publish Pre-release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, corese-stack-ubuntu-24]
     permissions:
       contents: write
 
@@ -58,6 +58,7 @@ jobs:
             **Build Info:**
             - Branch: `${{ github.ref_name }}`
             - Commit: `${{ github.sha }}`
+            - Build Time: `${{ steps.timestamp.outputs.timestamp }}`
           prerelease: true
           allowUpdates: true
           replacesArtifacts: true
