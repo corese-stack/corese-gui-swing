@@ -6,11 +6,11 @@ plugins {
     // Publishing plugins
     signing                                                     // Signs artifacts for Maven Central
     `maven-publish`                                             // Enables publishing to Maven repositories
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0" // Automates Nexus publishing
+    id("com.vanniktech.maven.publish") version "0.34.0"         // Automates Maven publishing tasks
 
     // Tooling plugins
     `jacoco`                                                    // For code coverage reports
-    id("com.gradleup.shadow") version "8.3.6"                   // Bundles dependencies into a single JAR
+    id("com.gradleup.shadow") version "8.3.7"                   // Bundles dependencies into a single JAR
     id("com.diffplug.spotless") version "6.25.0"                // Code formatting and style checking
 }
 
@@ -31,10 +31,6 @@ object Meta {
     // License information
     const val license = "CeCILL-C License"
     const val licenseUrl = "https://opensource.org/licenses/CeCILL-C"
-
-    // Sonatype OSSRH publishing settings
-    const val release = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-    const val snapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
 ////////////////////////
@@ -64,7 +60,6 @@ repositories {
     mavenCentral()  // Then, check Maven Central
 }
 
-// Define dependencies
 dependencies {
 
     // === Corese GUI dependencies ===
@@ -82,107 +77,53 @@ dependencies {
 // Publishing settings //
 /////////////////////////
 
-// Publication configuration for Maven repositories
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
+mavenPublishing {
+    coordinates(Meta.groupId, Meta.artifactId, Meta.version)
 
-            // Configure the publication to include JAR, sources, and Javadoc
-            from(components["java"])
-
-            // Configures version mapping to control how dependency versions are resolved
-            // for different usage contexts (API and runtime).
-            versionMapping {
-                // Defines version mapping for Java API usage.
-                // Sets the version to be resolved from the runtimeClasspath configuration.
-                usage("java-api") {
-                    fromResolutionOf("runtimeClasspath")
-                }
-
-                // Defines version mapping for Java runtime usage.
-                // Uses the result of dependency resolution to determine the version.
-                usage("java-runtime") {
-                    fromResolutionResult()
-                }
-            }
-
-            // Configure the publication metadata
-            groupId = Meta.groupId
-            artifactId = Meta.artifactId
-            version = Meta.version
-
-            pom {
-                name.set(Meta.artifactId)
-                description.set(Meta.desc)
-                url.set("https://github.com/${Meta.githubRepo}")
-                licenses {
-                    license {
-                        name.set(Meta.license)
-                        url.set(Meta.licenseUrl)
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("OlivierCorby")
-                        name.set("Olivier Corby")
-                        email.set("olivier.corby@inria.fr")
-                        url.set("http://www-sop.inria.fr/members/Olivier.Corby")
-                        organization.set("Inria")
-                        organizationUrl.set("http://www.inria.fr/")
-                    }
-                    developer {
-                        id.set("remiceres")
-                        name.set("Rémi Cérès")
-                        email.set("remi.ceres@inria.fr")
-                        url.set("http://www-sop.inria.fr/members/Remi.Ceres")
-                        organization.set("Inria")
-                        organizationUrl.set("http://www.inria.fr/")
-                    }
-                }
-                scm {
-                    url.set("https://github.com/${Meta.githubRepo}.git")
-                    connection.set("scm:git:git://github.com/${Meta.githubRepo}.git")
-                    developerConnection.set("scm:git:git://github.com/${Meta.githubRepo}.git")
-                }
-                issueManagement {
-                    url.set("https://github.com/${Meta.githubRepo}/issues")
-                }
+    pom {
+        name.set(Meta.artifactId)
+        description.set(Meta.desc)
+        url.set("https://github.com/${Meta.githubRepo}")
+        licenses {
+            license {
+                name.set(Meta.license)
+                url.set(Meta.licenseUrl)
+                distribution.set("repo")
             }
         }
-    }
-}
-
-// Configure artifact signing
-signing {
-    // Retrieve the GPG signing key and passphrase from environment variables for secure access.
-    val signingKey = providers.environmentVariable("GPG_SIGNING_KEY")
-    val signingPassphrase = providers.environmentVariable("GPG_SIGNING_PASSPHRASE")
-
-    // Sign the publications if the GPG signing key and passphrase are available.
-    if (signingKey.isPresent && signingPassphrase.isPresent) {
-        useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
-        sign(publishing.publications)
-    }
-}
-
-// Configure Nexus publishing and credentials
-nexusPublishing {
-    repositories {
-        // Configure Sonatype OSSRH repository for publishing.
-        sonatype {
-            // Retrieve Sonatype OSSRH credentials from environment variables.
-            val ossrhUsername = providers.environmentVariable("OSSRH_USERNAME")
-            val ossrhPassword = providers.environmentVariable("OSSRH_PASSWORD")
-
-            // Set the credentials for Sonatype OSSRH if they are available.
-            if (ossrhUsername.isPresent && ossrhPassword.isPresent) {
-                username.set(ossrhUsername.get())
-                password.set(ossrhPassword.get())
+        developers {
+            developer {
+                id.set("OlivierCorby")
+                name.set("Olivier Corby")
+                email.set("olivier.corby@inria.fr")
+                url.set("http://www-sop.inria.fr/members/Olivier.Corby")
+                organization.set("Inria")
+                organizationUrl.set("http://www.inria.fr/")
             }
-
-            // Define the package group for this publication, typically following the group ID.
-            packageGroup.set(Meta.groupId)
+            developer {
+                id.set("remiceres")
+                name.set("Rémi Cérès")
+                email.set("remi.ceres@inria.fr")
+                url.set("http://www-sop.inria.fr/members/Remi.Ceres")
+                organization.set("Inria")
+                organizationUrl.set("http://www.inria.fr/")
+            }
         }
+        scm {
+            url.set("https://github.com/${Meta.githubRepo}/")
+            connection.set("scm:git:git://github.com/${Meta.githubRepo}.git")
+            developerConnection.set("scm:git:ssh://git@github.com/${Meta.githubRepo}.git")
+        }
+        issueManagement {
+            url.set("https://github.com/${Meta.githubRepo}/issues")
+        }
+    }
+
+    publishToMavenCentral()
+
+    // Only sign publications when GPG keys are available (CI environment)
+    if (project.hasProperty("signingInMemoryKey") || project.hasProperty("signing.keyId")) {
+        signAllPublications()
     }
 }
 
@@ -191,21 +132,20 @@ nexusPublishing {
 /////////////////////////
 
 // Set UTF-8 encoding for Java compilation tasks
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf(
-        "-Xlint:deprecation",
-        "-Xlint:unchecked",
-        "-parameters"
-    ))
+    options.compilerArgs.add("-Xlint:none")
 }
 
 // Configure Javadoc tasks with UTF-8 encoding and disable failure on error.
 // This ensures that Javadoc generation won't fail due to minor issues.
-tasks.withType<Javadoc>() {
+tasks.withType<Javadoc>().configureEach {
     options.encoding = "UTF-8"
     isFailOnError = false
+    // Configure Javadoc tasks to disable doclint warnings.
+    (options as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
 }
+
 
 // Configure the shadow JAR task to include dependencies in the output JAR.
 // This creates a single JAR file with all dependencies bundled.
@@ -213,15 +153,6 @@ tasks.withType<Javadoc>() {
 tasks {
     shadowJar {
         this.archiveClassifier = "standalone"
-    }
-}
-
-// Configure Javadoc tasks to disable doclint warnings.
-tasks {
-    javadoc {
-        options {
-            (this as CoreJavadocOptions).addBooleanOption("Xdoclint:none", true)
-        }
     }
 }
 
