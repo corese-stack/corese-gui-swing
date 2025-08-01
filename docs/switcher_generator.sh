@@ -22,7 +22,7 @@ json_array=()
 # Initialize the HTML content
 html_content="<html>
 <head>
-  <meta http-equiv=\"refresh\" content=\"0; url=https://corese-stack.github.io/corese-command/{{ latest_version }}/\">
+  <meta http-equiv=\"refresh\" content=\"0; url=https://corese-stack.github.io/corese-gui-swing/{{ latest_version }}/\">
   <title>Documentation Versions</title>
 </head>
 <body>
@@ -61,7 +61,7 @@ json_object=$(cat <<EOF
 {
     "name": "$name",
     "version": "$tag",
-    "url": "https://corese-stack.github.io/corese-command/$tag/",
+    "url": "https://corese-stack.github.io/corese-gui-swing/$tag/",
     "preferred": $preferred
 }
 EOF
@@ -72,10 +72,10 @@ EOF
         # Add HTML list item for the version
         if [ "$preferred" == "true" ]; then
             html_content="$html_content
-    <li><a href=\"https://corese-stack.github.io/corese-command/$tag/\">$tag (latest)</a></li>"
+    <li><a href=\"https://corese-stack.github.io/corese-gui-swing/$tag/\">$tag (latest)</a></li>"
         else
             html_content="$html_content
-    <li><a href=\"https://corese-stack.github.io/corese-command/$tag/\">$tag</a></li>"
+    <li><a href=\"https://corese-stack.github.io/corese-gui-swing/$tag/\">$tag</a></li>"
         fi
     fi
 done
@@ -83,7 +83,7 @@ done
 # Close the HTML content
 html_content="$html_content
   </ul>
-  <p>If you are not redirected, click <a href=\"https://corese-stack.github.io/corese-command/$latest_version/\">here</a>.</p>
+  <p>If you are not redirected, click <a href=\"https://corese-stack.github.io/corese-gui-swing/$latest_version/\">here</a>.</p>
 </body>
 </html>"
 
