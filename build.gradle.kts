@@ -39,7 +39,6 @@ object Meta {
 
 // Java compilation settings
 java {
-    withJavadocJar()                             // Include Javadoc JAR in publications
     withSourcesJar()                             // Include sources JAR in publications
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
@@ -185,6 +184,13 @@ tasks.withType<PublishToMavenLocal>().configureEach {
 // This guarantees that artifacts are signed before they are published to Maven repositories.
 tasks.withType<PublishToMavenRepository>().configureEach {
     dependsOn(tasks.withType<Sign>())
+}
+
+// Fix dependency issue with Maven publication metadata generation
+// The generateMetadataFileForMavenPublication task needs to depend on plainJavadocJar
+// Use afterEvaluate to ensure tasks are created by the vanniktech plugin first
+afterEvaluate {
+    tasks.findByName("generateMetadataFileForMavenPublication")?.dependsOn("plainJavadocJar")
 }
 
 /////////////////////////
