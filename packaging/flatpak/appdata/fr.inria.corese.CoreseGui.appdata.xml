@@ -141,7 +141,7 @@
 
 
     <releases>
-        <release version="4.6.0" date="2025-07-07">
+        <release version="4.6.0" date="2025-08-01">
             <description>
                 <ul>
                     <li>Migrated from Maven to Gradle for build management.</li>
