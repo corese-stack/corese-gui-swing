@@ -154,19 +154,21 @@
                         Graph,RDF4J Model).</li>
                     <li>Fixed zooming and panning functionality of graph view.</li>
                     <li>Allowed to zoom in/out/reset the view in the Corese GUI.</li>
-                </ul>
-                <!-- French translation -->
-                <ul xml:lang="fr">
-                    <li>Migration de Maven vers Gradle pour la gestion du projet.</li>
-                    <li>Mise à jour de toutes les dépendances vers leurs dernières versions.</li>
-                    <li>Suppression de tous les fichiers <code>module-info</code>.</li>
-                    <li>Nettoyage des imports inutilisés et des commentaires obsolètes dans le code.</li>
-                    <li>Abandon du support de <code>shex</code>.</li>
-                    <li>Suppression du benchmark LUBM du code source.</li>
-                    <li>Abandon du support des systèmes de stockage alternatifs (Jena TDB1, Corese
+
+                    <li xml:lang="fr">Migration de Maven vers Gradle pour la gestion du projet.</li>
+                    <li xml:lang="fr">Mise à jour de toutes les dépendances vers leurs dernières
+                        versions.</li>
+                    <li xml:lang="fr">Suppression de tous les fichiers <code>module-info</code>.</li>
+                    <li xml:lang="fr">Nettoyage des imports inutilisés et des commentaires obsolètes
+                        dans le code.</li>
+                    <li xml:lang="fr">Abandon du support de <code>shex</code>.</li>
+                    <li xml:lang="fr">Suppression du benchmark LUBM du code source.</li>
+                    <li xml:lang="fr">Abandon du support des systèmes de stockage alternatifs (Jena
+                        TDB1, Corese
                         Graph,RDF4J Model).</li>
-                    <li>Correction du zoom et du panoramique dans la vue graphique.</li>
-                    <li>Possibilité de zoomer avant/arrière/réinitialiser la vue dans l'interface
+                    <li xml:lang="fr">Correction du zoom et du panoramique dans la vue graphique.</li>
+                    <li xml:lang="fr">Possibilité de zoomer avant/arrière/réinitialiser la vue dans
+                        l'interface
                         Corese.</li>
                 </ul>
             </description>
@@ -177,13 +179,12 @@
                     <li>Updated loading message in Corese-GUI.</li>
                     <li>Fixed federated query with PREFIX statements failing under some conditions.</li>
                     <li>Updated json library to 20231013.</li>
-                </ul>
-                <!-- French translation -->
-                <ul xml:lang="fr">
-                    <li>Mise à jour du message de chargement dans Corese-GUI.</li>
-                    <li>Correction de la requête fédérée avec des déclarations PREFIX échouant dans
+
+                    <li xml:lang="fr">Mise à jour du message de chargement dans Corese-GUI.</li>
+                    <li xml:lang="fr">Correction de la requête fédérée avec des déclarations PREFIX
+                        échouant dans
                         certaines conditions.</li>
-                    <li>Mise à jour de la bibliothèque json à 20231013.</li>
+                    <li xml:lang="fr">Mise à jour de la bibliothèque json à 20231013.</li>
                 </ul>
             </description>
         </release>
@@ -192,12 +193,11 @@
                 <ul>
                     <li>Fixed warning: "sun.reflect.Reflection.getCallerClass is not supported".</li>
                     <li>Updated json library from 20180813 to 20230227.</li>
-                </ul>
-                <!-- French translation -->
-                <ul xml:lang="fr">
-                    <li>Correction de l'avertissement : "sun.reflect.Reflection.getCallerClass n'est
+
+                    <li xml:lang="fr">Correction de l'avertissement :
+                        "sun.reflect.Reflection.getCallerClass n'est
                         pas pris en charge".</li>
-                    <li>Mise à jour de la bibliothèque json du 20180813 au 20230227.</li>
+                    <li xml:lang="fr">Mise à jour de la bibliothèque json du 20180813 au 20230227.</li>
                 </ul>
             </description>
         </release>
@@ -217,24 +217,30 @@
                         updated during reload.</li>
                     <li>Fixed the rule engine that was implementing optimizations incompatible with
                         the `owl:propertyChainAxiom` rule.</li>
-                </ul>
-                <!-- French translation -->
-                <ul xml:lang="fr">
-                    <li>Ajout du support des systèmes de stockage (Jena TDB1, RDF4J Model)</li>
-                    <li>Ajout du support Beta pour RDF* et SPARQL* (Rapport du groupe communautaire
+
+                    <li xml:lang="fr">Ajout du support des systèmes de stockage (Jena TDB1, RDF4J
+                        Model)</li>
+                    <li xml:lang="fr">Ajout du support Beta pour RDF* et SPARQL* (Rapport du groupe
+                        communautaire
                         du 17 décembre 2021)</li>
-                    <li>Ajout du support Annuler/Refaire</li>
-                    <li>Correction d'une erreur d'encodage lors du chargement d'un fichier dont le
+                    <li xml:lang="fr">Ajout du support Annuler/Refaire</li>
+                    <li xml:lang="fr">Correction d'une erreur d'encodage lors du chargement d'un
+                        fichier dont le
                         chemin contient un espace</li>
-                    <li>Correction d'un bug du moteur SPARQL où il était impossible de charger un
+                    <li xml:lang="fr">Correction d'un bug du moteur SPARQL où il était impossible de
+                        charger un
                         graphe nommé contenant une liste RDF non vide.</li>
-                    <li>Correction du problème avec "rdf:" non trouvé lors de l'envoi d'une requête
+                    <li xml:lang="fr">Correction du problème avec "rdf:" non trouvé lors de l'envoi
+                        d'une requête
                         fédérée à Fuseki.</li>
-                    <li>Correction du format JSON non standard lors du dépassement du temps de
+                    <li xml:lang="fr">Correction du format JSON non standard lors du dépassement du
+                        temps de
                         requête.</li>
-                    <li>Correction de l'état incohérent des cases à cocher OWL et Rules qui n'était
+                    <li xml:lang="fr">Correction de l'état incohérent des cases à cocher OWL et
+                        Rules qui n'était
                         pas mis à jour lors du rechargement.</li>
-                    <li>Correction du moteur de règles qui mettait en œuvre des optimisations
+                    <li xml:lang="fr">Correction du moteur de règles qui mettait en œuvre des
+                        optimisations
                         incompatibles avec la règle `owl:propertyChainAxiom`.</li>
                 </ul>
             </description>
@@ -245,12 +251,10 @@
                     <li>Added graphical editor for SHACL file.</li>
                     <li>Added graphical editor for TURTLE file.</li>
                     <li>Added save graph option.</li>
-                </ul>
-                <!-- French translation -->
-                <ul xml:lang="fr">
-                    <li>Ajout d'un éditeur graphique pour les fichiers SHACL.</li>
-                    <li>Ajout d'un éditeur graphique pour les fichiers TURTLE.</li>
-                    <li>Ajout de l'option de sauvegarde de graphe.</li>
+
+                    <li xml:lang="fr">Ajout d'un éditeur graphique pour les fichiers SHACL.</li>
+                    <li xml:lang="fr">Ajout d'un éditeur graphique pour les fichiers TURTLE.</li>
+                    <li xml:lang="fr">Ajout de l'option de sauvegarde de graphe.</li>
                 </ul>
             </description>
         </release>
