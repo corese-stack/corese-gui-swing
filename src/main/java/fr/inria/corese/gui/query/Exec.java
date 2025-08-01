@@ -1,40 +1,39 @@
 package fr.inria.corese.gui.query;
 
-import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import java.util.Date;
 
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import fr.inria.corese.core.sparql.exceptions.EngineException;
-import fr.inria.corese.gui.core.MainFrame;
-import fr.inria.corese.gui.event.MyEvalListener;
-import fr.inria.corese.core.sparql.triple.parser.NSManager;
+import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.compiler.federate.FederateVisitor;
 import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.kgram.core.Query;
 import fr.inria.corese.core.kgram.event.Event;
-import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.util.SPINProcess;
-import fr.inria.corese.core.util.Tool;
+import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.core.sparql.triple.parser.ASTQuery;
 import fr.inria.corese.core.sparql.triple.parser.Metadata;
+import fr.inria.corese.core.sparql.triple.parser.NSManager;
 import fr.inria.corese.core.sparql.triple.parser.context.ContextLog;
-import org.apache.logging.log4j.Level;
+import fr.inria.corese.core.util.SPINProcess;
+import fr.inria.corese.core.util.Tool;
+import fr.inria.corese.gui.core.MainFrame;
+import fr.inria.corese.gui.event.MyEvalListener;
 
-/**
- * Exec KGRAM Query in a // thread to enable interacting with EvalListener
- * through the GUI
- */
+/** Exec KGRAM Query in a // thread to enable interacting with EvalListener through the GUI */
 public class Exec extends Thread {
 
     private static Logger logger = LogManager.getLogger(Exec.class);
 
-    static final String qvalidate = "template { st:apply-templates-with(st:spintypecheck) } where {}";
+    static final String qvalidate =
+            "template { st:apply-templates-with(st:spintypecheck) } where {}";
     static final String qshacl = "template { xt:turtle(?g) } where { bind (sh:shacl() as ?g) }";
-    static final String qshex  = "template { xt:turtle(?g) } where { bind (sh:shex() as ?g) }";
 
-    //static final String qvalidate = "template {st:apply-templates-with('/home/corby/AData/template/spintypecheck/template/')} where {}";
+    // static final String qvalidate = "template
+    // {st:apply-templates-with('/home/corby/AData/template/spintypecheck/template/')}
+    // where {}";
     static final String qgraph = NSManager.STL + "query";
 
     MainFrame frame;
@@ -44,7 +43,6 @@ public class Exec extends Thread {
     boolean debug = false;
     private boolean validate = false;
     private boolean shacl = false;
-    private boolean shex = false;
     QueryExec current;
     private GraphEngine graphEngine;
     private Mappings mappings;
@@ -57,17 +55,15 @@ public class Exec extends Thread {
     }
 
     /**
-     * run the thread in // the buffer is used by listener to wait for user
-     * interaction with buttons: next, quit, etc.
+     * run the thread in // the buffer is used by listener to wait for user interaction with
+     * buttons: next, quit, etc.
      */
     public void process() {
         buffer = new Buffer();
         start();
     }
 
-    /**
-     * run the thread in //
-     */
+    /** run the thread in // */
     @Override
     public void run() {
         Mappings res = null;
@@ -88,7 +84,7 @@ public class Exec extends Thread {
 
     public void finish(boolean kill) {
         if (kill) {
-            stop();
+            interrupt();
         } else if (current != null) {
             current.finish();
         }
@@ -97,18 +93,18 @@ public class Exec extends Thread {
     void setCurrent(QueryExec exec) {
         current = exec;
     }
-    
+
     QueryExec getCurrent() {
         return current;
     }
-    
+
     QueryExec getQueryExec() {
         if (getCurrent() == null) {
             setCurrent(QueryExec.create(getGraphEngine()));
         }
         return getCurrent();
     }
-    
+
     Mappings query() {
         QueryExec exec = QueryExec.create(getGraphEngine());
         setCurrent(exec);
@@ -119,30 +115,28 @@ public class Exec extends Thread {
         try {
             String q = query;
             if (isShacl()) {
-                q = (isShex()) ? qshex : qshacl;
+                q = qshacl;
             }
             // draft test: Mappings available using xt:mappings()
             Mappings map = exec.SPARQLQuery(q, getMappings());
             Date d2 = new Date();
             trace(map);
-            logger.info(String.format("** Time: %s ; nb result: %s", 
-                    Tool.time(d1, d2), map.size()));            
+            logger.info(
+                    String.format("** Time: %s ; nb result: %s", Tool.time(d1, d2), map.size()));
             return map;
         } catch (EngineException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             frame.getPanel().getTextArea().setText(e.toString());
         }
         return null;
     }
-    
+
     void trace(Mappings map) {
-        ASTQuery ast = map.getAST();
-        //if (ast.isFederateIndex()) {
-            if (!FederateVisitor.getBlacklist().isEmpty()) {
-                logger.info("Blacklist:\n" + FederateVisitor.getBlacklist());
-            }
-        //}
+        // if (ast.isFederateIndex()) {
+        if (!FederateVisitor.getBlacklist().isEmpty()) {
+            logger.info("Blacklist:\n" + FederateVisitor.getBlacklist());
+        }
+        // }
     }
 
     Mappings compile() {
@@ -161,18 +155,18 @@ public class Exec extends Thread {
             // in two different Binding
             // hence we get compile time log
             // during std eval, service clause manage this duality of log
-            // here it is validation, hence no service clause is executed 
+            // here it is validation, hence no service clause is executed
             // by eval
             exec.getQueryProcess().getCreateBinding().setLog(log);
             ASTQuery ast = exec.getQueryProcess().getAST(map);
-            if (ast!=null && !ast.hasMetadata(Metadata.EXPLAIN)) {
+            if (ast != null && !ast.hasMetadata(Metadata.EXPLAIN)) {
                 // display mappings will check existence of query resource URI in the graph
                 ast.setMetadata(Metadata.EXPLAIN);
             }
             Date d2 = new Date();
             trace(map);
-            logger.info(String.format("** Time: %s ; nb result: %s", 
-                    Tool.time(d1, d2), map.size()));
+            logger.info(
+                    String.format("** Time: %s ; nb result: %s", Tool.time(d1, d2), map.size()));
             return map.getResult();
         } catch (EngineException e) {
             e.printStackTrace();
@@ -181,10 +175,7 @@ public class Exec extends Thread {
         return null;
     }
 
-    
-    /**
-     * Translate SPARQL query to SPIN graph Apply spin typecheck transformation
-     */
+    /** Translate SPARQL query to SPIN graph Apply spin typecheck transformation */
     Mappings validate() {
         try {
             SPINProcess sp = SPINProcess.create();
@@ -201,9 +192,7 @@ public class Exec extends Thread {
         return new Mappings();
     }
 
-    /**
-     * Create EvalListener
-     */
+    /** Create EvalListener */
     void debug(QueryExec exec) {
         MyEvalListener el = MyEvalListener.create();
         el.handle(Event.ALL, true);
@@ -245,20 +234,6 @@ public class Exec extends Thread {
         this.shacl = shacl;
     }
 
-    /**
-     * @return the shex
-     */
-    public boolean isShex() {
-        return shex;
-    }
-
-    /**
-     * @param shex the shex to set
-     */
-    public void setShex(boolean shex) {
-        this.shex = shex;
-    }
-
     public Mappings getMappings() {
         return mappings;
     }
@@ -271,11 +246,9 @@ public class Exec extends Thread {
     public void setGraphEngine(GraphEngine graphEngine) {
         this.graphEngine = graphEngine;
     }
-    
+
     public GraphEngine getGraphEngine() {
-        //return frame.getMyCorese();
+        // return frame.getMyCorese();
         return graphEngine;
     }
-    
-
 }

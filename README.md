@@ -1,66 +1,81 @@
-# Corese-GUI-Swing
+<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD041 -->
+
+<p align="center">
+    <a href="https://project.inria.fr/corese/">
+        <img src="docs/source/_static/logo/corese-gui-swing.svg" width="200" alt="Corese-GUI-logo">
+    </a>
+    <br>
+    <strong>Graphical User Interface for the Semantic Web of Linked Data</strong>
+</p>
 
 [![License: CECILL-C](https://img.shields.io/badge/License-CECILL--C-blue.svg)](https://cecill.info/licences/Licence_CeCILL-C_V1-en.html) [![Discussions](https://img.shields.io/badge/Discussions-GitHub-blue)](https://github.com/orgs/corese-stack/discussions)
 
-Corese-GUI-Swing is the graphical user interface for the Corese platform, providing a user-friendly environment to interact with RDF data, perform SPARQL queries, and visualize the results.
-
 ## Features
 
-- Interactive interface for RDF data manipulation.
-- SPARQL querying and result visualization.
-- SHAQL validation and result display.
-- Rule-based reasoning and inference.
-- STTL transformation and visualization.
-- LDScript execution.
-- RDF graph visualizer.
+- Load and save RDF data in various formats (Turtle, RDF/XML, JSON-LD, etc.)
+- Execute SPARQL queries
+- Visualize RDF graphs
+- Validate RDF data with SHACL
+- Apply reasoning and inference
+- Extend functionality with STTL SPARQL, SPARQL Rule, and LDScript
+- Intuitive user interface for manipulating RDF data
 
 ## Getting Started
 
-### Download and Install
+Install Corese-GUI using your preferred platform:
 
-You can run Corese-GUI-Swing using Flathub or by downloading and executing the JAR file.
+### Linux
 
-**Flathub:**
+<a href='https://flathub.org/apps/fr.inria.corese.CoreseGui'>
+    <img width='140' alt='Get it on Flathub' src='docs/source/_static/logo/badge_flathub.svg'/>
+</a>
 
-To install Corese-GUI-Swing via Flathub, use the following command:
-
-``` bash
-flatpak install flathub fr.inria.corese.CoreseGui
+```bash
+curl -fsSL https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/packaging/scripts/install-linux.sh -o /tmp/corese.sh && bash /tmp/corese.sh
 ```
 
-To run the application:
+### macOS
 
-``` bash
-flatpak run fr.inria.corese.CoreseGui
+```bash
+curl -fsSL https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/packaging/scripts/install-macos.sh -o /tmp/corese.sh && bash /tmp/corese.sh
 ```
 
-For more information, visit the [Flathub page](https://flathub.org/apps/details/fr.inria.corese.CoreseGui).
+### Windows (PowerShell)
 
-**JAR File:**
-
-You can also download the latest version of the Corese-GUI-Swing JAR from the [releases page](https://github.com/corese-stack/corese-gui-swing/releases) and run it with the following command:
-
-``` bash
-java -jar corese-gui-swing-4.5.0.jar
+```powershell
+iwr -useb https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/packaging/scripts/install-windows.ps1 | iex
 ```
 
-## Documentation
+### Manual Installation (cross-platform)
 
-Explore the available documentation to help you get started with Corese-GUI-Swing:
+You can also use Corese-GUI as a standalone `.jar` file or add it to a Java project via Maven.
 
-- [Getting Started Guide](https://corese-stack.github.io/corese-gui/v4.5.0/getting_started/getting_started_with_corese-gui.html)
-- [API Documentation](https://corese-stack.github.io/corese-gui/v4.5.0/java_api/library_root.html)
+> Requires Java 21 or higher.
 
-## Contributions and Community
+<a href='https://github.com/corese-stack/corese-gui-swing/releases'>
+    <img width='140' alt='Get it on GitHub' src='docs/source/_static/logo/badge_github.svg'/>
+</a>
+<a href='https://central.sonatype.com/artifact/fr.inria.corese/corese-gui'>
+    <img width='140' alt='Get it on Maven Central' src='docs/source/_static/logo/badge_maven.svg'/>
+</a>
 
-We welcome contributions to improve Corese-GUI-Swing! Here’s how you can get involved:
+Run manually with:
 
-- **Discussions:** If you have questions, ideas, or suggestions, please participate in our [discussion forum](https://github.com/orgs/corese-stack/discussions).
-- **Issue Tracker:** Found a bug or want to request a new feature? Use our [issue tracker](https://github.com/corese-stack/corese-gui-swing/issues).
-- **Pull Requests:** We accept pull requests. You can submit your changes [here](https://github.com/corese-stack/corese-gui-swing/pulls).
+```bash
+java -jar corese-gui-standalone.jar
+```
+
+## Contributing
+
+We welcome contributions! Here’s how to get involved:
+
+- [GitHub Discussions](https://github.com/orgs/corese-stack/discussions)
+- [Issue Tracker](https://github.com/corese-stack/corese-gui-swing/issues)
+- [Pull Requests](https://github.com/corese-stack/corese-gui-swing/pulls)
 
 ## Useful Links
 
-- [Corese Official Website](https://corese-stack.github.io/corese-gui-swing/v4.5.0/index.html)
-- **Mailing List:** <corese-users@inria.fr>
-- **Join the Mailing List:** Send an email to <corese-users-request@inria.fr> with the subject: `subscribe`
+- [Corese Website](https://corese-stack.github.io/corese-gui-swing/)
+- Mailing List: <corese-users@inria.fr>
+- Subscribe: Send an email to <corese-users-request@inria.fr> with the subject: `subscribe`
