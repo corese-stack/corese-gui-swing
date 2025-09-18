@@ -105,7 +105,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     private static final int LOAD = 1;
-    private static final String TITLE = "Corese 4.6.0 - Inria UCA I3S - 2025-08-01";
+    private static final String TITLE = "Corese 4.6.1-SNAPSHOT - Inria UCA I3S - 2025-09-18";
     // Declare the tab container
     protected static JTabbedPane conteneurOnglets;
     // Counter for the number of query tabs created
@@ -256,6 +256,8 @@ public class MainFrame extends JFrame implements ActionListener {
     private GraphEngine myCorese = null;
     private CaptureOutput myCapturer = null;
     private static final Logger LOGGER = LogManager.getLogger(MainFrame.class.getName());
+    // Track which inferences have been applied to provide better user feedback
+    private java.util.Set<Integer> appliedInferences = new java.util.HashSet<>();
     private MyEvalListener el;
     Buffer buffer;
     private static final String STYLE = "/style/";
@@ -548,6 +550,11 @@ public class MainFrame extends JFrame implements ActionListener {
 
     /** Displays text in the logs panel */
     public void appendMsg(String msg) {
+        // Check if UI is fully initialized before trying to append message
+        if (ongletListener == null || ongletListener.getTextPaneLogs() == null) {
+            return;
+        }
+
         Document currentDoc = ongletListener.getTextPaneLogs().getDocument();
         try {
             currentDoc.insertString(currentDoc.getLength(), msg, null);
@@ -1381,10 +1388,42 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private void setOWLRL(boolean selected, int owl, boolean inThread) {
         if (selected) {
-            Entailment e = new Entailment(myCorese, inThread);
-            e.setOWLRL(owl);
-            e.setTrace(trace);
-            e.process();
+            if (!appliedInferences.contains(owl)) {
+                Entailment e = new Entailment(myCorese, inThread);
+                e.setOWLRL(owl);
+                e.setTrace(trace);
+                e.process();
+                appliedInferences.add(owl);
+                appendMsg(getRuleEngineName(owl) + " inferences applied.\n");
+            } else {
+                appendMsg(getRuleEngineName(owl) + " inferences already applied.\n");
+            }
+        } else {
+            // When unchecking, inform user that inferences have already been applied
+            String ruleName = getRuleEngineName(owl);
+            if (appliedInferences.contains(owl)) {
+                appendMsg(
+                        "Note: "
+                                + ruleName
+                                + " inferences have already been applied to the graph.\n"
+                                + "To remove them, use 'Engine -> Reset' or reload your data.\n");
+            }
+        }
+    }
+
+    /** Get a human-readable name for the rule engine type */
+    private String getRuleEngineName(int owl) {
+        switch (owl) {
+            case RuleEngine.OWL_RL:
+                return "OWL RL";
+            case RuleEngine.OWL_RL_EXT:
+                return "OWL RL Extended";
+            case RuleEngine.OWL_RL_TEST:
+                return "OWL RL Test";
+            case RuleEngine.RDFS_RL:
+                return "RDFS RL";
+            default:
+                return "Rule Engine";
         }
     }
 
@@ -1394,15 +1433,29 @@ public class MainFrame extends JFrame implements ActionListener {
             e.setPath(path);
             e.setTrace(trace);
             e.process();
+        } else {
+            // When unchecking, inform user that rule inferences have already been applied
+            String ruleName = path != null ? path : "Custom Rule";
+            appendMsg(
+                    "Note: "
+                            + ruleName
+                            + " inferences have already been applied to the graph.\n"
+                            + "To remove them, use 'Engine -> Reset' or reload your data.\n");
         }
     }
 
     void cleanOWL() {
         getMyCorese().cleanOWL();
+        // Auto-uncheck after action is completed
+        cbclean.setSelected(false);
+        appendMsg("OWL clean completed.\n");
     }
 
     void graphIndex() {
         getMyCorese().graphIndex();
+        // Auto-uncheck after action is completed
+        cbindex.setSelected(false);
+        appendMsg("Graph index displayed.\n");
     }
 
     // Actions du menu
@@ -1563,7 +1616,7 @@ public class MainFrame extends JFrame implements ActionListener {
             reset();
         } // Recharge tous les fichiers déjà chargés
         else if (e.getSource() == refresh) {
-            this.resetOwlCheckBox();
+            this.resetAllEngineStates();
             ongletListener.refresh(this);
         } else if (e.getSource() == apropos || e.getSource() == tuto || e.getSource() == doc) {
             String uri = URI_CORESE;
@@ -1727,6 +1780,7 @@ public class MainFrame extends JFrame implements ActionListener {
         ongletListener.getListLoadedFiles().removeAll();
         ongletListener.getModel().removeAllElements();
         setMyCoreseNewInstance();
+        resetAllEngineStates(); // Reset all inference states after creating new instance
         appendMsg("reset... \n" + myCapturer.getContent() + "\ndone.\n");
     }
 
@@ -2097,7 +2151,7 @@ public class MainFrame extends JFrame implements ActionListener {
     void controler(int event) {
         switch (event) {
             case LOAD:
-                this.resetOwlCheckBox();
+                this.resetAllEngineStates();
                 // @todo: user rule check box
                 break;
         }
@@ -2109,6 +2163,33 @@ public class MainFrame extends JFrame implements ActionListener {
         cbowlrl.setSelected(false);
         cbowlrlext.setSelected(false);
         cbowlrltest.setSelected(false);
+    }
+
+    /**
+     * Reset all engine states (inference checkboxes) to their default values This should be called
+     * when creating a new engine instance or resetting
+     */
+    private void resetAllEngineStates() {
+        // Reset OWL RL checkboxes (existing functionality)
+        cbowlrllite.setSelected(false);
+        cbowlrl.setSelected(false);
+        cbowlrlext.setSelected(false);
+        cbowlrltest.setSelected(false);
+
+        // Reset RDFS RL checkbox
+        cbrdfsrl.setSelected(false);
+
+        // Reset RDFS entailment to its default value
+        cbrdfs.setSelected(Graph.RDFS_ENTAILMENT_DEFAULT);
+
+        // Reset utility checkboxes
+        cbclean.setSelected(false);
+        cbindex.setSelected(false);
+
+        // Clear applied inferences tracking
+        appliedInferences.clear();
+
+        // Note: cbnamed and cbtrace are not reset as they are preferences, not engine states
     }
 
     public void load(String fichier) {
@@ -2316,6 +2397,7 @@ public class MainFrame extends JFrame implements ActionListener {
     void setRDFSEntailment(boolean b) {
         Graph g = myCorese.getGraph();
         g.setRDFSEntailment(b);
+        appendMsg("RDFS entailment " + (b ? "enabled" : "disabled") + ".\n");
     }
 
     public Logger getLogger() {

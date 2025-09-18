@@ -60,6 +60,8 @@ public class GraphEngine {
     GraphEngine(boolean b) {
         graph = GraphStore.create(b);
         qengine = QueryEngine.create(graph);
+        // Initialize the owlEngine for RDFS RL inferences
+        owlEngine = RuleEngine.create(graph);
         init();
     }
 
