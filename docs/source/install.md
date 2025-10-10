@@ -7,7 +7,7 @@
 
 <div style="margin: 10px 5px;">
   <a href="https://flathub.org/fr/apps/fr.inria.corese.CoreseGui">
-    <img src="./_static/logo/badge_flathub.svg" alt="Flathub" width="186">
+    <img src="./_static/logo/badge_flathub.svg" alt="Flathub" width="150">
   </a>
 </div>
 
@@ -21,7 +21,7 @@ curl -fsSL https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/
 curl -fsSL https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/packaging/scripts/install-macos.sh -o /tmp/corese.sh && bash /tmp/corese.sh
 ```
 
-### Windows
+### Windows (Powershell)
 
 ```powershell
 iwr -useb https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/packaging/scripts/install-windows.ps1 | iex
@@ -31,14 +31,16 @@ iwr -useb https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/p
 
 <div style="margin: 10px 5px;">
   <a href="https://github.com/corese-stack/corese-gui-swing/releases">
-    <img src="./_static/logo/badge_github.svg" alt="GitHub Release" width="186">
+    <img src="./_static/logo/badge_github.svg" alt="GitHub Release" width="150">
   </a>
   <a href="https://central.sonatype.com/artifact/fr.inria.corese/corese-gui">
-    <img src="./_static/logo/badge_maven.svg" alt="Maven Central" width="186">
+    <img src="./_static/logo/badge_maven.svg" alt="Maven Central" width="150">
   </a>
 </div>
 
-## Uninstall / Update
+> If you installed Corese-GUI using one of the scripts above, you can uninstall or update it by simply running the same script again.
+
+<!-- ## Uninstall / Update
 
 If you installed Corese-GUI using one of the scripts above, you can uninstall or update it by simply running the same script again.
 
@@ -66,4 +68,4 @@ All install scripts support the following options:
 ./install-linux.sh --help
 ./install-macos.sh --help
 .\install-windows.ps1 --help
-```
+``` -->
