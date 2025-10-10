@@ -22,7 +22,7 @@ object Meta {
     // Project coordinates
     const val groupId = "fr.inria.corese"
     const val artifactId = "corese-gui"
-    const val version = "4.6.0"
+    const val version = "4.6.1"
 
     // Project description
     const val desc = "A graphical desktop application for exploring, querying, and visualizing RDF data using SPARQL and SHACL with the Corese engine."

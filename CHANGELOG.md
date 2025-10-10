@@ -1,6 +1,13 @@
 <!-- markdownlint-disable MD024 -->
 # Corese Changelog
 
+## Version 4.6.1 - 2025-10-10
+
+### Fixed
+
+- Fixed RDFS RL inference engine initialization issue causing failures since version 4.6.0.
+- Improved synchronization between UI states and inference engine states.
+
 ## Version 4.6.0 - 2025-08-01
 
 ### Added

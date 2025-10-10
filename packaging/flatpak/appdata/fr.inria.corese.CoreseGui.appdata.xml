@@ -141,6 +141,18 @@
 
 
     <releases>
+
+        <release version="4.6.1" date="2025-10-10">
+            <description>
+            <ul>
+                <li>Fixed RDFS RL inference engine initialization issue causing failures since version 4.6.0.</li>
+                <li>Improved synchronization between UI states and inference engine states.</li>
+
+                <li xml:lang="fr">Correction d'un problème d'initialisation du moteur d'inférence RDFS RL provoquant des échecs depuis la version 4.6.0.</li>
+                <li xml:lang="fr">Amélioration de la synchronisation entre les états de l'interface utilisateur et les états du moteur d'inférence.</li>
+            </ul>
+            </description>
+        </release>
         <release version="4.6.0" date="2025-08-01">
             <description>
                 <ul>
