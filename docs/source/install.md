@@ -38,34 +38,4 @@ iwr -useb https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/p
   </a>
 </div>
 
-> If you installed Corese-GUI using one of the scripts above, you can uninstall or update it by simply running the same script again.
-
-<!-- ## Uninstall / Update
-
-If you installed Corese-GUI using one of the scripts above, you can uninstall or update it by simply running the same script again.
-
-## Advanced usage (CI / silent install)
-
-All install scripts support the following options:
-
-```bash
-# Install a specific version
-./install-linux.sh --install 4.6.0
-./install-macos.sh --install 4.6.0
-.\install-windows.ps1 --install 4.6.0
-
-# Install the latest available version
-./install-linux.sh --install-latest
-./install-macos.sh --install-latest
-.\install-windows.ps1 --install-latest
-
-# Uninstall Corese-GUI
-./install-linux.sh --uninstall
-./install-macos.sh --uninstall
-.\install-windows.ps1 --uninstall
-
-# Show help
-./install-linux.sh --help
-./install-macos.sh --help
-.\install-windows.ps1 --help
-``` -->
+> You can update, uninstall, or install a specific Corese-GUI version (e.g. `--install 4.6.0`) by rerunning the same script — use `--help` to see all available options.
