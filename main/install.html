@@ -395,7 +395,7 @@
 <h2>Linux<a class="headerlink" href="#linux" title="Link to this heading">#</a></h2>
 <div style="margin: 10px 5px;">
   <a href="https://flathub.org/fr/apps/fr.inria.corese.CoreseGui">
-    <img src="./_static/logo/badge_flathub.svg" alt="Flathub" width="186">
+    <img src="./_static/logo/badge_flathub.svg" alt="Flathub" width="150">
   </a>
 </div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/corese-stack/corese-gui-swing/main/packaging/scripts/install-linux.sh<span class="w"> </span>-o<span class="w"> </span>/tmp/corese.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>bash<span class="w"> </span>/tmp/corese.sh
@@ -408,8 +408,8 @@
 </pre></div>
 </div>
 </section>
-<section id="windows">
-<h2>Windows<a class="headerlink" href="#windows" title="Link to this heading">#</a></h2>
+<section id="windows-powershell">
+<h2>Windows (Powershell)<a class="headerlink" href="#windows-powershell" title="Link to this heading">#</a></h2>
 <div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nb">iwr </span><span class="n">-useb</span> <span class="n">https</span><span class="p">://</span><span class="n">raw</span><span class="p">.</span><span class="n">githubusercontent</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">corese-stack</span><span class="p">/</span><span class="n">corese-gui-swing</span><span class="p">/</span><span class="n">main</span><span class="p">/</span><span class="n">packaging</span><span class="p">/</span><span class="n">scripts</span><span class="p">/</span><span class="nb">install-windows</span><span class="p">.</span><span class="n">ps1</span> <span class="p">|</span> <span class="nb">iex</span>
 </pre></div>
 </div>
@@ -418,42 +418,16 @@
 <h2>Manual / Cross-platform Installation<a class="headerlink" href="#manual-cross-platform-installation" title="Link to this heading">#</a></h2>
 <div style="margin: 10px 5px;">
   <a href="https://github.com/corese-stack/corese-gui-swing/releases">
-    <img src="./_static/logo/badge_github.svg" alt="GitHub Release" width="186">
+    <img src="./_static/logo/badge_github.svg" alt="GitHub Release" width="150">
   </a>
   <a href="https://central.sonatype.com/artifact/fr.inria.corese/corese-gui">
-    <img src="./_static/logo/badge_maven.svg" alt="Maven Central" width="186">
+    <img src="./_static/logo/badge_maven.svg" alt="Maven Central" width="150">
   </a>
 </div>
+<blockquote>
+<div><p>You can update, uninstall, or install a specific Corese-GUI version (e.g. <code class="docutils literal notranslate"><span class="pre">--install</span> <span class="pre">4.6.0</span></code>) by rerunning the same script — use <code class="docutils literal notranslate"><span class="pre">--help</span></code> to see all available options.</p>
+</div></blockquote>
 </section>
-</section>
-<section id="uninstall-update">
-<h1>Uninstall / Update<a class="headerlink" href="#uninstall-update" title="Link to this heading">#</a></h1>
-<p>If you installed Corese-GUI using one of the scripts above, you can uninstall or update it by simply running the same script again.</p>
-</section>
-<section id="advanced-usage-ci-silent-install">
-<h1>Advanced usage (CI / silent install)<a class="headerlink" href="#advanced-usage-ci-silent-install" title="Link to this heading">#</a></h1>
-<p>All install scripts support the following options:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install a specific version</span>
-./install-linux.sh<span class="w"> </span>--install<span class="w"> </span><span class="m">4</span>.6.0
-./install-macos.sh<span class="w"> </span>--install<span class="w"> </span><span class="m">4</span>.6.0
-.<span class="se">\i</span>nstall-windows.ps1<span class="w"> </span>--install<span class="w"> </span><span class="m">4</span>.6.0
-
-<span class="c1"># Install the latest available version</span>
-./install-linux.sh<span class="w"> </span>--install-latest
-./install-macos.sh<span class="w"> </span>--install-latest
-.<span class="se">\i</span>nstall-windows.ps1<span class="w"> </span>--install-latest
-
-<span class="c1"># Uninstall Corese-GUI</span>
-./install-linux.sh<span class="w"> </span>--uninstall
-./install-macos.sh<span class="w"> </span>--uninstall
-.<span class="se">\i</span>nstall-windows.ps1<span class="w"> </span>--uninstall
-
-<span class="c1"># Show help</span>
-./install-linux.sh<span class="w"> </span>--help
-./install-macos.sh<span class="w"> </span>--help
-.<span class="se">\i</span>nstall-windows.ps1<span class="w"> </span>--help
-</pre></div>
-</div>
 </section>
 
 
@@ -494,17 +468,11 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Installation</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#macos">macOS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#windows-powershell">Windows (Powershell)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-cross-platform-installation">Manual / Cross-platform Installation</a></li>
 </ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#uninstall-update">Uninstall / Update</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-usage-ci-silent-install">Advanced usage (CI / silent install)</a></li>
-</ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">
