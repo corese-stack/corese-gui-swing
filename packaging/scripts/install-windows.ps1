@@ -192,19 +192,39 @@ function Get-NextVersions {
     try {
         $releases = Invoke-RestMethod "$NextReleaseApi"
 
-        $tags = $releases |
+        $allTags = $releases |
             Where-Object { -not $_.draft } |
             Select-Object -ExpandProperty tag_name |
             Where-Object { Test-IsNextGenTag $_ }
 
         $seen = @{}
-        $ordered = @()
-        foreach ($tag in $tags) {
-            if (-not $seen.ContainsKey($tag)) {
-                $seen[$tag] = $true
-                $ordered += $tag
+        $stable = @()
+        $hasDev = $false
+
+        foreach ($tag in $allTags) {
+            if ($seen.ContainsKey($tag)) {
+                continue
+            }
+            $seen[$tag] = $true
+
+            if ($tag -eq $NextPrereleaseTag) {
+                $hasDev = $true
+                continue
+            }
+
+            if (Test-IsSemverTag $tag) {
+                $stable += $tag
             }
         }
+
+        $stable = $stable | Sort-Object { [version](($_ -replace '^v', '')) } -Descending
+
+        $ordered = @()
+        $ordered += $stable
+        if ($hasDev) {
+            $ordered += $NextPrereleaseTag
+        }
+
         return $ordered
     }
     catch {
@@ -311,6 +331,34 @@ function Show-Installed-Version {
         Write-Host "   No version currently installed."
     }
     Write-Host ""
+}
+
+function Get-DownloadsDirectory {
+    $downloads = Join-Path ([Environment]::GetFolderPath("UserProfile")) "Downloads"
+    if (-not (Test-Path $downloads)) {
+        New-Item -ItemType Directory -Path $downloads -Force | Out-Null
+    }
+    if (-not (Test-Path $downloads)) {
+        return $env:TEMP
+    }
+    return $downloads
+}
+
+function Reveal-DownloadedFile([string]$Path) {
+    if (-not (Test-Path $Path)) {
+        return
+    }
+    try {
+        Start-Process explorer.exe "/select,`"$Path`"" | Out-Null
+    }
+    catch {
+        try {
+            Start-Process explorer.exe "`"$([System.IO.Path]::GetDirectoryName($Path))`"" | Out-Null
+        }
+        catch {
+            # Ignore explorer launch failures
+        }
+    }
 }
 
 function Download-Icon {
@@ -561,10 +609,13 @@ function Migrate-ToNextGen([string]$VersionTag) {
     Write-Host " - Release page:  $releaseUrl"
 
     if ($asset) {
-        $targetPath = Join-Path $env:TEMP $asset.name
+        $downloadsDir = Get-DownloadsDirectory
+        $targetPath = Join-Path $downloadsDir $asset.name
         Write-Host "Downloading recommended asset: $($asset.name)"
         Invoke-WebRequest $asset.browser_download_url -OutFile $targetPath
         Write-Host "Downloaded to: $targetPath"
+        Reveal-DownloadedFile $targetPath
+        Write-Host "Please run the downloaded installer/package."
 
         if ($asset.name -match '\.exe$') {
             if ($AutoYes) {

@@ -210,31 +210,57 @@ list_legacy_versions() {
 }
 
 list_next_gen_versions() {
-    curl -s "$NEXT_GEN_RELEASE_API" \
-        | jq -r '.[] | select(.draft == false) | [.tag_name, .published_at] | @tsv' \
-        | sort -k2 -r \
-        | while IFS=$'\t' read -r tag _published; do
-            if is_next_gen_tag "$tag"; then
-                echo "$tag"
-            fi
-        done
+    local rows
+    rows=$(
+        curl -s "$NEXT_GEN_RELEASE_API" \
+            | jq -r '.[] | select(.draft == false) | [.tag_name, .published_at] | @tsv' \
+            | sort -k2 -r
+    )
+
+    local has_dev=0
+    while IFS=$'\t' read -r tag _published; do
+        [[ -z "${tag:-}" ]] && continue
+        if [[ "$tag" == "$NEXT_GEN_PRERELEASE_TAG" ]]; then
+            has_dev=1
+            continue
+        fi
+        if is_next_gen_tag "$tag"; then
+            echo "$tag"
+        fi
+    done <<< "$rows"
+
+    if [[ "$has_dev" -eq 1 ]]; then
+        echo "$NEXT_GEN_PRERELEASE_TAG"
+    fi
 }
 
 build_version_catalog() {
     VERSION_CATALOG=()
     declare -A seen=()
+    local next_tags=()
+    mapfile -t next_tags < <(list_next_gen_versions)
 
-    while IFS= read -r tag; do
+    for tag in "${next_tags[@]}"; do
         [[ -z "$tag" ]] && continue
         [[ -n "${seen[$tag]:-}" ]] && continue
         seen[$tag]=1
 
         if [[ "$tag" == "$NEXT_GEN_PRERELEASE_TAG" ]]; then
-            VERSION_CATALOG+=("$tag"$'\t'"next"$'\t'"$tag (new app preview)")
-        else
-            VERSION_CATALOG+=("$tag"$'\t'"next"$'\t'"$tag (new app 5.x)")
+            continue
         fi
-    done < <(list_next_gen_versions)
+        VERSION_CATALOG+=("$tag"$'\t'"next"$'\t'"$tag (new app 5.x)")
+    done
+
+    if [[ -z "${seen[$NEXT_GEN_PRERELEASE_TAG]:-}" ]]; then
+        for tag in "${next_tags[@]}"; do
+            [[ -z "$tag" ]] && continue
+            if [[ "$tag" == "$NEXT_GEN_PRERELEASE_TAG" ]]; then
+                seen[$tag]=1
+                VERSION_CATALOG+=("$tag"$'\t'"next"$'\t'"$tag (new app preview)")
+                break
+            fi
+        done
+    fi
 
     while IFS= read -r tag; do
         [[ -z "$tag" ]] && continue
@@ -322,6 +348,37 @@ open_in_browser() {
     local url="$1"
     if command -v xdg-open >/dev/null 2>&1; then
         xdg-open "$url" >/dev/null 2>&1 || true
+    fi
+}
+
+resolve_downloads_dir() {
+    local downloads_dir=""
+
+    if command -v xdg-user-dir >/dev/null 2>&1; then
+        downloads_dir="$(xdg-user-dir DOWNLOAD 2>/dev/null || true)"
+    fi
+
+    if [[ -z "$downloads_dir" || "$downloads_dir" == "DOWNLOAD" ]]; then
+        downloads_dir="${XDG_DOWNLOAD_DIR:-$HOME/Downloads}"
+    fi
+
+    if [[ ! -d "$downloads_dir" ]]; then
+        mkdir -p "$downloads_dir" 2>/dev/null || true
+    fi
+
+    if [[ ! -d "$downloads_dir" || ! -w "$downloads_dir" ]]; then
+        downloads_dir="/tmp"
+    fi
+
+    echo "$downloads_dir"
+}
+
+open_file_manager_for_path() {
+    local path="$1"
+    local directory
+    directory="$(dirname "$path")"
+    if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$directory" >/dev/null 2>&1 || true
     fi
 }
 
@@ -438,11 +495,16 @@ redirect_to_next_gen_release() {
     asset_url="$(select_next_gen_linux_asset_url "$release_json")"
 
     if [[ -n "$asset_url" ]]; then
-        local download_path="/tmp/$(basename "$asset_url")"
+        local downloads_dir
+        downloads_dir="$(resolve_downloads_dir)"
+        local download_path="$downloads_dir/$(basename "$asset_url")"
         echo "⬇️  Downloading platform asset: $(basename "$asset_url")"
         curl --progress-bar -L "$asset_url" -o "$download_path"
         echo
         echo "✅ Download complete: $download_path"
+        echo "📂 Opening download folder..."
+        open_file_manager_for_path "$download_path"
+        echo "➡️  Please run the downloaded installer/package."
     else
         echo "⚠️  No Linux asset detected automatically for your architecture."
     fi

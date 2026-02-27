@@ -71,21 +71,37 @@ list_legacy_versions() {
 }
 
 list_next_versions() {
-    curl -fsSL "$NEXT_RELEASE_API" \
-        | jq -r '.[] | select(.draft == false) | [.tag_name, .published_at] | @tsv' \
-        | sort -k2 -r \
-        | cut -f1 \
-        | awk 'NF' \
-        | awk '
-            $0 == "dev-prerelease" { print; next }
-            /^v?[0-9]+\.[0-9]+\.[0-9]+$/ {
-                v=$0
-                sub(/^v/, "", v)
-                split(v, a, ".")
-                if (a[1] >= 5) print $0
-            }
-        ' \
-        | awk '!seen[$0]++'
+    local rows
+    rows=$(
+        curl -fsSL "$NEXT_RELEASE_API" \
+            | jq -r '.[] | select(.draft == false) | [.tag_name, .published_at] | @tsv' \
+            | sort -k2 -r
+    )
+
+    local has_dev=0
+    declare -A seen=()
+    while IFS=$'\t' read -r tag _published; do
+        [[ -z "${tag:-}" ]] && continue
+        [[ -n "${seen[$tag]:-}" ]] && continue
+        seen[$tag]=1
+
+        if [[ "$tag" == "dev-prerelease" ]]; then
+            has_dev=1
+            continue
+        fi
+
+        if [[ "$tag" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            local normalized="${tag#v}"
+            local major="${normalized%%.*}"
+            if [[ "$major" =~ ^[0-9]+$ ]] && [[ "$major" -ge 5 ]]; then
+                echo "$tag"
+            fi
+        fi
+    done <<< "$rows"
+
+    if [[ "$has_dev" -eq 1 ]]; then
+        echo "dev-prerelease"
+    fi
 }
 
 choose_version() {
@@ -199,6 +215,24 @@ open_url() {
     local url="$1"
     if command -v open >/dev/null 2>&1; then
         open "$url" >/dev/null 2>&1 || true
+    fi
+}
+
+resolve_downloads_dir() {
+    local downloads_dir="$HOME/Downloads"
+    if [[ ! -d "$downloads_dir" ]]; then
+        mkdir -p "$downloads_dir" 2>/dev/null || true
+    fi
+    if [[ ! -d "$downloads_dir" || ! -w "$downloads_dir" ]]; then
+        downloads_dir="/tmp"
+    fi
+    echo "$downloads_dir"
+}
+
+reveal_downloaded_file() {
+    local file_path="$1"
+    if command -v open >/dev/null 2>&1; then
+        open -R "$file_path" >/dev/null 2>&1 || open "$(dirname "$file_path")" >/dev/null 2>&1 || true
     fi
 }
 
@@ -368,11 +402,16 @@ migrate_to_next_gen_version() {
     echo "   - Release page: $release_page"
     if [[ -n "$asset_url" && "$asset_url" != "null" ]]; then
         echo "   - Recommended download for this Mac/arch: $asset_url"
-        local download_path="/tmp/$(basename "$asset_url")"
+        local downloads_dir
+        downloads_dir="$(resolve_downloads_dir)"
+        local download_path="$downloads_dir/$(basename "$asset_url")"
         echo "⬇️  Downloading platform asset: $(basename "$asset_url")"
         curl --progress-bar -L "$asset_url" -o "$download_path"
         echo
         echo "   - Downloaded to: $download_path"
+        echo "📂 Opening Finder on downloaded file..."
+        reveal_downloaded_file "$download_path"
+        echo "➡️  Please run the downloaded installer/package."
     fi
     echo
     echo "Note: selecting 5.x+ migrates away from this legacy line."
