@@ -20,16 +20,18 @@ DESKTOP_FILE="$XDG_DATA_HOME/applications/corese-gui.desktop"
 ICON_FILE="$XDG_DATA_HOME/icons/fr.inria.corese.CoreseGui.svg"
 AUTO_YES=0
 
-LEGACY_GITHUB_REPO="corese-stack/corese-gui-swing"
-LEGACY_RELEASE_API="https://api.github.com/repos/$LEGACY_GITHUB_REPO/releases"
-NEXT_GEN_GITHUB_REPO="corese-stack/corese-gui"
-NEXT_GEN_RELEASE_API="https://api.github.com/repos/$NEXT_GEN_GITHUB_REPO/releases"
-NEXT_GEN_DOCS_URL="https://corese-stack.github.io/corese-gui/"
-NEXT_GEN_RELEASES_URL="https://github.com/$NEXT_GEN_GITHUB_REPO/releases/latest"
+LEGACY_GITHUB_REPO="${LEGACY_GITHUB_REPO:-corese-stack/corese-gui-swing}"
+LEGACY_RELEASE_API="${LEGACY_RELEASE_API:-https://api.github.com/repos/$LEGACY_GITHUB_REPO/releases}"
+NEXT_GEN_GITHUB_REPO="${NEXT_GEN_GITHUB_REPO:-corese-stack/corese-gui}"
+NEXT_GEN_RELEASE_API="${NEXT_GEN_RELEASE_API:-https://api.github.com/repos/$NEXT_GEN_GITHUB_REPO/releases}"
+NEXT_GEN_DOCS_URL="${NEXT_GEN_DOCS_URL:-https://corese-stack.github.io/corese-gui/}"
+NEXT_GEN_RELEASES_URL="${NEXT_GEN_RELEASES_URL:-https://github.com/$NEXT_GEN_GITHUB_REPO/releases/latest}"
 
 LEGACY_MIN_VERSION="4.0.0"
 NEXT_GEN_MIN_VERSION="5.0.0"
-NEXT_GEN_PRERELEASE_TAG="dev-prerelease"
+NEXT_GEN_PRERELEASE_TAG="${NEXT_GEN_PRERELEASE_TAG:-dev-prerelease}"
+GITHUB_API_USER_AGENT="${GITHUB_API_USER_AGENT:-corese-gui-swing-installer}"
+NEXT_GEN_API_WARNING_SHOWN=0
 
 VERSION_TAG=""
 VERSION_CHANNEL=""
@@ -198,10 +200,15 @@ install_java_by_distro() {
 }
 
 list_legacy_versions() {
-    curl -s "$LEGACY_RELEASE_API" \
-        | jq -r '.[] | select(.prerelease == false and .draft == false) | [.tag_name, .published_at] | @tsv' \
-        | sort -k2 -r \
-        | cut -f1 \
+    local rows
+    if ! rows="$(
+        fetch_release_rows "$LEGACY_RELEASE_API" \
+            | sort -k2 -r
+    )"; then
+        return 0
+    fi
+
+    cut -f1 <<< "$rows" \
         | while IFS= read -r tag; do
             if is_legacy_tag "$tag"; then
                 echo "$tag"
@@ -209,13 +216,84 @@ list_legacy_versions() {
         done
 }
 
+fetch_release_json() {
+    local api_url="$1"
+    curl -fsSL \
+        -H "Accept: application/vnd.github+json" \
+        -H "User-Agent: $GITHUB_API_USER_AGENT" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        "$api_url" 2>/dev/null
+}
+
+fetch_release_rows() {
+    local api_url="$1"
+    local response
+
+    if ! response="$(fetch_release_json "$api_url")"; then
+        return 1
+    fi
+
+    if ! jq -e 'type == "array"' >/dev/null 2>&1 <<< "$response"; then
+        return 2
+    fi
+
+    jq -r '
+        .[]
+        | select(.draft == false)
+        | [.tag_name, (.published_at // "")]
+        | @tsv
+    ' <<< "$response"
+}
+
+next_gen_prerelease_available() {
+    local response
+
+    if ! response="$(fetch_release_json "$NEXT_GEN_RELEASE_API/tags/$NEXT_GEN_PRERELEASE_TAG")"; then
+        return 1
+    fi
+
+    jq -e '
+        type == "object"
+        and (.tag_name // "") != ""
+        and (.draft // true) == false
+    ' >/dev/null 2>&1 <<< "$response"
+}
+
+warn_next_gen_fetch_issue_once() {
+    local reason="$1"
+
+    if [[ "$NEXT_GEN_API_WARNING_SHOWN" -eq 1 ]]; then
+        return
+    fi
+
+    if [[ "$reason" == "unexpected_payload" ]]; then
+        echo "⚠️  Could not parse next-generation release data (possibly GitHub API rate limiting)." >&2
+    else
+        echo "⚠️  Could not reach next-generation releases right now." >&2
+    fi
+    echo "   Legacy versions remain available. Retry in a moment to list 5.x/dev-prerelease." >&2
+
+    NEXT_GEN_API_WARNING_SHOWN=1
+}
+
 list_next_gen_versions() {
-    local rows
-    rows=$(
-        curl -s "$NEXT_GEN_RELEASE_API" \
-            | jq -r '.[] | select(.draft == false) | [.tag_name, .published_at] | @tsv' \
+    local rows=""
+    local fetch_status=0
+    if rows="$(
+        fetch_release_rows "$NEXT_GEN_RELEASE_API" \
             | sort -k2 -r
-    )
+    )"; then
+        fetch_status=0
+    else
+        fetch_status=$?
+        rows=""
+    fi
+
+    if [[ "$fetch_status" -eq 1 ]]; then
+        warn_next_gen_fetch_issue_once "network"
+    elif [[ "$fetch_status" -eq 2 ]]; then
+        warn_next_gen_fetch_issue_once "unexpected_payload"
+    fi
 
     local has_dev=0
     while IFS=$'\t' read -r tag _published; do
@@ -228,6 +306,10 @@ list_next_gen_versions() {
             echo "$tag"
         fi
     done <<< "$rows"
+
+    if [[ "$has_dev" -eq 0 ]] && next_gen_prerelease_available; then
+        has_dev=1
+    fi
 
     if [[ "$has_dev" -eq 1 ]]; then
         echo "$NEXT_GEN_PRERELEASE_TAG"
@@ -242,12 +324,13 @@ build_version_catalog() {
 
     for tag in "${next_tags[@]}"; do
         [[ -z "$tag" ]] && continue
-        [[ -n "${seen[$tag]:-}" ]] && continue
-        seen[$tag]=1
 
         if [[ "$tag" == "$NEXT_GEN_PRERELEASE_TAG" ]]; then
             continue
         fi
+
+        [[ -n "${seen[$tag]:-}" ]] && continue
+        seen[$tag]=1
         VERSION_CATALOG+=("$tag"$'\t'"next"$'\t'"$tag (new app 5.x)")
     done
 
