@@ -361,6 +361,34 @@ function Reveal-DownloadedFile([string]$Path) {
     }
 }
 
+function Download-File([string]$Url, [string]$OutFile, [string]$Label = "asset") {
+    if (-not $Url) {
+        throw "Missing download URL for $Label."
+    }
+
+    if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
+        & curl.exe -L --fail --progress-bar -o "$OutFile" "$Url"
+        if ($LASTEXITCODE -ne 0) {
+            throw "curl.exe failed with exit code $LASTEXITCODE."
+        }
+        return
+    }
+
+    if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
+        Start-BitsTransfer -Source $Url -Destination $OutFile -DisplayName "Corese-GUI $Label" -ErrorAction Stop
+        return
+    }
+
+    $previousProgressPreference = $ProgressPreference
+    try {
+        $ProgressPreference = "SilentlyContinue"
+        Invoke-WebRequest $Url -OutFile $OutFile -ErrorAction Stop
+    }
+    finally {
+        $ProgressPreference = $previousProgressPreference
+    }
+}
+
 function Download-Icon {
     Write-Host "Downloading application icon..."
 
@@ -506,11 +534,12 @@ function Install-LegacyVersion([string]$VersionTag) {
         exit 1
     }
 
-    if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
-        & curl.exe -L -# -o "$InstallDir\$JarName" $assetUrl
+    try {
+        Download-File -Url $assetUrl -OutFile "$InstallDir\$JarName" -Label "legacy package $VersionTag"
     }
-    else {
-        Invoke-WebRequest $assetUrl -OutFile "$InstallDir\$JarName"
+    catch {
+        Write-Host "Error downloading legacy package: $($_.Exception.Message)" -ForegroundColor Red
+        exit 1
     }
     Write-Host ""
 
@@ -612,7 +641,14 @@ function Migrate-ToNextGen([string]$VersionTag) {
         $downloadsDir = Get-DownloadsDirectory
         $targetPath = Join-Path $downloadsDir $asset.name
         Write-Host "Downloading recommended asset: $($asset.name)"
-        Invoke-WebRequest $asset.browser_download_url -OutFile $targetPath
+        try {
+            Download-File -Url $asset.browser_download_url -OutFile $targetPath -Label $asset.name
+        }
+        catch {
+            Write-Host "Download failed: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "Open release page manually: $releaseUrl"
+            return
+        }
         Write-Host "Downloaded to: $targetPath"
         Reveal-DownloadedFile $targetPath
         Write-Host "Please run the downloaded installer/package."
