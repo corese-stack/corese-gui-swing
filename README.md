@@ -12,9 +12,11 @@
 [![License: CECILL-C](https://img.shields.io/badge/License-CECILL--C-blue.svg)](https://cecill.info/licences/Licence_CeCILL-C_V1-en.html) [![Discussions](https://img.shields.io/badge/Discussions-GitHub-blue)](https://github.com/orgs/corese-stack/discussions)
 
 > [!WARNING]
-> This repository hosts the legacy Corese-GUI Swing 4.x line and is planned for archival.
+> This repository hosts the legacy Corese-GUI Swing 4.x line and is archived.
 > New releases (`5.0.0+`) are published in [`corese-stack/corese-gui`](https://github.com/corese-stack/corese-gui).
-> Install the new application from: <https://corese-stack.github.io/corese-gui/dev-prerelease/install.html>.
+> Install the new application from:
+> - Docs (latest line): <https://corese-stack.github.io/corese-gui/>
+> - Latest release: <https://github.com/corese-stack/corese-gui/releases/latest>
 
 ## Features
 
@@ -31,8 +33,8 @@
 Install Corese-GUI using your preferred platform:
 
 For the new Corese-GUI `5.x+` line, use:
-- Install guide: <https://corese-stack.github.io/corese-gui/dev-prerelease/install.html>
-- Releases: <https://github.com/corese-stack/corese-gui/releases>
+- Docs (latest line): <https://corese-stack.github.io/corese-gui/>
+- Latest release: <https://github.com/corese-stack/corese-gui/releases/latest>
 
 The scripts below are kept for legacy 4.x maintenance and migration assistance.
 

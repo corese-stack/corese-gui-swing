@@ -24,8 +24,8 @@ LEGACY_GITHUB_REPO="corese-stack/corese-gui-swing"
 LEGACY_RELEASE_API="https://api.github.com/repos/$LEGACY_GITHUB_REPO/releases"
 NEXT_GEN_GITHUB_REPO="corese-stack/corese-gui"
 NEXT_GEN_RELEASE_API="https://api.github.com/repos/$NEXT_GEN_GITHUB_REPO/releases"
-NEXT_GEN_INSTALL_GUIDE_URL="https://corese-stack.github.io/corese-gui/dev-prerelease/install.html"
-NEXT_GEN_RELEASES_URL="https://github.com/$NEXT_GEN_GITHUB_REPO/releases"
+NEXT_GEN_DOCS_URL="https://corese-stack.github.io/corese-gui/"
+NEXT_GEN_RELEASES_URL="https://github.com/$NEXT_GEN_GITHUB_REPO/releases/latest"
 
 LEGACY_MIN_VERSION="4.0.0"
 NEXT_GEN_MIN_VERSION="5.0.0"
@@ -421,12 +421,12 @@ redirect_to_next_gen_release() {
 
     echo "🔁 Redirecting to the new Corese-GUI 5.x channel..."
     echo "   Selected version: $tag"
-    echo "   Migration guide: $NEXT_GEN_INSTALL_GUIDE_URL"
+    echo "   Docs: $NEXT_GEN_DOCS_URL"
 
     if ! release_json=$(curl -s -f "$NEXT_GEN_RELEASE_API/tags/$tag"); then
         echo "⚠️  Could not resolve release '$tag' in $NEXT_GEN_GITHUB_REPO."
         echo "➡️  Open this page to continue: $NEXT_GEN_RELEASES_URL"
-        open_in_browser "$NEXT_GEN_INSTALL_GUIDE_URL"
+        open_in_browser "$NEXT_GEN_DOCS_URL"
         return
     fi
 
@@ -448,10 +448,10 @@ redirect_to_next_gen_release() {
     fi
 
     echo "➡️  Release page: $release_html_url"
-    echo "➡️  Install guide: $NEXT_GEN_INSTALL_GUIDE_URL"
+    echo "➡️  Docs: $NEXT_GEN_DOCS_URL"
     echo
 
-    open_in_browser "$NEXT_GEN_INSTALL_GUIDE_URL"
+    open_in_browser "$NEXT_GEN_DOCS_URL"
 }
 
 download_icon() {
@@ -682,7 +682,8 @@ if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     echo
     echo "Notes:"
     echo "  - Versions >= 5.0.0 (and dev-prerelease) migrate to the new repository: $NEXT_GEN_GITHUB_REPO"
-    echo "  - Migration guide: $NEXT_GEN_INSTALL_GUIDE_URL"
+    echo "  - Docs: $NEXT_GEN_DOCS_URL"
+    echo "  - Latest release: $NEXT_GEN_RELEASES_URL"
     echo
     exit 0
 fi

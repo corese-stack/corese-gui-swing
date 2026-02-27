@@ -14,8 +14,8 @@ LEGACY_GITHUB_REPO="corese-stack/corese-gui-swing"
 NEXT_GITHUB_REPO="corese-stack/corese-gui"
 LEGACY_RELEASE_API="https://api.github.com/repos/$LEGACY_GITHUB_REPO/releases"
 NEXT_RELEASE_API="https://api.github.com/repos/$NEXT_GITHUB_REPO/releases"
-NEXT_INSTALL_GUIDE_URL="https://corese-stack.github.io/corese-gui/dev-prerelease/install.html"
-NEXT_RELEASES_PAGE_URL="https://github.com/$NEXT_GITHUB_REPO/releases"
+NEXT_DOCS_URL="https://corese-stack.github.io/corese-gui/"
+NEXT_RELEASES_PAGE_URL="https://github.com/$NEXT_GITHUB_REPO/releases/latest"
 JAR_NAME="corese-gui-standalone.jar"
 AUTO_YES=0
 VERSION_TAG=""
@@ -364,7 +364,7 @@ migrate_to_next_gen_version() {
     echo
     echo "✅ Legacy installation removed."
     echo "➡️  Continue with the new installer flow:"
-    echo "   - Install guide: $NEXT_INSTALL_GUIDE_URL"
+    echo "   - Docs: $NEXT_DOCS_URL"
     echo "   - Release page: $release_page"
     if [[ -n "$asset_url" && "$asset_url" != "null" ]]; then
         echo "   - Recommended download for this Mac/arch: $asset_url"
@@ -378,7 +378,7 @@ migrate_to_next_gen_version() {
     echo "Note: selecting 5.x+ migrates away from this legacy line."
     echo
 
-    open_url "$NEXT_INSTALL_GUIDE_URL"
+    open_url "$NEXT_DOCS_URL"
 }
 
 download_and_install() {

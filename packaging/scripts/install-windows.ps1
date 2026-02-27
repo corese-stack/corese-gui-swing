@@ -35,8 +35,8 @@ $LegacyGitHubRepo = "corese-stack/corese-gui-swing"
 $LegacyReleaseApi = "https://api.github.com/repos/$LegacyGitHubRepo/releases"
 $NextGitHubRepo = "corese-stack/corese-gui"
 $NextReleaseApi = "https://api.github.com/repos/$NextGitHubRepo/releases"
-$NextInstallGuideUrl = "https://corese-stack.github.io/corese-gui/dev-prerelease/install.html"
-$NextReleasesPageUrl = "https://github.com/$NextGitHubRepo/releases"
+$NextInstallGuideUrl = "https://corese-stack.github.io/corese-gui/"
+$NextReleasesPageUrl = "https://github.com/$NextGitHubRepo/releases/latest"
 $NextPrereleaseTag = "dev-prerelease"
 
 $Install = ""
@@ -557,7 +557,7 @@ function Migrate-ToNextGen([string]$VersionTag) {
 
     Write-Host ""
     Write-Host "Continue with Corese-GUI 5.x+:"
-    Write-Host " - Install guide: $NextInstallGuideUrl"
+    Write-Host " - Docs:          $NextInstallGuideUrl"
     Write-Host " - Release page:  $releaseUrl"
 
     if ($asset) {
@@ -645,7 +645,7 @@ if ($Help) {
     Write-Host "  install-windows-gui.ps1 --uninstall               Uninstall legacy Corese-GUI 4.x"
     Write-Host "  install-windows-gui.ps1 --help                    Show this help"
     Write-Host ""
-    Write-Host "Migration guide: $NextInstallGuideUrl"
+    Write-Host "Docs: $NextInstallGuideUrl"
     exit
 }
 
