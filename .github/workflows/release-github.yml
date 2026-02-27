@@ -59,3 +59,4 @@ jobs:
           tag: ${{ github.ref_name }}
           name: "Release ${{ github.ref_name }}"
           draft: true
+          makeLatest: false

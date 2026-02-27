@@ -22,8 +22,8 @@ sphinx-multiversion docs/source build/html
 
 ## Switcher generation
 
-- To navigate between versions by means of the switcher (the dropdown list indicating the available version), the switcher.json object must be generated.
-- To improve navigability, a landing page must also be generated to redirect to the latest version of the documentation.
+- To navigate between versions by means of the switcher (the dropdown list indicating the available version), the `switcher.json` object must be generated.
+- To improve navigability, a landing page must also be generated to redirect to the preferred documentation line.
 
 To this end a script must be executed and write the output to the output html directory:
 
@@ -31,6 +31,11 @@ To this end a script must be executed and write the output to the output html di
 ./docs/switcher_generator.sh build/html/switcher.json build/html/index.html
 ```
 
-Both sphinx-multiversion and switcher_generator work on tags following the ```^v[0-9]+\.[0-9]+\.[0-9]+$``` syntax and ordered by refname.
+The switcher generator:
+- keeps legacy 4.x entries from local tags (`corese-gui-swing`),
+- fetches 5.x and `dev-prerelease` entries from the new repository (`corese-gui`),
+- marks the new line as preferred and keeps legacy entries explicitly labeled.
 
-The minimal version set in the switcher_generator allows to not generate entries in the switcher and landing page for unexisting or uncompatible documentation.
+The minimal version thresholds in the script allow filtering incompatible or unsupported ranges for each line.
+
+In this legacy repository, `switcher_generator.sh` also includes 5.x and `dev-prerelease` entries from `corese-stack/corese-gui` so users can navigate between legacy 4.x and the new documentation site.

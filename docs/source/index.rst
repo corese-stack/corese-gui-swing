@@ -14,6 +14,12 @@
    :width: 400px
    :class: only-dark
 
+.. warning::
+
+   You are reading the **legacy documentation** for Corese-GUI 4.x (`corese-gui-swing`).
+   New releases (5.x+) are now published in `corese-gui <https://github.com/corese-stack/corese-gui>`_.
+   Use the version selector above to switch between legacy and new documentation.
+
 
 Corese is a software platform that implements and extends the standards of the Semantic Web. It enables users to create, manipulate, parse, serialize, query, reason about, and validate RDF data.
 
@@ -131,7 +137,8 @@ Corese-GUI provides an intuitive interface to execute SPARQL queries, visualize 
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       * `corese-core <https://corese-stack.github.io/corese-core/>`_: Java library to process RDF data and use Corese features via an API.
       * `corese-command <https://corese-stack.github.io/corese-command/>`_: Command Line Interface for Corese that allows users to interact with Corese features from the terminal.
-      * `corese-gui <https://corese-stack.github.io/corese-gui-swing/>`_: Graphical interface that allows an easy and visual use of Corese features.
+      * `corese-gui (5.x+) <https://corese-stack.github.io/corese-gui/>`_: Current graphical interface and active development line.
+      * `corese-gui-swing (4.x legacy) <https://corese-stack.github.io/corese-gui-swing/>`_: Legacy graphical interface release line.
       * `corese-server <https://corese-stack.github.io/corese-server-jetty/>`_: Tool to create, configure and manage SPARQL endpoints.
       * `corese-python (beta) <https://corese-stack.github.io/corese-python/>`_: Python wrapper for accessing and manipulating RDF data with Corese features using py4j.
 

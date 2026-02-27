@@ -17,7 +17,7 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 #sys.path.insert(0, pathlib.Path(__file__).parents[2].joinpath('code').resolve().as_posix())
 
 
-project = 'Corese'
+project = 'Corese (Legacy Swing GUI)'
 author = 'Wimmics'
 
 version = ""
@@ -82,8 +82,8 @@ html_js_files = [
 ]
 
 # Modify the title to get good social-media links
-html_title = "Corese-gui-swing Documentation"
-html_short_title = "Corese-gui-swing Docs"
+html_title = "Corese-gui-swing Legacy Documentation"
+html_short_title = "Corese-gui-swing Legacy Docs"
 
 # -- Theme Options -----------------------------------------------------------
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -97,14 +97,28 @@ html_theme_options = {
     "theme_switcher": True,
     "navbar_center": [ "navbar-nav" ],
     "navbar_end": ["theme-switcher", "navbar-icon-links", "version-switcher"],
+    "announcement": (
+        "You are reading the legacy Corese-GUI 4.x documentation. "
+        "<a href='https://corese-stack.github.io/corese-gui/'>"
+        "Switch to Corese-GUI 5.x documentation</a>."
+    ),
     "icon_links": [
         {
             "name": "GitHub",
             "url": "https://github.com/corese-stack/corese-gui-swing",
             "icon": "fab fa-github-square"
+        },
+        {
+            "name": "Corese-GUI 5.x",
+            "url": "https://github.com/corese-stack/corese-gui",
+            "icon": "fas fa-rocket"
         }
     ],
-    "switcher": {"json_url": "https://corese-stack.github.io/corese-gui-swing/switcher.json", "version_match": version}
+    "switcher": {
+        "json_url": "https://corese-stack.github.io/corese-gui-swing/switcher.json",
+        "version_match": version,
+        "check_switcher": False
+    }
 }
 
 html_sidebars = {

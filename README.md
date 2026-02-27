@@ -11,6 +11,11 @@
 
 [![License: CECILL-C](https://img.shields.io/badge/License-CECILL--C-blue.svg)](https://cecill.info/licences/Licence_CeCILL-C_V1-en.html) [![Discussions](https://img.shields.io/badge/Discussions-GitHub-blue)](https://github.com/orgs/corese-stack/discussions)
 
+> [!WARNING]
+> This repository hosts the legacy Corese-GUI Swing 4.x line and is planned for archival.
+> New releases (`5.0.0+`) are published in [`corese-stack/corese-gui`](https://github.com/corese-stack/corese-gui).
+> Install the new application from: <https://corese-stack.github.io/corese-gui/dev-prerelease/install.html>.
+
 ## Features
 
 - Load and save RDF data in various formats (Turtle, RDF/XML, JSON-LD, etc.)
@@ -24,6 +29,15 @@
 ## Getting Started
 
 Install Corese-GUI using your preferred platform:
+
+For the new Corese-GUI `5.x+` line, use:
+- Install guide: <https://corese-stack.github.io/corese-gui/dev-prerelease/install.html>
+- Releases: <https://github.com/corese-stack/corese-gui/releases>
+
+The scripts below are kept for legacy 4.x maintenance and migration assistance.
+
+> The installers below can still install legacy 4.x versions.
+> If you select `5.0.0` or later, they will uninstall the legacy installation and redirect you to the new repository installer flow.
 
 ### Linux
 
@@ -76,6 +90,8 @@ We welcome contributions! Here’s how to get involved:
 
 ## Useful Links
 
-- [Corese Website](https://corese-stack.github.io/corese-gui-swing/)
+- [Corese-GUI Swing Legacy Docs](https://corese-stack.github.io/corese-gui-swing/)
+- [Corese-GUI 5.x Docs](https://corese-stack.github.io/corese-gui/)
+- [Corese-GUI 5.x Repository](https://github.com/corese-stack/corese-gui)
 - Mailing List: <corese-users@inria.fr>
 - Subscribe: Send an email to <corese-users-request@inria.fr> with the subject: `subscribe`
