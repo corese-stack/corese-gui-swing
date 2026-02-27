@@ -3,13 +3,15 @@
 
 ## Installation
 
-> [!WARNING]
-> You are reading the legacy Corese-GUI Swing 4.x documentation.
-> New releases (`5.0.0+`) are available in the new repository:
-> - Docs (latest line): <https://corese-stack.github.io/corese-gui/>
-> - Latest release: <https://github.com/corese-stack/corese-gui/releases/latest>
->
-> The install scripts below remain available to maintain/uninstall legacy 4.x, and can guide migration to 5.x.
+```{warning}
+You are reading the legacy Corese-GUI Swing 4.x documentation.
+New releases (`5.0.0+`) are available in the new repository:
+
+- Docs (latest line): <https://corese-stack.github.io/corese-gui/>
+- Latest release: <https://github.com/corese-stack/corese-gui/releases/latest>
+
+The install scripts below remain available to maintain/uninstall legacy 4.x, and can guide migration to 5.x.
+```
 
 ### Linux
 
