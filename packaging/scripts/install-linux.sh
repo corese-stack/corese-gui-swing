@@ -3,19 +3,12 @@
 # ------------------------------------------------------------------------------
 # Corese-GUI Linux Installer
 # ------------------------------------------------------------------------------
-# This script installs or updates the Corese-GUI application on a Linux system.
-# It automatically checks for Java (>= 21), installs it if necessary,
-# fetches the desired version of Corese-GUI from GitHub, creates desktop
-# integration, and optionally adds the binary to the user's PATH.
-#
-# Usage:
-#   ./install-linux-gui.sh                     # Interactive mode
-#   ./install-linux-gui.sh --install <version> # Install a specific version (e.g. v4.6.0)
-#   ./install-linux-gui.sh --install-latest    # Install the latest available version
-#   ./install-linux-gui.sh --uninstall         # Remove Corese-GUI from the system
+# This script installs, updates, migrates, or uninstalls Corese-GUI.
+# - Legacy line (4.x): corese-gui-swing repository
+# - New line (5.x+):   corese-gui repository
 # ------------------------------------------------------------------------------
 
-set -e
+set -euo pipefail
 
 XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/corese-gui"
@@ -23,11 +16,83 @@ BIN_NAME="corese-gui"
 WRAPPER_PATH="$INSTALL_DIR/$BIN_NAME"
 JAR_NAME="corese-gui-standalone.jar"
 VERSION_FILE="$INSTALL_DIR/version.txt"
-GITHUB_REPO="corese-stack/corese-gui-swing"
-RELEASE_API="https://api.github.com/repos/$GITHUB_REPO/releases"
 DESKTOP_FILE="$XDG_DATA_HOME/applications/corese-gui.desktop"
 ICON_FILE="$XDG_DATA_HOME/icons/fr.inria.corese.CoreseGui.svg"
 AUTO_YES=0
+
+LEGACY_GITHUB_REPO="corese-stack/corese-gui-swing"
+LEGACY_RELEASE_API="https://api.github.com/repos/$LEGACY_GITHUB_REPO/releases"
+NEXT_GEN_GITHUB_REPO="corese-stack/corese-gui"
+NEXT_GEN_RELEASE_API="https://api.github.com/repos/$NEXT_GEN_GITHUB_REPO/releases"
+NEXT_GEN_INSTALL_GUIDE_URL="https://corese-stack.github.io/corese-gui/dev-prerelease/install.html"
+NEXT_GEN_RELEASES_URL="https://github.com/$NEXT_GEN_GITHUB_REPO/releases"
+
+LEGACY_MIN_VERSION="4.0.0"
+NEXT_GEN_MIN_VERSION="5.0.0"
+NEXT_GEN_PRERELEASE_TAG="dev-prerelease"
+
+VERSION_TAG=""
+VERSION_CHANNEL=""
+VERSION_LABEL=""
+declare -a VERSION_CATALOG=()
+
+require_command() {
+    local cmd="$1"
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "❌ Missing required command: $cmd"
+        exit 1
+    fi
+}
+
+check_requirements() {
+    require_command curl
+    require_command jq
+}
+
+normalize_tag_version() {
+    local version="$1"
+    echo "${version#v}"
+}
+
+is_semver_tag() {
+    local tag="$1"
+    [[ "$tag" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]
+}
+
+version_greater_equal() {
+    local current="$1"
+    local minimum="$2"
+    [[ "$(printf '%s\n%s\n' "$current" "$minimum" | sort -V | head -n 1)" == "$minimum" ]]
+}
+
+is_next_gen_tag() {
+    local tag="$1"
+
+    if [[ "$tag" == "$NEXT_GEN_PRERELEASE_TAG" ]]; then
+        return 0
+    fi
+
+    if ! is_semver_tag "$tag"; then
+        return 1
+    fi
+
+    local normalized
+    normalized="$(normalize_tag_version "$tag")"
+    version_greater_equal "$normalized" "$NEXT_GEN_MIN_VERSION"
+}
+
+is_legacy_tag() {
+    local tag="$1"
+
+    if ! is_semver_tag "$tag"; then
+        return 1
+    fi
+
+    local normalized
+    normalized="$(normalize_tag_version "$tag")"
+
+    version_greater_equal "$normalized" "$LEGACY_MIN_VERSION" && ! version_greater_equal "$normalized" "$NEXT_GEN_MIN_VERSION"
+}
 
 check_internet() {
     echo "🌐 Checking internet connection..."
@@ -55,14 +120,13 @@ check_java() {
         return
     fi
 
-    # Check if AWT is supported (i.e., not headless)
     JAVA_HOME=$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")
     if java --list-modules 2>/dev/null | grep -q '^java.desktop' \
-    && find "$JAVA_HOME" -type f -name 'libawt_xawt.so' -print -quit | grep -q . ; then
-    echo "✅ AWT / Swing OK"
+        && find "$JAVA_HOME" -type f -name 'libawt_xawt.so' -print -quit | grep -q . ; then
+        echo "✅ AWT / Swing OK"
     else
-    echo "⚠️  Pas de support GUI"
-    prompt_install_java
+        echo "⚠️  No GUI support found in this Java installation"
+        prompt_install_java
     fi
 
     echo "✅ Java version $JAVA_VERSION with GUI support detected."
@@ -86,13 +150,14 @@ prompt_install_java() {
 
 detect_distro() {
     if [ -f /etc/os-release ]; then
+        # shellcheck disable=SC1091
         . /etc/os-release
 
-        if [[ "$ID_LIKE" =~ (debian|ubuntu) ]]; then
+        if [[ "${ID_LIKE:-}" =~ (debian|ubuntu) ]]; then
             echo "debian"
         elif [[ "$ID" == "debian" || "$ID" == "ubuntu" || "$ID" == "pop" || "$ID" == "linuxmint" ]]; then
             echo "debian"
-        elif [[ "$ID" == "fedora" || "$ID_LIKE" == "fedora" ]]; then
+        elif [[ "$ID" == "fedora" || "${ID_LIKE:-}" == "fedora" ]]; then
             echo "fedora"
         elif [[ "$ID" == "arch" ]]; then
             echo "arch"
@@ -132,27 +197,79 @@ install_java_by_distro() {
     echo
 }
 
-list_versions() {
-    curl -s "$RELEASE_API" \
+list_legacy_versions() {
+    curl -s "$LEGACY_RELEASE_API" \
         | jq -r '.[] | select(.prerelease == false and .draft == false) | [.tag_name, .published_at] | @tsv' \
         | sort -k2 -r \
-        | cut -f1
+        | cut -f1 \
+        | while IFS= read -r tag; do
+            if is_legacy_tag "$tag"; then
+                echo "$tag"
+            fi
+        done
+}
+
+list_next_gen_versions() {
+    curl -s "$NEXT_GEN_RELEASE_API" \
+        | jq -r '.[] | select(.draft == false) | [.tag_name, .published_at] | @tsv' \
+        | sort -k2 -r \
+        | while IFS=$'\t' read -r tag _published; do
+            if is_next_gen_tag "$tag"; then
+                echo "$tag"
+            fi
+        done
+}
+
+build_version_catalog() {
+    VERSION_CATALOG=()
+    declare -A seen=()
+
+    while IFS= read -r tag; do
+        [[ -z "$tag" ]] && continue
+        [[ -n "${seen[$tag]:-}" ]] && continue
+        seen[$tag]=1
+
+        if [[ "$tag" == "$NEXT_GEN_PRERELEASE_TAG" ]]; then
+            VERSION_CATALOG+=("$tag"$'\t'"next"$'\t'"$tag (new app preview)")
+        else
+            VERSION_CATALOG+=("$tag"$'\t'"next"$'\t'"$tag (new app 5.x)")
+        fi
+    done < <(list_next_gen_versions)
+
+    while IFS= read -r tag; do
+        [[ -z "$tag" ]] && continue
+        [[ -n "${seen[$tag]:-}" ]] && continue
+        seen[$tag]=1
+        VERSION_CATALOG+=("$tag"$'\t'"legacy"$'\t'"$tag (legacy Swing 4.x)")
+    done < <(list_legacy_versions)
+}
+
+print_available_versions() {
+    if [[ "${#VERSION_CATALOG[@]}" -eq 0 ]]; then
+        echo "   (no version found)"
+        return
+    fi
+
+    for i in "${!VERSION_CATALOG[@]}"; do
+        IFS=$'\t' read -r tag _channel label <<< "${VERSION_CATALOG[$i]}"
+        if [[ "$i" -eq 0 ]]; then
+            printf "   [%d] %s (latest)\n" $((i + 1)) "$label"
+        else
+            printf "   [%d] %s\n" $((i + 1)) "$label"
+        fi
+    done
 }
 
 choose_version() {
-    echo "📦 Available versions:"
-    VERSIONS=()
-    while IFS= read -r line; do
-        VERSIONS+=("$line")
-    done < <(list_versions)
+    build_version_catalog
 
-    for i in "${!VERSIONS[@]}"; do
-        if [ "$i" -eq 0 ]; then
-            printf "   [%d] %s (latest)\n" $((i + 1)) "${VERSIONS[$i]}"
-        else
-            printf "   [%d] %s\n" $((i + 1)) "${VERSIONS[$i]}"
-        fi
-    done
+    if [[ "${#VERSION_CATALOG[@]}" -eq 0 ]]; then
+        echo "❌ No installable version found from GitHub APIs."
+        exit 1
+    fi
+
+    echo "📦 Available versions:"
+    print_available_versions
 
     while true; do
         echo -n "→ Enter the number of the version to install [default: 1]: "
@@ -161,17 +278,29 @@ choose_version() {
         if [[ -z "$VERSION_INDEX" ]]; then
             VERSION_INDEX=1
             break
-        elif [[ "$VERSION_INDEX" =~ ^[0-9]+$ && "$VERSION_INDEX" -ge 1 && "$VERSION_INDEX" -le "${#VERSIONS[@]}" ]]; then
+        elif [[ "$VERSION_INDEX" =~ ^[0-9]+$ && "$VERSION_INDEX" -ge 1 && "$VERSION_INDEX" -le "${#VERSION_CATALOG[@]}" ]]; then
             break
         else
-            echo "❌ Invalid input. Please enter a number between 1 and ${#VERSIONS[@]}."
+            echo "❌ Invalid input. Please enter a number between 1 and ${#VERSION_CATALOG[@]}."
         fi
     done
 
-    VERSION_TAG="${VERSIONS[$((VERSION_INDEX - 1))]}"
+    IFS=$'\t' read -r VERSION_TAG VERSION_CHANNEL VERSION_LABEL <<< "${VERSION_CATALOG[$((VERSION_INDEX - 1))]}"
+
     echo
     echo "✔️  Selected version: $VERSION_TAG"
     echo
+}
+
+set_latest_version_from_catalog() {
+    build_version_catalog
+
+    if [[ "${#VERSION_CATALOG[@]}" -eq 0 ]]; then
+        echo "❌ No installable version found from GitHub APIs."
+        exit 1
+    fi
+
+    IFS=$'\t' read -r VERSION_TAG VERSION_CHANNEL VERSION_LABEL <<< "${VERSION_CATALOG[0]}"
 }
 
 display_installed_version() {
@@ -189,14 +318,149 @@ display_installed_version() {
     echo
 }
 
+open_in_browser() {
+    local url="$1"
+    if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$url" >/dev/null 2>&1 || true
+    fi
+}
+
+detect_linux_arch() {
+    case "$(uname -m)" in
+        x86_64|amd64)
+            echo "x64"
+            ;;
+        aarch64|arm64)
+            echo "arm64"
+            ;;
+        *)
+            echo "x64"
+            ;;
+    esac
+}
+
+remove_from_all_shell_rcs() {
+    local block_start="# >>> Corese-GUI >>>"
+    local block_end="# <<< Corese-GUI <<<"
+
+    echo "🧹 Cleaning PATH from config files..."
+    declare -a config_files=()
+
+    [ -f "$HOME/.bashrc" ] && config_files+=("$HOME/.bashrc")
+    [ -f "$HOME/.zshrc" ] && config_files+=("$HOME/.zshrc")
+    [ -f "$HOME/.config/fish/config.fish" ] && config_files+=("$HOME/.config/fish/config.fish")
+    [ -f "$HOME/.profile" ] && config_files+=("$HOME/.profile")
+
+    for rc in "${config_files[@]}"; do
+        if [ -f "$rc" ]; then
+            sed -i "/$block_start/,/$block_end/d" "$rc"
+            sed -i '/^$/N;/^\n$/D' "$rc"
+            echo "   🧼 Cleaned $(basename "$rc")"
+        fi
+    done
+}
+
+remove_legacy_installation_files() {
+    echo "🗑️  Removing legacy Corese-GUI Swing files..."
+    rm -rf "$INSTALL_DIR"
+    rm -f "$DESKTOP_FILE"
+    rm -f "$ICON_FILE"
+}
+
+uninstall_legacy_for_migration() {
+    if [[ ! -f "$INSTALL_DIR/$JAR_NAME" && ! -d "$INSTALL_DIR" ]]; then
+        echo "ℹ️  No legacy Swing installation detected."
+        echo
+        return
+    fi
+
+    if [[ "$AUTO_YES" -ne 1 ]]; then
+        echo "⚠️  The selected version belongs to the new Corese-GUI 5.x line."
+        echo "⚠️  The current Corese-GUI Swing 4.x installation is legacy."
+        echo -n "→ Uninstall legacy 4.x from this machine now? [Y/n] "
+        read -r confirm
+        if [[ "$confirm" =~ ^[Nn]$ ]]; then
+            echo "ℹ️  Legacy installation kept."
+            echo
+            return
+        fi
+    fi
+
+    remove_legacy_installation_files
+    remove_from_all_shell_rcs
+    echo "✅ Legacy Swing installation removed."
+    echo
+}
+
+select_next_gen_linux_asset_url() {
+    local release_json="$1"
+    local arch
+    arch="$(detect_linux_arch)"
+
+    local archive_url
+    archive_url=$(echo "$release_json" | jq -r --arg arch "$arch" '
+        [ .assets[].browser_download_url
+          | select(test("/corese-gui-linux-" + $arch + "\\.tar\\.gz$"))
+        ][0] // empty
+    ')
+
+    if [[ -n "$archive_url" ]]; then
+        echo "$archive_url"
+        return
+    fi
+
+    echo "$release_json" | jq -r --arg arch "$arch" '
+        [ .assets[].browser_download_url
+          | select(test("/corese-gui-.*-standalone-linux-" + $arch + "\\.jar$"))
+        ][0] // empty
+    '
+}
+
+redirect_to_next_gen_release() {
+    local tag="$1"
+
+    echo "🔁 Redirecting to the new Corese-GUI 5.x channel..."
+    echo "   Selected version: $tag"
+    echo "   Migration guide: $NEXT_GEN_INSTALL_GUIDE_URL"
+
+    if ! release_json=$(curl -s -f "$NEXT_GEN_RELEASE_API/tags/$tag"); then
+        echo "⚠️  Could not resolve release '$tag' in $NEXT_GEN_GITHUB_REPO."
+        echo "➡️  Open this page to continue: $NEXT_GEN_RELEASES_URL"
+        open_in_browser "$NEXT_GEN_INSTALL_GUIDE_URL"
+        return
+    fi
+
+    local release_html_url
+    release_html_url=$(echo "$release_json" | jq -r '.html_url // empty')
+    [[ -z "$release_html_url" ]] && release_html_url="$NEXT_GEN_RELEASES_URL"
+
+    local asset_url
+    asset_url="$(select_next_gen_linux_asset_url "$release_json")"
+
+    if [[ -n "$asset_url" ]]; then
+        local download_path="/tmp/$(basename "$asset_url")"
+        echo "⬇️  Downloading platform asset: $(basename "$asset_url")"
+        curl --progress-bar -L "$asset_url" -o "$download_path"
+        echo
+        echo "✅ Download complete: $download_path"
+    else
+        echo "⚠️  No Linux asset detected automatically for your architecture."
+    fi
+
+    echo "➡️  Release page: $release_html_url"
+    echo "➡️  Install guide: $NEXT_GEN_INSTALL_GUIDE_URL"
+    echo
+
+    open_in_browser "$NEXT_GEN_INSTALL_GUIDE_URL"
+}
+
 download_icon() {
     echo "🎨 Downloading application icon..."
     mkdir -p "$(dirname "$ICON_FILE")"
 
-    # Try main branch first, fallback to develop
     ICON_URLS=(
-        "https://raw.githubusercontent.com/$GITHUB_REPO/main/packaging/assets/logo/fr.inria.corese.CoreseGui.svg"
-        "https://raw.githubusercontent.com/$GITHUB_REPO/develop/packaging/assets/logo/fr.inria.corese.CoreseGui.svg"
+        "https://raw.githubusercontent.com/$LEGACY_GITHUB_REPO/main/packaging/assets/logo/fr.inria.corese.CoreseGui.svg"
+        "https://raw.githubusercontent.com/$LEGACY_GITHUB_REPO/develop/packaging/assets/logo/fr.inria.corese.CoreseGui.svg"
     )
 
     for ICON_URL in "${ICON_URLS[@]}"; do
@@ -207,7 +471,6 @@ download_icon() {
     done
 
     echo "   ⚠️  Could not download icon, using fallback"
-    # Create a simple fallback icon placeholder
     touch "$ICON_FILE"
 }
 
@@ -215,7 +478,7 @@ create_desktop_file() {
     echo "🖥️  Creating desktop integration..."
     mkdir -p "$(dirname "$DESKTOP_FILE")"
 
-    cat > "$DESKTOP_FILE" <<EOF
+    cat > "$DESKTOP_FILE" <<EOT
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -230,39 +493,98 @@ StartupNotify=true
 Keywords=semantic web;RDF;SPARQL;OWL;SHACL;LDScript;STTL;SPARQL Rule;SPARQL*;RDF*;SPARQL Query;SPARQL Graph;SHACL Validation;
 X-GNOME-FullName=Corese-GUI
 DBusActivatable=false
-EOF
+EOT
 
     chmod +x "$DESKTOP_FILE"
     echo "   ✅ Desktop file created: $DESKTOP_FILE"
 }
 
+create_wrapper() {
+    cat > "$WRAPPER_PATH" <<EOT
+#!/usr/bin/env bash
+java -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -jar "$INSTALL_DIR/$JAR_NAME" "\$@"
+EOT
+    chmod +x "$WRAPPER_PATH"
+}
+
+add_to_all_available_shell_rcs() {
+    local block_start="# >>> Corese-GUI >>>"
+    local block_end="# <<< Corese-GUI <<<"
+
+    echo "🧩 Adding Corese-GUI to available shell configs..."
+
+    declare -a config_files=()
+
+    command -v bash &>/dev/null && config_files+=("$HOME/.bashrc")
+    command -v zsh &>/dev/null && config_files+=("$HOME/.zshrc")
+    command -v fish &>/dev/null && config_files+=("$HOME/.config/fish/config.fish")
+
+    config_files+=("$HOME/.profile")
+
+    for rc in "${config_files[@]}"; do
+        mkdir -p "$(dirname "$rc")"
+
+        if [[ -f "$rc" && "$(grep -F "$block_start" "$rc")" ]]; then
+            echo "   ✔ Already added in $(basename "$rc")"
+            continue
+        fi
+
+        echo "   ➕ Updating $(basename "$rc")"
+        [ -f "$rc" ] && [ "$(tail -c1 "$rc")" != "" ] && echo "" >> "$rc"
+
+        {
+            echo "$block_start"
+            if [[ "$rc" == *"fish"* ]]; then
+                echo "set -gx PATH \$PATH $INSTALL_DIR"
+            else
+                echo "export PATH=\"$INSTALL_DIR:\$PATH\""
+            fi
+            echo "$block_end"
+        } >> "$rc"
+    done
+
+    echo
+    echo "✅ Corese-GUI path added."
+    echo "🔁 Restart your terminal or run: source ~/.bashrc | source ~/.zshrc | exec fish"
+    echo
+}
+
 download_and_install() {
+    if is_next_gen_tag "$VERSION_TAG"; then
+        uninstall_legacy_for_migration
+        redirect_to_next_gen_release "$VERSION_TAG"
+        return
+    fi
+
+    if ! is_legacy_tag "$VERSION_TAG"; then
+        echo "❌ Unsupported legacy version tag: $VERSION_TAG"
+        exit 1
+    fi
+
+    check_java
+
     mkdir -p "$INSTALL_DIR"
     cd "$INSTALL_DIR" || exit 1
 
-    echo "⬇️  Downloading Corese-GUI $VERSION_TAG..."
+    echo "⬇️  Downloading Corese-GUI (legacy) $VERSION_TAG..."
 
-    if ! RESPONSE=$(curl -s -f "$RELEASE_API/tags/$VERSION_TAG"); then
+    if ! response=$(curl -s -f "$LEGACY_RELEASE_API/tags/$VERSION_TAG"); then
         echo
         echo "❌ Version '$VERSION_TAG' was not found on GitHub."
-        echo
-        echo "Available versions:"
-        list_versions | sed 's/^/ - /'
         echo
         exit 1
     fi
 
-    ASSET_URL=$(echo "$RESPONSE" | grep "browser_download_url" | grep "$JAR_NAME" | cut -d '"' -f 4 | head -n 1)
+    asset_url=$(echo "$response" | jq -r --arg jar "$JAR_NAME" '.assets[] | select(.name == $jar) | .browser_download_url' | head -n 1)
 
-    if [[ -z "$ASSET_URL" ]]; then
+    if [[ -z "$asset_url" ]]; then
         echo "❌ Could not find asset '$JAR_NAME' in release '$VERSION_TAG'."
         exit 1
     fi
 
-    curl --progress-bar -L "$ASSET_URL" -o "$JAR_NAME"
+    curl --progress-bar -L "$asset_url" -o "$JAR_NAME"
     echo
 
-    # Save version information
     echo "$VERSION_TAG" > "$VERSION_FILE"
 
     create_wrapper
@@ -279,61 +601,9 @@ download_and_install() {
         fi
     fi
 
-    echo "✅ Corese-GUI $VERSION_TAG installed successfully!"
+    echo "✅ Corese-GUI legacy $VERSION_TAG installed successfully!"
     echo "🖥️  Launch from applications menu or run: $BIN_NAME"
     echo "📁 Installed in: $INSTALL_DIR"
-    echo
-}
-
-create_wrapper() {
-    cat > "$WRAPPER_PATH" <<EOF
-#!/usr/bin/env bash
-java -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -jar "$INSTALL_DIR/$JAR_NAME" "\$@"
-EOF
-    chmod +x "$WRAPPER_PATH"
-}
-
-add_to_all_available_shell_rcs() {
-    BLOCK_START="# >>> Corese-GUI >>>"
-    BLOCK_END="# <<< Corese-GUI <<<"
-
-    echo "🧩 Adding Corese-GUI to available shell configs..."
-
-    declare -a CONFIG_FILES=()
-
-    command -v bash &>/dev/null && CONFIG_FILES+=("$HOME/.bashrc")
-    command -v zsh &>/dev/null && CONFIG_FILES+=("$HOME/.zshrc")
-    command -v fish &>/dev/null && CONFIG_FILES+=("$HOME/.config/fish/config.fish")
-
-    CONFIG_FILES+=("$HOME/.profile")
-
-    for rc in "${CONFIG_FILES[@]}"; do
-        mkdir -p "$(dirname "$rc")"
-
-        if [[ -f "$rc" && "$(grep -F "$BLOCK_START" "$rc")" ]]; then
-            echo "   ✔ Already added in $(basename "$rc")"
-            continue
-        fi
-
-        echo "   ➕ Updating $(basename "$rc")"
-
-        # Add a newline before the block only if the file doesn't already end with one
-        [ -f "$rc" ] && [ "$(tail -c1 "$rc")" != "" ] && echo "" >> "$rc"
-
-        {
-            echo "$BLOCK_START"
-            if [[ "$rc" == *"fish"* ]]; then
-                echo "set -gx PATH \$PATH $INSTALL_DIR"
-            else
-                echo "export PATH=\"$INSTALL_DIR:\$PATH\""
-            fi
-            echo "$BLOCK_END"
-        } >> "$rc"
-    done
-
-    echo
-    echo "✅ Corese-GUI path added."
-    echo "🔁 Restart your terminal or run: source ~/.bashrc | source ~/.zshrc | exec fish"
     echo
 }
 
@@ -350,29 +620,8 @@ uninstall() {
         fi
     fi
 
-    echo "🗑️  Removing Corese-GUI files..."
-    rm -rf "$INSTALL_DIR"
-    rm -f "$DESKTOP_FILE"
-    rm -f "$ICON_FILE"
-
-    BLOCK_START="# >>> Corese-GUI >>>"
-    BLOCK_END="# <<< Corese-GUI <<<"
-
-    echo "🧹 Cleaning PATH from config files..."
-    declare -a CONFIG_FILES=()
-
-    [ -f "$HOME/.bashrc" ] && CONFIG_FILES+=("$HOME/.bashrc")
-    [ -f "$HOME/.zshrc" ] && CONFIG_FILES+=("$HOME/.zshrc")
-    [ -f "$HOME/.config/fish/config.fish" ] && CONFIG_FILES+=("$HOME/.config/fish/config.fish")
-    [ -f "$HOME/.profile" ] && CONFIG_FILES+=("$HOME/.profile")
-
-    for rc in "${CONFIG_FILES[@]}"; do
-        if [ -f "$rc" ]; then
-            sed -i "/$BLOCK_START/,/$BLOCK_END/d" "$rc"
-            sed -i '/^$/N;/^\n$/D' "$rc"
-            echo "   🧼 Cleaned $(basename "$rc")"
-        fi
-    done
+    remove_legacy_installation_files
+    remove_from_all_shell_rcs
 
     echo
     echo "✅ Corese-GUI has been removed."
@@ -400,7 +649,6 @@ main() {
     case "$choice" in
         1)
             check_internet
-            check_java
             choose_version
             download_and_install
             ;;
@@ -418,40 +666,44 @@ main() {
     esac
 }
 
-# Platform check (Linux only)
 if [[ "$(uname)" == "Darwin" ]]; then
     echo "❌ This installer is intended for Linux only."
     echo "Please use the macOS version instead."
     exit 1
 fi
 
-# Entry point
-if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+check_requirements
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     echo "Usage:"
     echo "  ./install-linux-gui.sh --install <version>       Install specific version"
     echo "  ./install-linux-gui.sh --install-latest          Install latest version"
     echo "  ./install-linux-gui.sh --uninstall               Uninstall Corese-GUI"
     echo
+    echo "Notes:"
+    echo "  - Versions >= 5.0.0 (and dev-prerelease) migrate to the new repository: $NEXT_GEN_GITHUB_REPO"
+    echo "  - Migration guide: $NEXT_GEN_INSTALL_GUIDE_URL"
+    echo
     exit 0
 fi
 
-if [[ "$1" == "--install" && -n "$2" ]]; then
+if [[ "${1:-}" == "--install" && -n "${2:-}" ]]; then
     AUTO_YES=1
     VERSION_TAG="$2"
-    check_java
+    check_internet
     download_and_install
     exit 0
 fi
 
-if [[ "$1" == "--install-latest" ]]; then
+if [[ "${1:-}" == "--install-latest" ]]; then
     AUTO_YES=1
-    VERSION_TAG=$(list_versions | head -n 1)
-    check_java
+    check_internet
+    set_latest_version_from_catalog
     download_and_install
     exit 0
 fi
 
-if [[ "$1" == "--uninstall" ]]; then
+if [[ "${1:-}" == "--uninstall" ]]; then
     AUTO_YES=1
     uninstall
     exit 0

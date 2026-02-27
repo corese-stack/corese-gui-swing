@@ -1,33 +1,25 @@
 # Corese-GUI Windows Installer & Updater
 
-<#
+<#!
 .SYNOPSIS
     Corese-GUI installer for Windows
 
 .DESCRIPTION
-    This PowerShell script installs, updates, or uninstalls the Corese-GUI application on Windows.
-    It checks for Java 21 or higher, prompts the user if Java is not found,
-    and fetches the requested release from GitHub. It also creates desktop shortcuts
-    and optionally adds Corese to the user's PATH.
+    Installs, updates, migrates, or uninstalls Corese-GUI on Windows.
+    - Legacy line (4.x): corese-stack/corese-gui-swing
+    - New line (5.x+):   corese-stack/corese-gui
 
 .PARAMETER Install
-    Installs the specified version of Corese-GUI (e.g., v4.6.0).
+    Installs the specified version (legacy 4.x or new 5.x+).
 
 .PARAMETER InstallLatest
-    Automatically installs the latest available version.
+    Installs the latest available version (prefer 5.x+).
 
 .PARAMETER Uninstall
-    Completely removes Corese-GUI and cleans up the user's PATH.
+    Removes legacy Corese-GUI Swing installation from this machine.
 
 .PARAMETER Help
     Displays usage instructions.
-
-.EXAMPLE
-    powershell -ExecutionPolicy Bypass -File install-windows-gui.ps1 --install v4.6.0
-
-.NOTES
-    This script supports both interactive mode and CLI arguments.
-    It should be executed with appropriate permissions to modify PATH and create shortcuts.
 #>
 
 $InstallDir = "$env:USERPROFILE\.corese-gui"
@@ -35,17 +27,23 @@ $BinName = "corese-gui"
 $JarName = "corese-gui-standalone.jar"
 $WrapperPath = "$InstallDir\$BinName.cmd"
 $VersionFile = "$InstallDir\version.txt"
-$GitHubRepo = "corese-stack/corese-gui-swing"
-$ReleaseApi = "https://api.github.com/repos/$GitHubRepo/releases"
 $DesktopPath = [Environment]::GetFolderPath("Desktop")
 $StartMenuPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
 $IconPath = "$InstallDir\fr.inria.corese.CoreseGui.ico"
 
-# Argument parsing (for iex compatibility)
+$LegacyGitHubRepo = "corese-stack/corese-gui-swing"
+$LegacyReleaseApi = "https://api.github.com/repos/$LegacyGitHubRepo/releases"
+$NextGitHubRepo = "corese-stack/corese-gui"
+$NextReleaseApi = "https://api.github.com/repos/$NextGitHubRepo/releases"
+$NextInstallGuideUrl = "https://corese-stack.github.io/corese-gui/dev-prerelease/install.html"
+$NextReleasesPageUrl = "https://github.com/$NextGitHubRepo/releases"
+$NextPrereleaseTag = "dev-prerelease"
+
 $Install = ""
 $InstallLatest = $false
 $Uninstall = $false
 $Help = $false
+$AutoYes = $false
 
 for ($i = 0; $i -lt $args.Length; $i++) {
     switch ($args[$i]) {
@@ -56,11 +54,11 @@ for ($i = 0; $i -lt $args.Length; $i++) {
             }
         }
         "--install-latest" { $InstallLatest = $true }
-        "--uninstall"      { $Uninstall = $true }
-        "--help"           { $Help = $true }
+        "--uninstall" { $Uninstall = $true }
+        "--help" { $Help = $true }
     }
 }
-$AutoYes = ($Install -or $InstallLatest) -or $Uninstall
+$AutoYes = ($Install -or $InstallLatest -or $Uninstall)
 
 function Write-Centered($text) {
     $width = [console]::WindowWidth
@@ -77,11 +75,58 @@ function Check-Internet {
             throw "No response"
         }
         Write-Host "Internet connection is OK."
-    } catch {
+    }
+    catch {
         Write-Error "No internet connection. Please connect and try again."
         exit 1
     }
     Write-Host ""
+}
+
+function Test-IsSemverTag([string]$Tag) {
+    return $Tag -match '^v?\d+\.\d+\.\d+$'
+}
+
+function Test-IsNextGenTag([string]$Tag) {
+    if ($Tag -eq $NextPrereleaseTag) {
+        return $true
+    }
+
+    if (-not (Test-IsSemverTag $Tag)) {
+        return $false
+    }
+
+    $normalized = $Tag -replace '^v', ''
+    $parts = $normalized.Split('.')
+    if ($parts.Count -lt 1) {
+        return $false
+    }
+
+    $major = 0
+    if (-not [int]::TryParse($parts[0], [ref]$major)) {
+        return $false
+    }
+
+    return $major -ge 5
+}
+
+function Test-IsLegacyTag([string]$Tag) {
+    if (-not (Test-IsSemverTag $Tag)) {
+        return $false
+    }
+
+    $normalized = $Tag -replace '^v', ''
+    $parts = $normalized.Split('.')
+    if ($parts.Count -lt 1) {
+        return $false
+    }
+
+    $major = 0
+    if (-not [int]::TryParse($parts[0], [ref]$major)) {
+        return $false
+    }
+
+    return $major -lt 5
 }
 
 function Check-Java {
@@ -94,12 +139,10 @@ function Check-Java {
     }
 
     $versionOutput = & java -version 2>&1
-    $versionLine = $versionOutput | Where-Object { $_ -match 'version' }
+    $versionLine = $versionOutput | Where-Object { $_ -match 'version' } | Select-Object -First 1
 
     $major = $null
-    if ($versionLine -match 'version "(\d+)(\.(\d+))?') {
-        $major = [int]$Matches[1]
-    } elseif ($versionLine -match "version ""(\d+)") {
+    if ($versionLine -match 'version "(\d+)') {
         $major = [int]$Matches[1]
     }
 
@@ -112,7 +155,8 @@ function Check-Java {
     if ($major -lt 21) {
         Write-Host "Java 21 or higher is required (found: $major)."
         Ask-Java-Install
-    } else {
+    }
+    else {
         Write-Host "Java version $major detected."
     }
     Write-Host ""
@@ -126,29 +170,97 @@ function Ask-Java-Install {
     }
 }
 
-function Get-Versions {
+function Get-LegacyVersions {
     try {
-        $releases = Invoke-RestMethod "$ReleaseApi"
-        return ($releases |
+        $releases = Invoke-RestMethod "$LegacyReleaseApi"
+
+        $tags = $releases |
             Where-Object { -not $_.prerelease -and -not $_.draft } |
-            Select-Object -ExpandProperty tag_name) |
-            Sort-Object { [version]($_ -replace '[^\d.]') } -Descending
-    } catch {
-        Write-Error "Failed to fetch versions from GitHub"
+            Select-Object -ExpandProperty tag_name |
+            Where-Object { Test-IsLegacyTag $_ }
+
+        return $tags |
+            Sort-Object { [version](($_ -replace '^v', '')) } -Descending
+    }
+    catch {
+        Write-Error "Failed to fetch legacy versions from GitHub"
         exit 1
     }
 }
 
+function Get-NextVersions {
+    try {
+        $releases = Invoke-RestMethod "$NextReleaseApi"
+
+        $tags = $releases |
+            Where-Object { -not $_.draft } |
+            Select-Object -ExpandProperty tag_name |
+            Where-Object { Test-IsNextGenTag $_ }
+
+        $seen = @{}
+        $ordered = @()
+        foreach ($tag in $tags) {
+            if (-not $seen.ContainsKey($tag)) {
+                $seen[$tag] = $true
+                $ordered += $tag
+            }
+        }
+        return $ordered
+    }
+    catch {
+        Write-Error "Failed to fetch next-generation versions from GitHub"
+        exit 1
+    }
+}
+
+function Get-VersionCatalog {
+    $catalog = @()
+
+    foreach ($tag in (Get-NextVersions)) {
+        $label = if ($tag -eq $NextPrereleaseTag) {
+            "$tag (preview, new repo)"
+        }
+        else {
+            "$tag (new repo 5.x+)"
+        }
+        $catalog += [PSCustomObject]@{
+            Tag = $tag
+            Source = "next"
+            Label = $label
+        }
+    }
+
+    foreach ($tag in (Get-LegacyVersions)) {
+        $catalog += [PSCustomObject]@{
+            Tag = $tag
+            Source = "legacy"
+            Label = "$tag (legacy Swing 4.x)"
+        }
+    }
+
+    return $catalog
+}
+
+function Resolve-VersionSource([string]$Tag) {
+    if (Test-IsNextGenTag $Tag) {
+        return "next"
+    }
+    if (Test-IsLegacyTag $Tag) {
+        return "legacy"
+    }
+    return ""
+}
+
 function Choose-Version {
-    $versions = Get-Versions
-    if (-not $versions) {
+    $catalog = Get-VersionCatalog
+    if (-not $catalog -or $catalog.Count -eq 0) {
         Write-Error "No versions found."
         exit 1
     }
 
     Write-Host "`nAvailable versions:"
-    for ($i = 0; $i -lt $versions.Count; $i++) {
-        $label = if ($i -eq 0) { "$($versions[$i]) (latest)" } else { $versions[$i] }
+    for ($i = 0; $i -lt $catalog.Count; $i++) {
+        $label = if ($i -eq 0) { "$($catalog[$i].Label) (latest)" } else { $catalog[$i].Label }
         Write-Host "   [$($i + 1)] $label"
     }
 
@@ -159,43 +271,54 @@ function Choose-Version {
             $index = 0
             break
         }
-        elseif ($choice -match '^\d+$' -and [int]$choice -ge 1 -and [int]$choice -le $versions.Count) {
+        elseif ($choice -match '^\d+$' -and [int]$choice -ge 1 -and [int]$choice -le $catalog.Count) {
             $index = [int]$choice - 1
             break
         }
         else {
-            Write-Host "Invalid input. Please enter a number between 1 and $($versions.Count)."
+            Write-Host "Invalid input. Please enter a number between 1 and $($catalog.Count)."
         }
     }
 
+    $selected = $catalog[$index]
     Write-Host ""
-    Write-Host "Selected version: $($versions[$index])"
+    Write-Host "Selected version: $($selected.Tag)"
     Write-Host ""
-    return $versions[$index]
+    return $selected
+}
+
+function Get-LatestVersionFromCatalog {
+    $catalog = Get-VersionCatalog
+    if (-not $catalog -or $catalog.Count -eq 0) {
+        Write-Error "No versions found."
+        exit 1
+    }
+    return $catalog[0]
 }
 
 function Show-Installed-Version {
     Write-Host "Current installation:"
     if (Test-Path "$InstallDir\$JarName") {
         if (Test-Path $VersionFile) {
-            $installedVersion = Get-Content $VersionFile
+            $installedVersion = Get-Content $VersionFile -ErrorAction SilentlyContinue
             Write-Host "   Installed: $installedVersion"
-        } else {
+        }
+        else {
             Write-Host "   Installed: version unknown (legacy installation)"
         }
-    } else {
+    }
+    else {
         Write-Host "   No version currently installed."
     }
     Write-Host ""
 }
 
-function Download-Icon($version) {
+function Download-Icon {
     Write-Host "Downloading application icon..."
 
-    # Try main branch first, fallback to develop
     $iconUrls = @(
-        "https://raw.githubusercontent.com/$GitHubRepo/main/packaging/assets/logo/fr.inria.corese.CoreseGui.ico",
-        "https://raw.githubusercontent.com/$GitHubRepo/develop/packaging/assets/logo/fr.inria.corese.CoreseGui.ico"
+        "https://raw.githubusercontent.com/$LegacyGitHubRepo/main/packaging/assets/logo/fr.inria.corese.CoreseGui.ico",
+        "https://raw.githubusercontent.com/$LegacyGitHubRepo/develop/packaging/assets/logo/fr.inria.corese.CoreseGui.ico"
     )
 
     $iconDownloaded = $false
@@ -205,14 +328,14 @@ function Download-Icon($version) {
             $iconDownloaded = $true
             Write-Host "   Icon downloaded successfully"
             break
-        } catch {
-            # Continue to next URL
+        }
+        catch {
+            # try next URL
         }
     }
 
     if (-not $iconDownloaded) {
         Write-Host "   Could not download icon, using fallback"
-        # Create a simple fallback
         New-Item -ItemType File -Path "$InstallDir\fr.inria.corese.CoreseGui.ico" -Force | Out-Null
     }
 }
@@ -228,11 +351,11 @@ function Create-Shortcuts {
     $WshShell = New-Object -ComObject WScript.Shell
 
     foreach ($target in @(
-        @{Path="$DesktopPath\Corese-GUI.lnk"},
-        @{Path="$StartMenuPath\Corese-GUI.lnk"}
-    )) {
+            @{ Path = "$DesktopPath\Corese-GUI.lnk" },
+            @{ Path = "$StartMenuPath\Corese-GUI.lnk" }
+        )) {
         $s = $WshShell.CreateShortcut($target.Path)
-        $s.TargetPath  = $javaExe
+        $s.TargetPath = $javaExe
         $s.Arguments = "-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dfile.encoding=UTF-8 -jar `"$InstallDir\$JarName`""
         $s.WorkingDirectory = $InstallDir
         $s.Description = "Corese-GUI - Graphical Semantic Web Platform"
@@ -246,23 +369,83 @@ function Create-Shortcuts {
     Write-Host "   Desktop and Start-Menu shortcuts created."
 }
 
+function Add-ToPath {
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($null -eq $userPath) {
+        $userPath = ""
+    }
 
-function Download-And-Install($version) {
+    if ($userPath -notmatch [regex]::Escape($InstallDir)) {
+        Write-Host "Adding Corese-GUI to PATH..."
+        if ([string]::IsNullOrWhiteSpace($userPath)) {
+            $newPath = $InstallDir
+        }
+        else {
+            $newPath = "$userPath;$InstallDir"
+        }
+        [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+        Write-Host "   Added to PATH (User)"
+        Write-Host "   Restart your terminal to use 'corese-gui'"
+    }
+    else {
+        Write-Host "   Already in PATH"
+    }
+}
+
+function Remove-LegacyInstallation([switch]$Silent) {
+    if (-not $Silent -and -not $AutoYes) {
+        $confirm = Read-Host "`nThis will remove legacy Corese-GUI Swing 4.x files. Continue? [y/N]"
+        if ($confirm -notmatch '^[Yy]') {
+            Write-Host "Cancelled."
+            return $false
+        }
+    }
+
+    Write-Host "`nRemoving legacy Corese-GUI files..."
+    if (Test-Path $InstallDir) {
+        Remove-Item -Recurse -Force $InstallDir
+        Write-Host "   Removed: $InstallDir"
+    }
+
+    foreach ($shortcut in @(
+            "$DesktopPath\Corese-GUI.lnk",
+            "$StartMenuPath\Corese-GUI.lnk"
+        )) {
+        if (Test-Path $shortcut) {
+            Remove-Item $shortcut -Force
+            Write-Host "   Removed shortcut: $(Split-Path $shortcut -Leaf)"
+        }
+    }
+
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($null -ne $userPath -and $userPath -match [regex]::Escape($InstallDir)) {
+        $newPath = (($userPath -split ';') | Where-Object { $_ -and $_ -ne $InstallDir }) -join ';'
+        [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+        Write-Host "   Removed from PATH (User)"
+    }
+
+    Write-Host ""
+    return $true
+}
+
+function Install-LegacyVersion([string]$VersionTag) {
+    if (-not (Test-IsLegacyTag $VersionTag)) {
+        Write-Host "Error: '$VersionTag' is not a supported legacy 4.x version." -ForegroundColor Red
+        exit 1
+    }
+
+    Check-Java
+
     if (-not (Test-Path $InstallDir)) {
         New-Item -ItemType Directory -Path $InstallDir | Out-Null
     }
 
-    Write-Host "`nDownloading Corese-GUI $version..."
+    Write-Host "`nDownloading Corese-GUI (legacy) $VersionTag..."
     try {
-        $release = Invoke-RestMethod "$ReleaseApi/tags/$version" -ErrorAction Stop
-    } catch {
-        Write-Host ""
-        Write-Host "Error: the version '$version' was not found on GitHub." -ForegroundColor Red
-        $allVersions = Get-Versions
-        Write-Host "`nAvailable versions are:"
-        foreach ($v in $allVersions) {
-            Write-Host " - $v"
-        }
+        $release = Invoke-RestMethod "$LegacyReleaseApi/tags/$VersionTag" -ErrorAction Stop
+    }
+    catch {
+        Write-Host "Error: the legacy version '$VersionTag' was not found on GitHub." -ForegroundColor Red
         exit 1
     }
 
@@ -271,31 +454,32 @@ function Download-And-Install($version) {
         Select-Object -ExpandProperty browser_download_url -ErrorAction SilentlyContinue
 
     if (-not $assetUrl) {
-        Write-Warning "Could not find asset '$JarName' in release '$version'."
+        Write-Warning "Could not find asset '$JarName' in release '$VersionTag'."
         exit 1
     }
 
     if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
         & curl.exe -L -# -o "$InstallDir\$JarName" $assetUrl
-    } else {
+    }
+    else {
         Invoke-WebRequest $assetUrl -OutFile "$InstallDir\$JarName"
     }
     Write-Host ""
 
-    # Save version information
-    Set-Content -Path $VersionFile -Value $version -Encoding UTF8
+    Set-Content -Path $VersionFile -Value $VersionTag -Encoding UTF8
 
     Write-Host "Creating launcher script..."
     $launcherContent = "@echo off`njava -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dfile.encoding=UTF-8 -jar `"$InstallDir\$JarName`" %*"
     Set-Content -Path $WrapperPath -Value $launcherContent -Encoding ASCII
     Write-Host "   Wrapper created: $WrapperPath"
 
-    Download-Icon $version
+    Download-Icon
     Create-Shortcuts
 
-    if ($Global:AutoYes) {
+    if ($AutoYes) {
         Add-ToPath
-    } else {
+    }
+    else {
         $addToPath = Read-Host "`nAdd Corese-GUI to PATH for command-line usage? [Y/n]"
         if ($addToPath -notmatch '^[Nn]') {
             Add-ToPath
@@ -303,78 +487,136 @@ function Download-And-Install($version) {
     }
 
     Write-Host ""
-    Write-Host "Corese-GUI $version installed successfully!"
+    Write-Host "Corese-GUI legacy $VersionTag installed successfully!"
     Write-Host "Launch from Desktop/Start Menu or run: $BinName"
     Write-Host "Installed in: $InstallDir"
     Write-Host ""
 }
 
-function Add-ToPath {
-    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
-    if ($userPath -notmatch [regex]::Escape($InstallDir)) {
-        Write-Host "Adding Corese-GUI to PATH..."
-        $newPath = "$userPath;$InstallDir"
-        [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
-        Write-Host "   Added to PATH (User)"
-        Write-Host "   Restart your terminal to use 'corese-gui'"
-    } else {
-        Write-Host "   Already in PATH"
-    }
+function Select-NextWindowsAsset($Release) {
+    $arch = "x64"
+
+    $asset = $Release.assets | Where-Object { $_.name -match "windows-$arch\.exe$" } | Select-Object -First 1
+    if ($asset) { return $asset }
+
+    $asset = $Release.assets | Where-Object { $_.name -match "windows-$arch-portable\.zip$" } | Select-Object -First 1
+    if ($asset) { return $asset }
+
+    $asset = $Release.assets | Where-Object { $_.name -match "standalone-windows-$arch\.jar$" } | Select-Object -First 1
+    if ($asset) { return $asset }
+
+    return $null
 }
 
-function Uninstall {
-    if (-not $Global:AutoYes) {
-        $confirm = Read-Host "`nThis will remove Corese-GUI from your system. Are you sure? [y/N]"
-        if ($confirm -notmatch '^[Yy]') {
-            Write-Host "Uninstall cancelled."
+function Migrate-ToNextGen([string]$VersionTag) {
+    if (-not (Test-IsNextGenTag $VersionTag)) {
+        Write-Host "Error: '$VersionTag' is not a supported Corese-GUI 5.x+ version." -ForegroundColor Red
+        exit 1
+    }
+
+    Write-Host "Selected version '$VersionTag' belongs to the new Corese-GUI repository (5.x+)."
+
+    if (-not $AutoYes) {
+        $confirm = Read-Host "Continue migration to the new repository? [Y/n]"
+        if ($confirm -match '^[Nn]') {
+            Write-Host "Migration cancelled."
             return
         }
     }
 
-    Write-Host "`nRemoving Corese-GUI files..."
-    if (Test-Path $InstallDir) {
-        Remove-Item -Recurse -Force $InstallDir
-        Write-Host "   Removed: $InstallDir"
-    }
+    if (Test-Path "$InstallDir\$JarName") {
+        $removeLegacy = $true
+        if (-not $AutoYes) {
+            $answer = Read-Host "Uninstall legacy 4.x Swing installation from this PC now? [Y/n]"
+            if ($answer -match '^[Nn]') {
+                $removeLegacy = $false
+            }
+        }
 
-    # Remove shortcuts
-    $shortcuts = @(
-        "$DesktopPath\Corese-GUI.lnk",
-        "$StartMenuPath\Corese-GUI.lnk"
-    )
-
-    foreach ($shortcut in $shortcuts) {
-        if (Test-Path $shortcut) {
-            Remove-Item $shortcut -Force
-            Write-Host "   Removed shortcut: $(Split-Path $shortcut -Leaf)"
+        if ($removeLegacy) {
+            [void](Remove-LegacyInstallation -Silent)
+            Write-Host "Legacy installation removed."
+        }
+        else {
+            Write-Host "Legacy installation kept."
         }
     }
 
-    # Remove from PATH
-    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
-    if ($userPath -match [regex]::Escape($InstallDir)) {
-        $newPath = ($userPath -split ';') -ne $InstallDir -join ';'
-        [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
-        Write-Host "   Removed from PATH (User)"
+    try {
+        $release = Invoke-RestMethod "$NextReleaseApi/tags/$VersionTag" -ErrorAction Stop
+    }
+    catch {
+        Write-Host "`nError: version '$VersionTag' was not found in the new repository." -ForegroundColor Red
+        Write-Host "Open release list: $NextReleasesPageUrl"
+        Start-Process $NextInstallGuideUrl | Out-Null
+        return
+    }
+
+    $releaseUrl = if ($release.html_url) { $release.html_url } else { $NextReleasesPageUrl }
+    $asset = Select-NextWindowsAsset $release
+
+    Write-Host ""
+    Write-Host "Continue with Corese-GUI 5.x+:"
+    Write-Host " - Install guide: $NextInstallGuideUrl"
+    Write-Host " - Release page:  $releaseUrl"
+
+    if ($asset) {
+        $targetPath = Join-Path $env:TEMP $asset.name
+        Write-Host "Downloading recommended asset: $($asset.name)"
+        Invoke-WebRequest $asset.browser_download_url -OutFile $targetPath
+        Write-Host "Downloaded to: $targetPath"
+
+        if ($asset.name -match '\.exe$') {
+            if ($AutoYes) {
+                Start-Process -FilePath $targetPath | Out-Null
+            }
+            else {
+                $runInstaller = Read-Host "Run this installer now? [Y/n]"
+                if ($runInstaller -notmatch '^[Nn]') {
+                    Start-Process -FilePath $targetPath | Out-Null
+                }
+            }
+        }
+    }
+    else {
+        Write-Host "No Windows asset was auto-selected for this release."
+    }
+
+    try {
+        Start-Process $NextInstallGuideUrl | Out-Null
+    }
+    catch {
+        # Ignore browser launch failures
     }
 
     Write-Host ""
-    Write-Host "Corese-GUI has been uninstalled."
-    Write-Host ""
+}
+
+function Download-And-Install([string]$VersionTag, [string]$Source) {
+    if ($Source -eq "next") {
+        Migrate-ToNextGen $VersionTag
+    }
+    elseif ($Source -eq "legacy") {
+        Install-LegacyVersion $VersionTag
+    }
+    else {
+        Write-Host "Unsupported version '$VersionTag'." -ForegroundColor Red
+        exit 1
+    }
 }
 
 function Main {
     Write-Host ""
-    Write-Centered "-------------------------------------"
-    Write-Centered "   Corese-GUI - Windows Installer"
-    Write-Centered "-------------------------------------"
+    Write-Centered "-----------------------------------------------"
+    Write-Centered "   Corese-GUI - Windows Installer/Migration"
+    Write-Centered "-----------------------------------------------"
     Write-Host ""
 
     Show-Installed-Version
 
     Write-Host "-------------- Menu --------------"
-    Write-Host "| [1] Install or update          |"
-    Write-Host "| [2] Uninstall                  |"
+    Write-Host "| [1] Install or migrate         |"
+    Write-Host "| [2] Uninstall legacy 4.x       |"
     Write-Host "| [3] Exit                       |"
     Write-Host "----------------------------------"
 
@@ -382,11 +624,12 @@ function Main {
     switch ($opt) {
         1 {
             Check-Internet
-            Check-Java
-            $v = Choose-Version
-            Download-And-Install $v
+            $selected = Choose-Version
+            Download-And-Install $selected.Tag $selected.Source
         }
-        2 { Uninstall }
+        2 {
+            [void](Remove-LegacyInstallation)
+        }
         3 { Write-Host "Goodbye!" }
         default {
             Write-Host "Invalid option."
@@ -395,33 +638,37 @@ function Main {
     }
 }
 
-# Handle command line arguments
 if ($Help) {
     Write-Host "Usage:"
     Write-Host "  install-windows-gui.ps1 --install [version]       Install specific version"
-    Write-Host "  install-windows-gui.ps1 --install-latest          Install latest version"
-    Write-Host "  install-windows-gui.ps1 --uninstall               Uninstall Corese-GUI"
+    Write-Host "  install-windows-gui.ps1 --install-latest          Install latest version (prefer 5.x+)"
+    Write-Host "  install-windows-gui.ps1 --uninstall               Uninstall legacy Corese-GUI 4.x"
     Write-Host "  install-windows-gui.ps1 --help                    Show this help"
+    Write-Host ""
+    Write-Host "Migration guide: $NextInstallGuideUrl"
     exit
 }
 
 if ($Install) {
     Check-Internet
-    Check-Java
-    Download-And-Install $Install
+    $source = Resolve-VersionSource $Install
+    if (-not $source) {
+        Write-Host "Unsupported version '$Install'. Use a semantic tag (for example v4.6.2 or v5.0.0) or dev-prerelease." -ForegroundColor Red
+        exit 1
+    }
+    Download-And-Install $Install $source
     exit
 }
 
 if ($InstallLatest) {
     Check-Internet
-    Check-Java
-    $v = (Get-Versions)[0]
-    Download-And-Install $v
+    $selected = Get-LatestVersionFromCatalog
+    Download-And-Install $selected.Tag $selected.Source
     exit
 }
 
 if ($Uninstall) {
-    Uninstall
+    [void](Remove-LegacyInstallation -Silent)
     exit
 }
 
