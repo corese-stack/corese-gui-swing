@@ -259,6 +259,33 @@ reveal_downloaded_file() {
     fi
 }
 
+open_downloaded_asset() {
+    local file_path="$1"
+    if command -v open >/dev/null 2>&1; then
+        open "$file_path" >/dev/null 2>&1 && return 0
+    fi
+    return 1
+}
+
+prompt_open_downloaded_asset() {
+    local file_path="$1"
+
+    if [[ "$AUTO_YES" -eq 1 ]]; then
+        return
+    fi
+
+    read -rp "→ Open the downloaded installer/package now? [Y/n] " answer
+    if [[ "$answer" =~ ^[Nn]$ ]]; then
+        return
+    fi
+
+    if open_downloaded_asset "$file_path"; then
+        echo "✅ Opened: $file_path"
+    else
+        echo "⚠️  Could not open the file automatically."
+    fi
+}
+
 fetch_next_release_json() {
     local tag="$1"
     curl -fsSL "$NEXT_RELEASE_API/tags/$tag"
@@ -434,6 +461,7 @@ migrate_to_next_gen_version() {
         echo "   - Downloaded to: $download_path"
         echo "📂 Opening Finder on downloaded file..."
         reveal_downloaded_file "$download_path"
+        prompt_open_downloaded_asset "$download_path"
         echo "➡️  Please run the downloaded installer/package."
     fi
     echo

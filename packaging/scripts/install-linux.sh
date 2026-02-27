@@ -465,6 +465,35 @@ open_file_manager_for_path() {
     fi
 }
 
+open_downloaded_asset() {
+    local path="$1"
+    if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$path" >/dev/null 2>&1 && return 0
+    fi
+    return 1
+}
+
+prompt_open_downloaded_asset() {
+    local path="$1"
+
+    if [[ "$AUTO_YES" -eq 1 ]]; then
+        return
+    fi
+
+    echo -n "→ Open the downloaded installer/package now? [Y/n] "
+    local answer
+    read -r answer
+    if [[ "$answer" =~ ^[Nn]$ ]]; then
+        return
+    fi
+
+    if open_downloaded_asset "$path"; then
+        echo "✅ Opened: $path"
+    else
+        echo "⚠️  Could not open the file automatically."
+    fi
+}
+
 detect_linux_arch() {
     case "$(uname -m)" in
         x86_64|amd64)
@@ -587,6 +616,7 @@ redirect_to_next_gen_release() {
         echo "✅ Download complete: $download_path"
         echo "📂 Opening download folder..."
         open_file_manager_for_path "$download_path"
+        prompt_open_downloaded_asset "$download_path"
         echo "➡️  Please run the downloaded installer/package."
     else
         echo "⚠️  No Linux asset detected automatically for your architecture."
