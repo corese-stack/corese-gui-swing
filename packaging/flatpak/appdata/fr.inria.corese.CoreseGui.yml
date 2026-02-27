@@ -32,20 +32,18 @@ modules:
     sources:
       # jar file from GitHub release
       - type: file
-        # url:
-        # sha256:
+        url: https://github.com/corese-stack/corese-gui-swing/releases/download/v4.6.2/corese-gui-standalone.jar
         x-checker-data:
           type: json
-          url: https://api.github.com/repos/corese-stack/corese-gui-swing/releases/latest
+          url: https://api.github.com/repos/corese-stack/corese-gui-swing/releases/tags/v4.6.2
           version-query: .tag_name
           url-query: '"https://github.com/corese-stack/corese-gui-swing/releases/download/" + $version + "/corese-gui-standalone.jar"'
 
       # appdata, desktop and icon files from GitHub repository
       - type: archive
-        # url:
-        # sha256:
+        url: https://github.com/corese-stack/corese-gui-swing/archive/refs/tags/v4.6.2.tar.gz
         x-checker-data:
           type: json
-          url: https://api.github.com/repos/corese-stack/corese-gui-swing/releases/latest
+          url: https://api.github.com/repos/corese-stack/corese-gui-swing/releases/tags/v4.6.2
           version-query: .tag_name
           url-query: '"https://github.com/corese-stack/corese-gui-swing/archive/refs/tags/" + $version + ".tar.gz"'

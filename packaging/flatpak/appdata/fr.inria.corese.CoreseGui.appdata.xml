@@ -142,6 +142,20 @@
 
     <releases>
 
+        <release version="4.6.2" date="2026-02-27">
+            <description>
+            <ul>
+                <li>Added an in-app update notice to guide migration toward Corese-GUI 5.x.</li>
+                <li>Updated install scripts to handle migration to the new repository for versions 5.0.0 and above.</li>
+                <li>Marked this 4.x line as legacy and linked users to the new documentation and release channels.</li>
+
+                <li xml:lang="fr">Ajout d'une notification dans l'application pour guider la migration vers Corese-GUI 5.x.</li>
+                <li xml:lang="fr">Mise à jour des scripts d'installation pour gérer la migration vers le nouveau dépôt pour les versions 5.0.0 et supérieures.</li>
+                <li xml:lang="fr">Marquage de cette branche 4.x comme legacy avec des liens vers la nouvelle documentation et les nouvelles releases.</li>
+            </ul>
+            </description>
+        </release>
+
         <release version="4.6.1" date="2025-10-10">
             <description>
             <ul>

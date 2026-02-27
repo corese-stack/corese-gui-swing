@@ -28,12 +28,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
@@ -49,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
@@ -60,6 +64,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import fr.inria.corese.core.Graph;
@@ -105,7 +110,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     private static final int LOAD = 1;
-    private static final String TITLE = "Corese 4.6.1 - Inria UCA I3S - 2025-10-10";
+    private static final String TITLE = "Corese 4.6.2 - Inria UCA I3S - 2026-02-27";
     // Declare the tab container
     protected static JTabbedPane conteneurOnglets;
     // Counter for the number of query tabs created
@@ -267,6 +272,16 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final String RQ = ".rq";
     private static final String URI_CORESE = "http://project.inria.fr/corese";
     private static final String URI_GRAPHSTREAM = "http://graphstream-project.org/";
+    private static final String NEXT_GEN_INSTALL_URL =
+            "https://corese-stack.github.io/corese-gui/dev-prerelease/install.html";
+    private static final String NEXT_GEN_RELEASES_URL =
+            "https://github.com/corese-stack/corese-gui/releases";
+    private static final String NEXT_GEN_RELEASES_LATEST_API_URL =
+            "https://api.github.com/repos/corese-stack/corese-gui/releases/latest";
+    private static final String UPDATE_USER_AGENT = "corese-gui-swing-legacy-migration";
+    private static final String PREF_UPDATE_NODE = "/fr/inria/corese/gui/update";
+    private static final String PREF_MIGRATION_NOTICE_LAST_TAG = "legacyMigrationNotice.lastTag";
+    private static final int NEXT_GEN_MAJOR_VERSION = 5;
     int nbTabs = 0;
 
     // Zoom settings
@@ -277,6 +292,16 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final float ZOOM_STEP = 0.1f;
 
     Command cmd;
+
+    private static final class NextGenRelease {
+        private final String tagName;
+        private final String htmlUrl;
+
+        private NextGenRelease(String tagName, String htmlUrl) {
+            this.tagName = tagName;
+            this.htmlUrl = htmlUrl;
+        }
+    }
 
     static {
         // false: load files into named graphs
@@ -460,6 +485,9 @@ public class MainFrame extends JFrame implements ActionListener {
                 "Interface initialized with zoom at "
                         + String.format("%.0f", currentZoomFactor * 100)
                         + "%\n");
+
+        // The 4.x line is now legacy: notify users when a 5.x release is available.
+        scheduleLegacyMigrationUpdateNotice();
     }
 
     public void focusMessagePanel() {
@@ -1653,6 +1681,143 @@ public class MainFrame extends JFrame implements ActionListener {
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error(e);
             }
+        }
+    }
+
+    private void scheduleLegacyMigrationUpdateNotice() {
+        Thread updateThread =
+                new Thread(
+                        () -> {
+                            NextGenRelease nextGenRelease = fetchLatestNextGenRelease();
+                            if (nextGenRelease == null
+                                    || !isNextGenRelease(nextGenRelease.tagName)
+                                    || !shouldShowMigrationNotice(nextGenRelease.tagName)) {
+                                return;
+                            }
+
+                            SwingUtilities.invokeLater(
+                                    () -> showLegacyMigrationDialog(nextGenRelease));
+                        },
+                        "corese-gui-legacy-migration-check");
+        updateThread.setDaemon(true);
+        updateThread.start();
+    }
+
+    private NextGenRelease fetchLatestNextGenRelease() {
+        HttpURLConnection connection = null;
+        try {
+            connection =
+                    (HttpURLConnection) new URL(NEXT_GEN_RELEASES_LATEST_API_URL).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/vnd.github+json");
+            connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28");
+            connection.setRequestProperty("User-Agent", UPDATE_USER_AGENT);
+            connection.setConnectTimeout(4000);
+            connection.setReadTimeout(4000);
+
+            int statusCode = connection.getResponseCode();
+            if (statusCode < 200 || statusCode >= 300) {
+                LOGGER.debug("Migration update check skipped (HTTP {}).", statusCode);
+                return null;
+            }
+
+            StringBuilder payload = new StringBuilder();
+            try (BufferedReader reader =
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    connection.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    payload.append(line);
+                }
+            }
+
+            JSONObject json = new JSONObject(payload.toString());
+            String tagName = json.optString("tag_name", "").trim();
+            if (tagName.isBlank()) {
+                return null;
+            }
+
+            String htmlUrl = json.optString("html_url", NEXT_GEN_RELEASES_URL).trim();
+            if (htmlUrl.isBlank()) {
+                htmlUrl = NEXT_GEN_RELEASES_URL;
+            }
+
+            return new NextGenRelease(tagName, htmlUrl);
+        } catch (Exception e) {
+            LOGGER.debug("Migration update check failed.", e);
+            return null;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    private boolean isNextGenRelease(String tagName) {
+        String normalizedTag = tagName == null ? "" : tagName.trim();
+        if (normalizedTag.isBlank()) {
+            return false;
+        }
+
+        if (normalizedTag.startsWith("v") || normalizedTag.startsWith("V")) {
+            normalizedTag = normalizedTag.substring(1);
+        }
+
+        String numericPart = normalizedTag.split("-", 2)[0];
+        String[] segments = numericPart.split("\\.");
+        if (segments.length == 0) {
+            return false;
+        }
+
+        try {
+            return Integer.parseInt(segments[0]) >= NEXT_GEN_MAJOR_VERSION;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean shouldShowMigrationNotice(String releaseTag) {
+        Preferences preferences = Preferences.userRoot().node(PREF_UPDATE_NODE);
+        String lastSeenTag = preferences.get(PREF_MIGRATION_NOTICE_LAST_TAG, "");
+        return !releaseTag.equalsIgnoreCase(lastSeenTag);
+    }
+
+    private void markMigrationNoticeAsSeen(String releaseTag) {
+        Preferences preferences = Preferences.userRoot().node(PREF_UPDATE_NODE);
+        preferences.put(PREF_MIGRATION_NOTICE_LAST_TAG, releaseTag);
+    }
+
+    private void showLegacyMigrationDialog(NextGenRelease release) {
+        markMigrationNoticeAsSeen(release.tagName);
+
+        String htmlMessage =
+                "<html><body style='width: 460px'>"
+                        + "<h3>Corese-GUI 5.x is available</h3>"
+                        + "<p>You are currently using the legacy Corese-GUI 4.x line (corese-gui-swing).</p>"
+                        + "<p>Latest new release detected: <b>"
+                        + release.tagName
+                        + "</b>.</p>"
+                        + "<p>When migrating to 5.x, uninstall the legacy 4.x installation first.</p>"
+                        + "<p>You can open the migration guide or go directly to the new release page.</p>"
+                        + "</body></html>";
+
+        Object[] options = {"Open Install Guide", "Open Releases", "Later"};
+        int choice =
+                JOptionPane.showOptionDialog(
+                        this,
+                        htmlMessage,
+                        "Corese-GUI Update Available",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+
+        if (choice == 0) {
+            browse(NEXT_GEN_INSTALL_URL);
+        } else if (choice == 1) {
+            browse(release.htmlUrl);
         }
     }
 
