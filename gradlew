@@ -141,6 +141,29 @@ else
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
     fi
+
+    # Gradle 8.10.1 + Kotlin DSL can fail on some recent Java version strings (for example 25.0.2)
+    # while evaluating settings/build scripts. When JAVA_HOME is not explicitly set, prefer a local
+    # Java 21 runtime if available.
+    CURRENT_JAVA_VERSION=$( java -version 2>&1 | sed -n 's/.*version "\(.*\)".*/\1/p' | head -n 1 )
+    case "$CURRENT_JAVA_VERSION" in
+      25.* | 26.* | 27.*)
+        for JAVA21_HOME_CANDIDATE in \
+            /usr/lib/jvm/java-21-openjdk \
+            /usr/lib/jvm/java-21 \
+            /usr/lib/jvm/jre-21-openjdk \
+            /usr/lib/jvm/jre-21
+        do
+            if [ -x "$JAVA21_HOME_CANDIDATE/bin/java" ] ; then
+                JAVA_HOME="$JAVA21_HOME_CANDIDATE"
+                export JAVA_HOME
+                JAVACMD="$JAVA_HOME/bin/java"
+                warn "Using Java 21 from $JAVA_HOME for Gradle compatibility."
+                break
+            fi
+        done
+        ;;
+    esac
 fi
 
 # Increase the maximum file descriptors if we can.

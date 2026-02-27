@@ -272,8 +272,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final String RQ = ".rq";
     private static final String URI_CORESE = "http://project.inria.fr/corese";
     private static final String URI_GRAPHSTREAM = "http://graphstream-project.org/";
-    private static final String NEXT_GEN_INSTALL_URL =
-            "https://corese-stack.github.io/corese-gui/";
+    private static final String NEXT_GEN_INSTALL_URL = "https://corese-stack.github.io/corese-gui/";
     private static final String NEXT_GEN_RELEASES_URL =
             "https://github.com/corese-stack/corese-gui/releases";
     private static final String NEXT_GEN_RELEASES_LATEST_API_URL =
