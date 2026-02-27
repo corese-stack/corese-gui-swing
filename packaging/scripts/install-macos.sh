@@ -21,6 +21,19 @@ AUTO_YES=0
 VERSION_TAG=""
 VERSION_SOURCE=""
 
+require_command() {
+    local cmd="$1"
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "❌ Missing required command: $cmd"
+        exit 1
+    fi
+}
+
+check_requirements() {
+    require_command curl
+    require_command jq
+}
+
 check_internet() {
     echo "🌐 Checking internet connection..."
     if ! curl -s --max-time 5 https://github.com/ > /dev/null; then
@@ -79,11 +92,14 @@ list_next_versions() {
     )
 
     local has_dev=0
-    declare -A seen=()
+    local seen_tags="|"
     while IFS=$'\t' read -r tag _published; do
         [[ -z "${tag:-}" ]] && continue
-        [[ -n "${seen[$tag]:-}" ]] && continue
-        seen[$tag]=1
+
+        if [[ "$seen_tags" == *"|$tag|"* ]]; then
+            continue
+        fi
+        seen_tags="${seen_tags}${tag}|"
 
         if [[ "$tag" == "dev-prerelease" ]]; then
             has_dev=1
@@ -107,11 +123,18 @@ list_next_versions() {
 choose_version() {
     echo "📦 Available versions:"
 
+    local -a LEGACY_VERSIONS=()
+    local -a NEXT_VERSIONS=()
     VERSIONS=()
     VERSION_SOURCES=()
 
-    mapfile -t LEGACY_VERSIONS < <(list_legacy_versions)
-    mapfile -t NEXT_VERSIONS < <(list_next_versions)
+    while IFS= read -r tag; do
+        [[ -n "${tag:-}" ]] && LEGACY_VERSIONS+=("$tag")
+    done < <(list_legacy_versions)
+
+    while IFS= read -r tag; do
+        [[ -n "${tag:-}" ]] && NEXT_VERSIONS+=("$tag")
+    done < <(list_next_versions)
 
     local idx=1
 
@@ -480,6 +503,8 @@ if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     echo "  ./install-macos.sh --uninstall               Uninstall legacy Corese-GUI 4.x"
     exit 0
 fi
+
+check_requirements
 
 if [[ "${1:-}" == "--install" && -n "${2:-}" ]]; then
     AUTO_YES=1
