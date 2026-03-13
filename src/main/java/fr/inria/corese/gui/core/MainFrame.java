@@ -36,7 +36,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
@@ -278,8 +277,6 @@ public class MainFrame extends JFrame implements ActionListener {
     private static final String NEXT_GEN_RELEASES_LATEST_API_URL =
             "https://api.github.com/repos/corese-stack/corese-gui/releases/latest";
     private static final String UPDATE_USER_AGENT = "corese-gui-swing-legacy-migration";
-    private static final String PREF_UPDATE_NODE = "/fr/inria/corese/gui/update";
-    private static final String PREF_MIGRATION_NOTICE_LAST_TAG = "legacyMigrationNotice.lastTag";
     private static final int NEXT_GEN_MAJOR_VERSION = 5;
     int nbTabs = 0;
 
@@ -1689,8 +1686,7 @@ public class MainFrame extends JFrame implements ActionListener {
                         () -> {
                             NextGenRelease nextGenRelease = fetchLatestNextGenRelease();
                             if (nextGenRelease == null
-                                    || !isNextGenRelease(nextGenRelease.tagName)
-                                    || !shouldShowMigrationNotice(nextGenRelease.tagName)) {
+                                    || !isNextGenRelease(nextGenRelease.tagName)) {
                                 return;
                             }
 
@@ -1776,20 +1772,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
-    private boolean shouldShowMigrationNotice(String releaseTag) {
-        Preferences preferences = Preferences.userRoot().node(PREF_UPDATE_NODE);
-        String lastSeenTag = preferences.get(PREF_MIGRATION_NOTICE_LAST_TAG, "");
-        return !releaseTag.equalsIgnoreCase(lastSeenTag);
-    }
-
-    private void markMigrationNoticeAsSeen(String releaseTag) {
-        Preferences preferences = Preferences.userRoot().node(PREF_UPDATE_NODE);
-        preferences.put(PREF_MIGRATION_NOTICE_LAST_TAG, releaseTag);
-    }
-
     private void showLegacyMigrationDialog(NextGenRelease release) {
-        markMigrationNoticeAsSeen(release.tagName);
-
         String htmlMessage =
                 "<html><body style='width: 460px'>"
                         + "<h3>Corese-GUI 5.x is available</h3>"
