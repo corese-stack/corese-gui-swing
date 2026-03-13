@@ -1,6 +1,18 @@
 <!-- markdownlint-disable MD024 -->
 # Corese Changelog
 
+## Version 4.6.2 - 2026-03-13
+
+### Added
+
+- Added an in-app migration notification to guide users from legacy 4.x to the new Corese-GUI 5.x repository.
+- Updated install scripts to handle migration flows toward `corese-stack/corese-gui` for versions `>= 5.0.0`.
+
+### Changed
+
+- Marked this repository/documentation line as legacy and prepared transition links toward the new repository.
+- Updated documentation version switcher generation to support navigation between legacy 4.x docs and new 5.x docs.
+
 ## Version 4.6.1 - 2025-10-10
 
 ### Fixed
