@@ -142,7 +142,7 @@
 
     <releases>
 
-        <release version="4.6.2" date="2026-02-27">
+        <release version="4.6.2" date="2026-03-13">
             <description>
             <ul>
                 <li>Added an in-app update notice to guide migration toward Corese-GUI 5.x.</li>

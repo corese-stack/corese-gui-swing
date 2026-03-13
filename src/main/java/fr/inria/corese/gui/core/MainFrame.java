@@ -110,7 +110,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     private static final int LOAD = 1;
-    private static final String TITLE = "Corese 4.6.2 - Inria UCA I3S - 2026-02-27";
+    private static final String TITLE = "Corese 4.6.2 - Inria UCA I3S - 2026-03-13";
     // Declare the tab container
     protected static JTabbedPane conteneurOnglets;
     // Counter for the number of query tabs created
